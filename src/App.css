@@ -1,0 +1,65 @@
+.p1 {
+  font-size: 1.5rem;
+  line-height: 1.416666666666667;
+}
+.p2 {
+  font-size: 1.32rem;
+  line-height: 1.476190476190476;
+}
+.p3 {
+  font-size: 1.13rem;
+  line-height: 1.555555555555556;
+}
+.p4 {
+  font-size: 1rem;
+  line-height: 1.625;
+}
+.p5 {
+  font-size: 0.88rem;
+  line-height: 1.714285714285714;
+}
+.p6 {
+  font-size: 0.75rem;
+  line-height: 1.833333333333333;
+}
+.clear {
+  clear: both;
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+html {
+  font-size: 16px;
+  line-height: 22px;
+}
+html,
+body {
+  height: 100%;
+}
+body {
+  font-size: 0.88rem;
+  line-height: 1.714285714285714;
+  text-size-adjust: none;
+  position: relative;
+}
+li {
+  list-style-position: inside;
+}
+a,
+a:visited {
+  color: $col-matisse;
+}
+.hide {
+  display: none;
+}
+.txt--r {
+  text-align: right;
+}
+.c-provenance {
+  height: 100%;
+}
+.c-provenance .neo4jd3-graph {
+  min-height: 500px;
+}

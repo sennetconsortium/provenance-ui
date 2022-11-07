@@ -1,0 +1,32 @@
+px2em($prop, $sz, $bf = null)
+  if $bf == null 
+    $bf = $base-font
+  
+  $result = ceil(($sz/$bf), 2) * 1rem
+  if $prop
+    {$prop} $result
+  else 
+    return $result
+    
+lh-ratio($font-sz, $lh)
+  line-height ($lh/$font-sz) 
+  
+focus($size = null)
+  theme(outline-color, $col-main-blue $col-main-pink)
+  if $size == null 
+    $size = 1.4px
+  outline-style dotted
+  outline-width $size
+
+pos-abs()
+  position absolute 
+
+pos-rel()
+  position relative
+
+blk()
+  display block
+
+hide()
+  display none
+

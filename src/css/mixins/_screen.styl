@@ -1,0 +1,43 @@
+xsm()
+  @media $bp-xsm
+    {block}
+
+sm()
+  @media $bp-sm
+    {block}
+
+md()
+  @media $bp-md
+    {block}
+    
+md-max()
+  @media $bp-md-max
+    {block}
+    
+md-min()
+  @media $bp-md-min
+    {block}
+        
+lg()
+  @media $bp-lg
+    {block}
+    
+xlg()
+  @media $bp-xlg
+    {block}
+    
+xxlg()
+  @media $bp-xxlg
+    {block}
+    
+xxxlg()
+  @media $bp-xxxlg
+    {block}
+
+retina()
+  @media(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)
+    {block}
+    
+bp(mod, size)
+  @media({mod}-width:size)
+    {block}
