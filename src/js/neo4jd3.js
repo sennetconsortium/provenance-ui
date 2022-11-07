@@ -9,10 +9,12 @@ function Neo4jD3(_selector, _options) {
         numClasses = 0,
         options = {
             arrowSize: 4,
+            colorMaps: undefined,
             colors: colors(),
             highlight: undefined,
             iconMap: fontAwesomeIcons(),
             icons: undefined,
+            setNodeLabels: false,
             imageMap: {},
             images: undefined,
             infoPanel: true,
@@ -26,6 +28,8 @@ function Neo4jD3(_selector, _options) {
         },
         VERSION = '0.0.1';
 
+    classes2colors = _options.colorMaps || classes2colors;
+    
     function appendGraph(container) {
         svg = container.append('svg')
             .attr('width', '100%')
@@ -187,7 +191,7 @@ function Neo4jD3(_selector, _options) {
         appendRingToNode(n);
         appendOutlineToNode(n);
 
-        if (options.icons) {
+        if (options.setNodeLabels || options.icons) {
             appendTextToNode(n);
         }
 
@@ -222,14 +226,21 @@ function Neo4jD3(_selector, _options) {
             });
     }
 
+    function getTextToAppendToNode(d) {
+        let text = icon(d) || d.text || '';
+        text = icon(d) ? '&#x' + text : text;
+        const className = icon(d) ? ' icon' : (d.text) ? ' has-label' : '';
+        return {text, className};
+    }
+
     function appendTextToNode(node) {
         return node.append('text')
             .attr('class', function(d) {
-                return 'text' + (icon(d) ? ' icon' : '');
+                return 'text' + (getTextToAppendToNode(d).className);
             })
             .attr('fill', '#ffffff')
             .attr('font-size', function(d) {
-                return icon(d) ? (options.nodeRadius + 'px') : '10px';
+                return icon(d) ? (options.nodeRadius + 'px') : '8px';
             })
             .attr('pointer-events', 'none')
             .attr('text-anchor', 'middle')
@@ -237,8 +248,7 @@ function Neo4jD3(_selector, _options) {
                 return icon(d) ? (parseInt(Math.round(options.nodeRadius * 0.32)) + 'px') : '4px';
             })
             .html(function(d) {
-                let _icon = icon(d);
-                return _icon ? '&#x' + _icon : d.id;
+                return getTextToAppendToNode(d).text;
             });
     }
 
@@ -451,7 +461,7 @@ function Neo4jD3(_selector, _options) {
                             label = labelPropertyValue[0];
                             break;
                         default:
-                            console.error()
+                            //console.error()
                             break;
                     }
 
