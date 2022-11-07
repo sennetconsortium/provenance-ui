@@ -14,7 +14,7 @@ function ProvenanceUI({ ops, data = null, dataUrl = null}) {
 
   useEffect(() => {
     let neo4jd3 = new Neo4jd3('#neo4jd3', {
-      highlight: [
+      highlight: ops.highlight || [
         {
           class: 'Dataset',
           property: 'sennet_id',
@@ -25,8 +25,8 @@ function ProvenanceUI({ ops, data = null, dataUrl = null}) {
           value: 'SNT385.FJPB.242'
         }
       ],
-      setNodeLabels: true,
-      colorMaps: {
+      setNodeLabels: (ops.setNodeLabels !== undefined) ? ops.setNodeLabels : true,
+      colorMaps: ops.colorMaps || {
         "Dataset": "#8ecb93",
         "Activity": "#f16766",
         "Sample": "#ebb5c8",

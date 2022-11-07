@@ -1,39 +1,72 @@
 /**
  * map = {
+ *     // Map Specific properties from raw data to required properties of the ProvenanceUI API
  *     root: {
- *         entity_type: 'labels'
+ *         entity_type: 'labels',
+ *         'uuid': 'id'
  *     },
- *     properties: ['uuid', 'sennet_id']
+ *
+ *     // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
+ *     properties: ['uuid', 'sennet_id'],
+ *
+ *     // Capture specific properties from type raw data into the properties sub object of the ProvenanceUI API
  *     typeProperties: {
  *         'Source': ['source_type'],
  *         'Sample': ['sample_category],
  *         'Activity': ['created_timestamp', 'created_by_user_displayname']
  *     },
+ *
+ *     // Run callbacks on the values
  *     callbacks: {
- *         'created_timestamp': function() {}
+ *         'some_prop_name': function(val) {},
+ *         'created_timestamp': 'formatDate'
  *     }
  * }
  */
 
 class DataConverter {
     constructor(rawData, map) {
-        this.rawData = rawData;
+        this.nodes = rawData.nodes;
         this.result = []
         this.map = map
-        this.reformat()
+        this.reformatNodes()
     }
 
-    reformat() {
+    formatDate(val) {
+        return new Date(val * 1000).toLocaleString()
+    }
+
+    valueCallback(cb, val) {
+        if (typeof cb === 'string') {
+            if (cb === 'formatDate') {
+                return this.formatDate(val)
+            }
+            return val;
+        } else {
+            return cb(val)
+        }
+    }
+
+    // TODO: Write converter for relationships
+    reformatRelationships() {
+
+    }
+
+    reformatNodes() {
         let data = {}
-        for (let item of this.rawData) {
+        for (let item of this.nodes) {
             let type;
+
+            // Capture properties wanted for
             for (let prop of item) {
+                let value = this.item[prop];
                 if (this.map.root[prop]) {
                     if (this.map.root[prop] === 'labels') {
-                        this.data.labels = [this.item[prop]]
-                        type = this.item[prop];
-                    } else {
-                        this.data[this.map.root[prop]] = this.item[prop];
+                        this.data.labels = [value]
+                        type = value;
+                    }  else {
+                        this.data[this.map.root[prop]] = this.map.callbacks[prop]
+                            ? this.valueCallback(this.map.callbacks[prop], value) : value;
                     }
                 }
             }
@@ -54,6 +87,26 @@ class DataConverter {
     
     getResult() {
         return this.result;
+    }
+
+    /**
+     *
+     * @param data
+     * @returns {{results: [{data: [{graph: {relationships: *, nodes: *}}], columns: []}], errors: *[]}}
+     */
+    getNeo4jFormat(data) {
+        return {
+            results: [{
+                columns: data.columns,
+                data: [{
+                    graph: {
+                        nodes: data.nodes,
+                        relationships: data.relationships
+                    }
+                }]
+            }],
+            errors: []
+        }
     }
 }
 
