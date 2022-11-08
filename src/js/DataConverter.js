@@ -1,9 +1,11 @@
+import Graph from './Graph'
 /**
  * map = {
  *     // Map Specific properties from raw data to required properties of the ProvenanceUI API
  *     root: {
  *         entity_type: 'labels',
- *         'uuid': 'id'
+ *         'uuid': 'id',
+ *         'created_by_user_displayname': 'text'
  *     },
  *
  *     // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
@@ -12,7 +14,7 @@
  *     // Capture specific properties from type raw data into the properties sub object of the ProvenanceUI API
  *     typeProperties: {
  *         'Source': ['source_type'],
- *         'Sample': ['sample_category],
+ *         'Sample': ['sample_category'],
  *         'Activity': ['created_timestamp', 'created_by_user_displayname']
  *     },
  *
@@ -26,10 +28,10 @@
 
 class DataConverter {
     constructor(rawData, map) {
-        this.nodes = rawData.nodes;
-        this.result = []
+        this.rawNodes = rawData;
+        this.relationships = []
+        this.nodes = []
         this.map = map
-        this.reformatNodes()
     }
 
     formatDate(val) {
@@ -47,46 +49,76 @@ class DataConverter {
         }
     }
 
-    // TODO: Write converter for relationships
-    reformatRelationships() {
+    getRootAsHighlight(prop) {
+        const node = this.nodes[0]
+        return {
+            'class': node.labels[0],
+            property: prop,
+            value: node.properties[prop]
+        }
+    }
 
+    reformatRelationships() {
+        let i = 0;
+        for (let item of this.rawNodes) {
+            this.relationships.push({
+                id: i,
+                type: item.type,
+                startNode: item.startNode,
+                endNode: item.endNode,
+                properties: {}
+            })
+            i++
+        }
+    }
+
+    runFormatting() {
+        let graph = new Graph()
+        graph.dfs(this.rawNodes)
+        this.rawNodes = graph.getResult()
+        this.reformatNodes()
     }
 
     reformatNodes() {
-        let data = {}
-        for (let item of this.nodes) {
+
+        for (let item of this.rawNodes) {
+            let data = {}
             let type;
 
             // Capture properties wanted for
-            for (let prop of item) {
-                let value = this.item[prop];
+            for (let prop in item) {
+                let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
                 if (this.map.root[prop]) {
                     if (this.map.root[prop] === 'labels') {
-                        this.data.labels = [value]
+                        data.labels = item.labels || [value]
                         type = value;
                     }  else {
-                        this.data[this.map.root[prop]] = this.map.callbacks[prop]
+                        data[this.map.root[prop]] = this.map.callbacks[prop]
                             ? this.valueCallback(this.map.callbacks[prop], value) : value;
                     }
                 }
             }
-            this.data.properties = {}
+            data.properties = {}
             for (let gProp of this.map.properties) {
-                this.data.properties[gProp] = item[gProp]
+                data.properties[gProp] = item[gProp]
             }
 
             if (type) {
                 for (let tProp of this.map.typeProperties[type]) {
-                    this.data.properties[tProp] = item[tProp]
+                    data.properties[tProp] = item[tProp]
                 }
             }
-            this.result.push(data)
+            this.nodes.push(data)
         }
         return this;
     }
     
-    getResult() {
-        return this.result;
+    getNodes() {
+        return this.nodes;
+    }
+
+    getRelationships() {
+        return this.relationships;
     }
 
     /**

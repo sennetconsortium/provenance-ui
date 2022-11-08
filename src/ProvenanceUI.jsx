@@ -1,8 +1,5 @@
 
 import { useEffect, useState } from 'react'
-import './css/lib/font-awesome.min.css'
-import './css/lib/neo4jd3.css'
-import './App.css'
 import Neo4jd3 from './js/neo4jd3'
 import sample from "./data/sample";
 import useD3 from "./hooks/useD3";
@@ -13,6 +10,7 @@ function ProvenanceUI({ ops = {}, data = null, dataUrl = null}) {
   const [graphDataUrl, setDataUrl] = useState(dataUrl)
 
   useEffect(() => {
+    console.log(graphData)
     let neo4jd3 = new Neo4jd3('#neo4jd3', {
       highlight: ops.highlight || [
         {
@@ -52,7 +50,7 @@ function ProvenanceUI({ ops = {}, data = null, dataUrl = null}) {
       zoomFit: true
     });
 
-  }, []);
+  }, [sample]);
 
   return (
     <div className='c-provenance'>
