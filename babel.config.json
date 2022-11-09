@@ -13,6 +13,11 @@
         "corejs": "3.6.5"
       }
     ],
-    "@babel/preset-react"
+    ["@babel/preset-react", {
+      "pragma": "dom",
+      "pragmaFrag": "DomFrag",
+      "throwIfNamespace": false,
+      "runtime": "classic"
+    }]
   ]
 }

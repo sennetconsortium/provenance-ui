@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Neo4jd3 from '../js/neo4jd3'
 import useD3 from '../hooks/useD3'
 import PropTypes from 'prop-types';

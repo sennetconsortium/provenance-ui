@@ -7,7 +7,7 @@ exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.promise.js");
 require("core-js/modules/es.json.stringify.js");
-var _react = require("react");
+var _react = _interopRequireWildcard(require("react"));
 var _neo4jd = _interopRequireDefault(require("../js/neo4jd3"));
 var _useD = _interopRequireDefault(require("../hooks/useD3"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
@@ -79,9 +79,9 @@ function ProvenanceUI(_ref) {
       zoomFit: true
     });
   }, []);
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/_react.default.createElement("div", {
     className: "c-provenance"
-  }, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/_react.default.createElement("div", {
     id: "neo4jd3"
   }));
 }
