@@ -61,14 +61,17 @@ class DataConverter {
     reformatRelationships() {
         let i = 0;
         for (let item of this.rawNodes) {
-            this.relationships.push({
-                id: i,
-                type: item.type,
-                startNode: item.startNode,
-                endNode: item.endNode,
-                properties: {}
-            })
-            i++
+            if (item.endNode) {
+                this.relationships.push({
+                    id: i,
+                    type: item.type,
+                    startNode: item.startNode,
+                    endNode: item.endNode,
+                    properties: {}
+                })
+                i++
+            }
+
         }
     }
 

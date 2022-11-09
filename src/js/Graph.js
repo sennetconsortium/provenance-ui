@@ -8,14 +8,18 @@ class Graph {
      * @param ops.token String Auth token
      * @param ops.idKey String The name of the id property in the data
      * @param ops.neighborsKey String The name of the neighbors property in the data
+     * @param ops.edgeLabels Object<String> {actor, entity}
+     * @param ops.actorLabels Array<String>
      */
     constructor(ops = {}) {
         this.token = ops.token
         this.idKey = ops.idKey || 'uuid'
         this.neighborsKey = ops.neighborsKey || 'ancestors'
+        this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
+        this.actorLabels = ops.actorLabels || ['Activity']
         this.traverseAll = false;
         this.result = []
-        this.activitiesIndex = -1;
+        this.actIndex = -1;
         this.visited = {}
         this.list = {}
         this.stack = []
@@ -51,19 +55,18 @@ class Graph {
 
     continueDfs(ops) {
         const _t = this;
-        let prevStartNode = ops.startNode
         while (this.stack.length) {
             let current = this.stack.pop();
             //console.log(current)
             let node = this.list[current];
             //console.log(node)
             if (node && !node[this.neighborsKey] && this.traverseAll) {
-                this.service({parent: current, activityIndex: this.activitiesIndex})
+                this.service({parent: current, activityIndex: this.actIndex})
             } else {
-                prevStartNode = ops.isRoot ? prevStartNode : _t.activitiesIndex;
-                ++_t.activitiesIndex;
 
-                this.result.push({...node, startNode: current, endNode: this.activitiesIndex.toString(), type: "WAS_GENERATED_BY", id: node[this.idKey]});
+                ++_t.actIndex;
+
+                this.result.push({...node, startNode: current, endNode: this.getNodeId(this.actIndex), type: this.edgeLabels.entity, id: current});
                 
                 if (node[this.neighborsKey] && node[this.neighborsKey].length) {
                     node[this.neighborsKey].forEach(function(neighbor, index) {
@@ -71,8 +74,7 @@ class Graph {
 
                         if (!_t.visited[n]) {
 
-                            _t.result.push({...node, startNode: _t.activitiesIndex.toString(), endNode: n, type: "USED", labels: ["Activity"],
-                                id:  _t.activitiesIndex.toString(), isActivity: true});
+                            _t.addActor(node, n)
 
                             _t.list[n] = neighbor
                             _t.visited[n] = true;
@@ -82,11 +84,20 @@ class Graph {
                     })
                 } else {
 
-                    this.result.push({...node, startNode: this.activitiesIndex.toString(), endNode: (this.activitiesIndex + 1).toString(),
-                        labels: ["Activity"], id:  this.activitiesIndex.toString(), type: "USED", isActivity: true });
+                    this.addActor(node)
                 }
             }
         }
+    }
+
+    /**
+     *
+     * @param node Object
+     * @param nodeId String
+     */
+    addActor(node, nodeId) {
+        this.result.push({...node, startNode: this.getNodeId(this.actIndex), endNode: nodeId, type: this.edgeLabels.actor, labels: this.actorLabels,
+            id: this.getNodeId(this.actIndex), isActivity: true})
     }
 
     getNodeId(id) {
