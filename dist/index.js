@@ -21,6 +21,7 @@ Object.defineProperty(exports, "ProvenanceUI", {
     return _ProvenanceUI.default;
   }
 });
+var _react = _interopRequireDefault(require("react"));
 var _ProvenanceUI = _interopRequireDefault(require("./components/ProvenanceUI"));
 var _Graph = _interopRequireDefault(require("./js/Graph"));
 var _DataConverter = _interopRequireDefault(require("./js/DataConverter"));
