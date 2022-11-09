@@ -13,7 +13,13 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "css": "stylus -w src/css/App.styl -o ./src/App.css"
+    "css": "stylus --include-css --compress -w src/css/App.styl -o ./src/ProvenanceUI.css"
+  },
+  "prettier": {
+    "singleQuote": true,
+    "jsxSingleQuote": true,
+    "semi": false,
+    "trailingComma": "none"
   },
   "eslintConfig": {
     "extends": [
@@ -31,5 +37,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "loglevel": "^1.8.1"
   }
 }
