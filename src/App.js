@@ -8,7 +8,8 @@ function App() {
 
     return (
         <div className={`c-App`}>
-            <ProvenanceUI data={contextData || sample} />
+            <ProvenanceUI data={sample} />
+            { contextData && <ProvenanceUI data={contextData} /> }
         </div>
     )
 }

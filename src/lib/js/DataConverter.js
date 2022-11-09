@@ -38,14 +38,25 @@ class DataConverter {
         return new Date(val * 1000).toLocaleString()
     }
 
+    lastNameFirstInitial(val) {
+        let name = val.split(' ')
+        return name.length > 1 ? `${name[1]}, ${name[0][0]}.` : val
+    }
+
     valueCallback(cb, val) {
+
         if (typeof cb === 'string') {
-            if (cb === 'formatDate') {
-                return this.formatDate(val)
+            if (typeof this[cb]  === 'function') {
+                return this[cb](val)
             }
             return val;
         } else {
-            return cb(val)
+            try {
+                return cb(val)
+            } catch (e) {
+                console.log(e)
+            }
+
         }
     }
 
@@ -75,11 +86,12 @@ class DataConverter {
         }
     }
 
-    runFormatting() {
+    runFormatting(nodes) {
         let graph = new Graph()
-        graph.dfs(this.rawNodes)
+        graph.dfs(nodes)
         this.rawNodes = graph.getResult()
         this.reformatNodes()
+        this.reformatRelationships()
     }
 
     reformatNodes() {

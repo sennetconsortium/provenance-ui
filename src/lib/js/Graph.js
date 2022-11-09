@@ -13,9 +13,10 @@ class Graph {
      */
     constructor(ops = {}) {
         this.token = ops.token
+        this.url = ops.url
         this.idKey = ops.idKey || 'uuid'
         this.neighborsKey = ops.neighborsKey || 'ancestors'
-        this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
+        this.edgeLabels = ops.edgeLabels || {actor: 'USED', entity: 'WAS_GENERATED_BY'}
         this.actorLabels = ops.actorLabels || ['Activity']
         this.traverseAll = false;
         this.result = []
@@ -26,24 +27,28 @@ class Graph {
     }
 
     async service(ops = {}) {
-        const _t = this;
-        let headers = new Headers();
-        headers.append("Content-Type", "application/json");
-        headers.append("Authorization", "Bearer " + this.token)
+        try {
+            const _t = this;
+            let headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", "Bearer " + this.token)
 
-        return await fetch(ops.url || this.url, {
-            method: ops.method || 'GET',
-            headers: headers,
-            body: ops.raw,
-        }).then(response => response.json())
-            .then(result => {
+            let response = await fetch(ops.url || this.url, {
+                method: ops.method || 'GET',
+                headers: headers
+            })
+            const result = await response.json()
+
+            if (ops.callback && typeof ops.callback === 'function') {
+                ops.callback(result)
+            } else {
                 _t.list[result[_t.idKey]] = result;
                 _t.stack.push(result[_t.idKey])
                 _t.continueDfs(result, ops);
-                return result;
-            }).catch(error => {
-                return error;
-            });
+            }
+        } catch(e) {
+            console.log(e)
+        }
     }
 
     dfs(node) {
@@ -57,23 +62,28 @@ class Graph {
         const _t = this;
         while (this.stack.length) {
             let current = this.stack.pop();
-            //console.log(current)
+
             let node = this.list[current];
-            //console.log(node)
+
             if (node && !node[this.neighborsKey] && this.traverseAll) {
                 this.service({parent: current, activityIndex: this.actIndex})
             } else {
 
                 ++_t.actIndex;
 
-                this.result.push({...node, startNode: current, endNode: this.getNodeId(this.actIndex), type: this.edgeLabels.entity, id: current});
-                
+                this.result.push({
+                    ...node,
+                    startNode: current,
+                    endNode: this.getNodeId(this.actIndex),
+                    type: this.edgeLabels.entity,
+                    id: current
+                });
+
                 if (node[this.neighborsKey] && node[this.neighborsKey].length) {
-                    node[this.neighborsKey].forEach(function(neighbor, index) {
+                    node[this.neighborsKey].forEach(function (neighbor, index) {
                         let n = neighbor[_t.idKey];
 
                         if (!_t.visited[n]) {
-
                             _t.addActor(node, n)
 
                             _t.list[n] = neighbor
@@ -83,7 +93,6 @@ class Graph {
                         }
                     })
                 } else {
-
                     this.addActor(node)
                 }
             }
@@ -96,13 +105,21 @@ class Graph {
      * @param nodeId String
      */
     addActor(node, nodeId) {
-        this.result.push({...node, startNode: this.getNodeId(this.actIndex), endNode: nodeId, type: this.edgeLabels.actor, labels: this.actorLabels,
-            id: this.getNodeId(this.actIndex), isActivity: true})
+        this.result.push({
+            ...node,
+            startNode: this.getNodeId(this.actIndex),
+            endNode: nodeId,
+            type: this.edgeLabels.actor,
+            labels: this.actorLabels,
+            id: this.getNodeId(this.actIndex),
+            isActivity: true
+        })
     }
 
     getNodeId(id) {
         return 'Acv-' + id;
     }
+
     getResult() {
         return this.result;
     }
