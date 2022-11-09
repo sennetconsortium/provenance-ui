@@ -1,12 +1,11 @@
-import { useEffect, useState, useContext } from 'react'
-import Neo4jd3 from './js/neo4jd3'
-import sample from './data/sample'
-import useD3 from './hooks/useD3'
-import AppContext from './context/AppContext'
+import { useEffect, useState } from 'react'
+import Neo4jd3 from '../js/neo4jd3'
+import useD3 from '../hooks/useD3'
 import PropTypes from 'prop-types';
 
 /**
  *
+ * @param data Object
  * @param ops Object<Object>
  *     @param ops.highlight Array<Object>
  *          @param ops.higlight.class String
@@ -16,20 +15,19 @@ import PropTypes from 'prop-types';
  *     @param ops.colorMaps Object The color maps for each node class/type and hex code
  *     @param ops.setNodeLabels Boolean Whether to set labels on the nodes
  *
- * @param data Object
  * @param dataUrl String
  * @returns {JSX.Element}
  * @constructor
  */
-function ProvenanceUI({ops = {}, data = null, dataUrl = null}) {
-    const { contextData } = useContext(AppContext)
+function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
+
     useD3()
-    const [graphData, setGraphData] = useState(data || contextData || sample)
+    const [graphData, setGraphData] = useState(data)
     const [graphDataUrl, setDataUrl] = useState(dataUrl)
 
     useEffect(() => {
         if (!ops.noStyles) {
-            import (`./ProvenanceUI.css`)
+            import (`../ProvenanceUI.css`)
         }
         let neo4jd3 = new Neo4jd3('#neo4jd3', {
             highlight: ops.highlight || [
@@ -69,7 +67,7 @@ function ProvenanceUI({ops = {}, data = null, dataUrl = null}) {
             zoomFit: true
         });
 
-    }, [sample]);
+    }, []);
 
     return (
         <div className='c-provenance'>

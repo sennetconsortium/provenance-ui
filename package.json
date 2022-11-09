@@ -1,8 +1,19 @@
 {
   "name": "provenance-ui",
   "version": "0.1.0",
-  "private": true,
+  "description": "Proven",
+  "author": "lisabruney@pitt.edu",
+  "keywords": ["provenance", "ui", "medical", "dbmi"],
+  "private": false,
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "files": [ "dist", "README.md" ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sennetconsortium/provenance-ui.git"
+  },
   "dependencies": {
+    "@babel/polyfill": "^7.12.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
@@ -13,7 +24,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "css": "stylus --include-css --compress -w src/css/App.styl -o ./src/ProvenanceUI.css"
+    "dist": "rm -rf dist && NODE_ENV=production babel src/lib --out-dir dist --copy-files",
+    "css": "stylus --include-css --compress -w src/css/App.styl -o ./src/lib/ProvenanceUI.css"
   },
   "prettier": {
     "singleQuote": true,
@@ -39,6 +51,9 @@
     ]
   },
   "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.20.2",
+    "@babel/preset-env": "^7.20.2",
     "loglevel": "^1.8.1"
   }
 }

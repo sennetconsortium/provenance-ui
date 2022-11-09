@@ -13,6 +13,8 @@ Watch and build CSS files:
 
 ### `npm run css`
 
+## Preparing Your Data
+
 ## Using Provenance component 
 ```
 const options = {

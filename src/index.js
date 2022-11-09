@@ -1,15 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import ProvenanceUI from './ProvenanceUI';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { AppProvider } from './context/AppContext'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-
   <React.StrictMode>
       <AppProvider>
-        <ProvenanceUI />
+        <App />
       </AppProvider>
   </React.StrictMode>
 );
