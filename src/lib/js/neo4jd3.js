@@ -34,7 +34,7 @@ function Neo4jD3(_selector, _options) {
         svg = container.append('svg')
             .attr('width', '100%')
             .attr('height', '100%')
-            .attr('class', 'neo4jd3-graph')
+            .attr('class', 'neo4jd3__graph')
             .call(d3.zoom().on('zoom', function() {
                 let scale = d3.event.transform.k,
                     translate = [d3.event.transform.x, d3.event.transform.y];
@@ -83,7 +83,7 @@ function Neo4jD3(_selector, _options) {
 
     function appendInfoPanel(container) {
         return container.append('div')
-            .attr('class', 'neo4jd3-info');
+            .attr('class', 'neo4jd3__info');
     }
 
     function appendInfoElement(cls, isNode, property, value) {
