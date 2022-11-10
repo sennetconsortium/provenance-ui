@@ -9,6 +9,7 @@ const AppContext = createContext()
 export const AppProvider = ({children}) => {
     const [contextData, setContextData] = useState(null)
     const [loading, setLoading] = useState(false)
+    const [options, setOptions] = useState({})
 
     const getEnv = (key) => {
         return process.env[`REACT_APP_${key}`]
@@ -18,6 +19,16 @@ export const AppProvider = ({children}) => {
         log.setLevel(getEnv('LOG_LEVEL'))
         const token = getEnv('API_TOKEN')
         const url = getEnv('API_URL')
+        let ops = getEnv('OPTIONS')
+        log.debug('Environment options', ops)
+        try {
+            if (ops) {
+                setOptions(JSON.parse(ops))
+            }
+        } catch (e) {
+            log.debug('Issue parsing options', e)
+        }
+
 
         let graph = new Graph({ token, url })
         const handleResult = (result) => {
@@ -46,7 +57,8 @@ export const AppProvider = ({children}) => {
             value={{
                 contextData,
                 setContextData,
-                loading
+                loading,
+                options
             }}
         >
             {children}

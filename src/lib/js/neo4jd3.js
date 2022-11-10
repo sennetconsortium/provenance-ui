@@ -1,5 +1,13 @@
 //import * as d3 from 'd3'
 
+/**
+ *
+ * @param _selector String
+ * @param _options Object
+ *  @param _options.colors Array An array of hex colors
+ * @returns {{updateWithD3Data: updateWithD3Data, randomD3Data: (function(*, *): {relationships: *[], nodes: *[]}), size: (function(): {relationships: *, nodes: *}), appendRandomDataToNode: appendRandomDataToNode, updateWithNeo4jData: updateWithNeo4jData, neo4jDataToD3Data: (function(*): {relationships: *[], nodes: *[]}), version: (function(): string), zoomFit: zoomFit}}
+ * @constructor
+ */
 function Neo4jD3(_selector, _options) {
     let d3 = window.d3
 
@@ -16,16 +24,25 @@ function Neo4jD3(_selector, _options) {
             icons: undefined,
             setNodeLabels: false,
             stickNodeInfoOnClick: true,
+            hideElementId: true,
             imageMap: {},
             images: undefined,
             infoPanel: true,
             minCollision: undefined,
             neo4jData: undefined,
             neo4jDataUrl: undefined,
-            nodeOutlineFillColor: undefined,
             nodeRadius: 25,
-            relationshipColor: '#a5abb6',
             zoomFit: false,
+            idNavigate: {
+                prop: '',
+                url: ''
+            },
+            theme: {
+                colors: {
+                    nodeOutlineFill: undefined,
+                    relationship: '#a5abb6',
+                }
+            },
             classes: {
                 graph: 'neo4jd3__graph',
                 info: 'neo4jd3__info',
@@ -94,21 +111,22 @@ function Neo4jD3(_selector, _options) {
     }
 
     function appendInfoElement(cls, isNode, property, value) {
+        const isNavigation = property === options.idNavigate.prop
         let elem = info.append('a');
 
-        elem.attr('href', '#')
-            .attr('class', cls)
+        elem.attr('href', isNavigation ?  options.idNavigate.url + value : '#')
+            .attr('class', cls + (!isNavigation ? ' flat' : ' has-hover'))
             .html('<strong>' + property + '</strong>' + (value ? (': ' + value) : ''));
 
         if (!value) {
             elem.style('background-color', function(d) {
-                return options.nodeOutlineFillColor ? options.nodeOutlineFillColor : (isNode ? class2color(property) : defaultColor());
+                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : (isNode ? class2color(property) : defaultColor());
             })
                 .style('border-color', function(d) {
-                    return options.nodeOutlineFillColor ? class2darkenColor(options.nodeOutlineFillColor) : (isNode ? class2darkenColor(property) : defaultDarkenColor());
+                    return options.theme.colors.nodeOutlineFill ? class2darkenColor(options.theme.colors.nodeOutlineFill) : (isNode ? class2darkenColor(property) : defaultDarkenColor());
                 })
                 .style('color', function(d) {
-                    return options.nodeOutlineFillColor ? class2darkenColor(options.nodeOutlineFillColor) : '#fff';
+                    return options.theme.colors.nodeOutlineFill ? class2darkenColor(options.theme.colors.nodeOutlineFill) : '#fff';
                 });
         }
     }
@@ -155,12 +173,13 @@ function Neo4jD3(_selector, _options) {
                 return classes;
             })
             .on('click', function(d) {
-                d.fx = d.fy = null;
+
                 if (options.stickNodeInfoOnClick && info) {
                     updateInfo(d, true);
                 }
 
                 if (typeof options.onNodeClick === 'function') {
+                    d.fx = d.fy = null;
                     options.onNodeClick(d);
                 }
             })
@@ -221,10 +240,10 @@ function Neo4jD3(_selector, _options) {
             .attr('class', 'outline')
             .attr('r', options.nodeRadius)
             .style('fill', function(d) {
-                return options.nodeOutlineFillColor ? options.nodeOutlineFillColor : class2color(d.labels[0]);
+                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : class2color(d.labels[0]);
             })
             .style('stroke', function(d) {
-                return options.nodeOutlineFillColor ? class2darkenColor(options.nodeOutlineFillColor) : class2darkenColor(d.labels[0]);
+                return options.theme.colors.nodeOutlineFill ? class2darkenColor(options.theme.colors.nodeOutlineFill) : class2darkenColor(d.labels[0]);
             })
             .append('title').text(function(d) {
                 return toString(d);
@@ -295,7 +314,7 @@ function Neo4jD3(_selector, _options) {
     function appendOutlineToRelationship(r) {
         return r.append('path')
             .attr('class', 'outline')
-            .attr('fill', '#a5abb6')
+            .attr('fill', options.theme.colors.relationship)
             .attr('stroke', 'none');
     }
 
@@ -394,7 +413,7 @@ function Neo4jD3(_selector, _options) {
     }
 
     function defaultColor() {
-        return options.relationshipColor;
+        return options.theme.colors.relationship;
     }
 
     function defaultDarkenColor() {
@@ -904,8 +923,10 @@ function Neo4jD3(_selector, _options) {
         } else {
             appendInfoElementRelationship('class', d.type);
         }
+        if (!options.hideElementId) {
+            appendInfoElementProperty('property', '&lt;id&gt;', d.id);
+        }
 
-        appendInfoElementProperty('property', '&lt;id&gt;', d.id);
 
         Object.keys(d.properties).forEach(function(property) {
             appendInfoElementProperty('property', property, JSON.stringify(d.properties[property]));

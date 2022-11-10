@@ -4,12 +4,12 @@ import ProvenanceUI from './lib/components/ProvenanceUI'
 import sample from './data/sample'
 
 function App() {
-    const { contextData } = useContext(AppContext)
+    const { contextData, options } = useContext(AppContext)
 
     return (
         <div className={`c-App`}>
             <ProvenanceUI data={sample} />
-            { contextData && <ProvenanceUI data={contextData} /> }
+            { contextData && <ProvenanceUI data={contextData} ops={ options } /> }
         </div>
     )
 }

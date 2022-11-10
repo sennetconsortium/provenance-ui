@@ -14,7 +14,11 @@ import PropTypes from 'prop-types';
  *     @param ops.noStyles Boolean Whether to set styles
  *     @param ops.colorMaps Object The color maps for each node class/type and hex code
  *     @param ops.setNodeLabels Boolean Whether to set labels on the nodes
- *
+ *     @param ops.idNavigate Object Url settings for the entity id property
+ *          @param ops.idNavigate.url The url 
+ *          @param ops.idNavigate.prop The name of the id property in the dataset
+ *     @param ops.onNodeDoubleClick Function Pass a custom function to run on double click of a node
+ *     @param ops.onRelationshipDoubleClick Function Pass a custom function to run on double click of an edge/relationship
  * @param dataUrl String
  * @returns {JSX.Element}
  * @constructor
@@ -48,11 +52,12 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
                 "Sample": "#ebb5c8",
                 "Source": "#ffc255"
             },
+            idNavigate: ops.idNavigate || { prop: '' },
             minCollision: 60,
             neo4jData: graphData,
             neo4jDataUrl: graphDataUrl,
             nodeRadius: 25,
-            onNodeDoubleClick: function (node) {
+            onNodeDoubleClick: ops.onNodeDoubleClick || function (node) {
                 switch (node.action) {
                     case 'url':
                         window.open(node.properties.url, '_blank');
@@ -61,11 +66,13 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
                         break;
                 }
             },
-            onRelationshipDoubleClick: function (relationship) {
-                console.log('double click on relationship: ' + JSON.stringify(relationship));
+            onRelationshipDoubleClick: ops.onRelationshipDoubleClick || function (relationship) {
+                // console.log('double click on relationship: ' + JSON.stringify(relationship));
             },
-            zoomFit: true
+            zoomFit: ops.zoomFit || false
         });
+
+        window.neo = neo4jd3
 
     }, []);
 

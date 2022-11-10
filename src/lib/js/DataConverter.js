@@ -7,7 +7,10 @@ import Graph from './Graph'
  *         'uuid': 'id',
  *         'created_by_user_displayname': 'text'
  *     },
- *
+ *     actor: {
+ *         dataProp: 'created_by_user_displayname',
+ *         visualProp: 'researcher'
+ *     },
  *     // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
  *     properties: ['uuid', 'sennet_id'],
  *
@@ -69,8 +72,20 @@ class DataConverter {
         }
     }
 
+    getPropFromMap(key = 'id') {
+        let result = '_id'
+        for (let prop in this.map.root) {
+            if (this.map.root[prop] === key ) {
+                return prop
+            }
+        }
+        return result
+    }
+
     reformatRelationships() {
         let i = 0;
+        const idProp = this.getPropFromMap()
+        const actorProp = this.map.actor.dataProp
         for (let item of this.rawNodes) {
             if (item.endNode) {
                 this.relationships.push({
@@ -78,7 +93,10 @@ class DataConverter {
                     type: item.type,
                     startNode: item.startNode,
                     endNode: item.endNode,
-                    properties: {}
+                    properties: {
+                        [idProp] : item[idProp],
+                        [this.map.actor.visualProp || 'actor']: item[actorProp]
+                    }
                 })
                 i++
             }
@@ -94,6 +112,10 @@ class DataConverter {
         this.reformatRelationships()
     }
 
+    evaluateCallbackOnValue(prop, value) {
+        return this.map.callbacks[prop]
+            ? this.valueCallback(this.map.callbacks[prop], value) : value;
+    }
     reformatNodes() {
 
         for (let item of this.rawNodes) {
@@ -102,18 +124,25 @@ class DataConverter {
 
             // Capture properties wanted for
             for (let prop in item) {
+                console.log(prop)
                 let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
                 if (this.map.root[prop]) {
                     if (this.map.root[prop] === 'labels') {
                         data.labels = item.labels || [value]
                         type = value;
+                    } else if (prop === this.map.actor.dataProp && item.isActivity ) {
+                        data.properties = {
+                            [this.map.actor.visualProp]: item[this.map.actor.dataProp]
+                        }
+                        data.text = this.evaluateCallbackOnValue(prop, value)
+                    } else if (this.map.root[prop] === 'text') {
+                        data.text = item.isActivity ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')]
                     }  else {
-                        data[this.map.root[prop]] = this.map.callbacks[prop]
-                            ? this.valueCallback(this.map.callbacks[prop], value) : value;
+                        data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value)
                     }
                 }
             }
-            data.properties = {}
+            data.properties = data.properties || {}
             for (let gProp of this.map.properties) {
                 data.properties[gProp] = item[gProp]
             }
