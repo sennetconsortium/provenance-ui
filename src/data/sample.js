@@ -16,7 +16,7 @@ const sample = {
                     "text": "L. Bruney",
                     "properties": {
                         "created_timestamp": "1666622535375",
-                        "created_by_user_displayname": "Lisa-Ann Bruney"
+                        "created_by_user_displayname": "Jane Doe"
                     }
                 }, {
                     "id": "3",
@@ -32,7 +32,7 @@ const sample = {
                     "text": "L. Bruney",
                     "properties": {
                         "created_timestamp": "1666622535375",
-                        "created_by_user_displayname": "Lisa-Ann Bruney"
+                        "created_by_user_displayname": "Jane Doe"
                     }
                 }, {
                     "id": "5",

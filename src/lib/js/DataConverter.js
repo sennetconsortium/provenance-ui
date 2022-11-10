@@ -63,8 +63,8 @@ class DataConverter {
         }
     }
 
-    getRootAsHighlight(prop) {
-        const node = this.nodes[0]
+    getNodeAsHighlight(prop, index = 0) {
+        const node = this.nodes[index]
         return {
             'class': node.labels[0],
             property: prop,

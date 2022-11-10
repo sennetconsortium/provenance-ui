@@ -37,42 +37,25 @@ const sample = {
             "graph": {
                 "nodes": [{
                     "id": "1",
-                    "labels": ["Dataset"],
+                    "labels": ["EntityClassNameHere"],
                     "properties": {
-                        "uuid": "19b4061567c8105e34005c3ca56a656c",
-                        "sennet_id": "SNT264.VWKZ.629"
+                        "your_property_name_for_info": "your_property_value",
+                        "your_property_name_for_info_2": "your_property_value"
                     }
                 }, {
                     "id": "2",
                     "labels": ["Activity"],
-                    "text": "L. Bruney",
+                    "text": "Jane Doe",
                     "properties": {
                         "created_timestamp": "1666622535375",
-                        "created_by_user_displayname": "Lisa-Ann Bruney"
+                        "created_by_user_displayname": "Jane Doe"
                     }
-                }, {
+                }{
                     "id": "3",
-                    "labels": ["Sample"],
+                    "labels": ["Entity2ClassNameHere"],
                     "properties": {
-                        "uuid": "75416aad581009b8f316a3d034a2bda0",
-                        "sennet_id": "SNT333.VBRT.956",
-                        "sample_category": "organ"
-                    }
-                }, {
-                    "id": "4",
-                    "labels": ["Activity"],
-                    "text": "L. Bruney",
-                    "properties": {
-                        "created_timestamp": "1666622535375",
-                        "created_by_user_displayname": "Lisa-Ann Bruney"
-                    }
-                }, {
-                    "id": "5",
-                    "labels": ["Source"],
-                    "properties": {
-                        "uuid": "789d09a4c3d81bff5b28b7938f3764cd",
-                        "sennet_id": "SNT385.FJPB.242",
-                        "source_type": "Human"
+                        "your_property_name_for_info": "your_property_value",
+                        "your_property_name_for_info_3": "your_property_value"
                     }
                 }],
                 "relationships": [{
@@ -86,21 +69,6 @@ const sample = {
                     "type": "USED",
                     "startNode": "2",
                     "endNode": "3",
-                    "properties": {
-                    }
-                }, {
-                    "id": "3",
-                    "type": "WAS_GENERATED_BY",
-                    "startNode": "3",
-                    "endNode": "4",
-                    "properties": {
-                        "from": 1473581532586
-                    }
-                },{
-                    "id": "4",
-                    "type": "USED",
-                    "startNode": "4",
-                    "endNode": "5",
                     "properties": {
                     }
                 }]
@@ -148,8 +116,8 @@ const dataMap = {
     converter.reformatNodes()
     converter.reformatRelationships()
     // This is the node that is highlighted in the visualization, can be multiple.
-    const h = [converter.getRootAsHighlight('sennet_id')]
-    setHighlight(h)
+    const h = [converter.getNodeAsHighlight('sennet_id')]
+   
     const neoData = converter.getNeo4jFormat({
         columns: ['user', 'entity'],
         nodes: converter.getNodes(),

@@ -28,8 +28,7 @@ export const AppProvider = ({children}) => {
         } catch (e) {
             log.debug('Issue parsing options', e)
         }
-
-
+        
         let graph = new Graph({ token, url })
         const handleResult = (result) => {
             graph.dfs(result)
@@ -44,10 +43,10 @@ export const AppProvider = ({children}) => {
             })
             log.debug('Data', neoData)
             setContextData(neoData)
+            setLoading(false)
         }
         if (token.length && url.length) {
             setLoading(true)
-
             graph.service({ callback: handleResult })
         }
     }, [])

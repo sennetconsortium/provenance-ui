@@ -5,7 +5,8 @@ import PropTypes from 'prop-types';
 
 /**
  *
- * @param data Object
+ * @param data Object Required if no dataUrl is provided
+ * @param dataUrl String Required if no data is provided
  * @param ops Object<Object>
  *     @param ops.highlight Array<Object>
  *          @param ops.higlight.class String
@@ -19,7 +20,7 @@ import PropTypes from 'prop-types';
  *          @param ops.idNavigate.prop The name of the id property in the dataset
  *     @param ops.onNodeDoubleClick Function Pass a custom function to run on double click of a node
  *     @param ops.onRelationshipDoubleClick Function Pass a custom function to run on double click of an edge/relationship
- * @param dataUrl String
+ *     @param ops.nodeRadius Integer
  * @returns {JSX.Element}
  * @constructor
  */
@@ -53,10 +54,10 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
                 "Source": "#ffc255"
             },
             idNavigate: ops.idNavigate || { prop: '' },
-            minCollision: 60,
+            minCollision: ops.minCollison || 60,
             neo4jData: graphData,
             neo4jDataUrl: graphDataUrl,
-            nodeRadius: 25,
+            nodeRadius: ops.nodeRadius || 25,
             onNodeDoubleClick: ops.onNodeDoubleClick || function (node) {
                 switch (node.action) {
                     case 'url':
@@ -71,9 +72,7 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
             },
             zoomFit: ops.zoomFit || false
         });
-
-        window.neo = neo4jd3
-
+        window.ProvenanceUId3 = neo4jd3
     }, []);
 
     return (
