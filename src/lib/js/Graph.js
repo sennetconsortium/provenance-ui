@@ -1,5 +1,6 @@
 /**
  * Uses DFS algorithm to find all nodes and neighbors.
+ * @author dbmi.pitt.edu
  */
 class Graph {
     /**

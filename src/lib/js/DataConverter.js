@@ -1,5 +1,10 @@
 import Graph from './Graph'
+
 /**
+ * Converts any data object to neo4j formatted data for the visualization.
+ * Requires provision of a properties map. See example below.
+ * @author dbmi.pitt.edu
+ *
  * map = {
  *     // Map Specific properties from raw data to required properties of the ProvenanceUI API
  *     root: {
@@ -28,7 +33,6 @@ import Graph from './Graph'
  *     }
  * }
  */
-
 class DataConverter {
     constructor(rawData, map) {
         this.rawNodes = rawData;

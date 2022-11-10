@@ -1,10 +1,14 @@
-//import * as d3 from 'd3'
-
 /**
+ * The core of the application. Creates a neo4j graph visualization with D3 library.
+ * This library has been edited by dbmi.pitt.edu.
+ * See https://eisman.github.io/neo4jd3/ for original version.
  *
  * @param _selector String
  * @param _options Object
- *  @param _options.colors Array An array of hex colors
+ *      @param _options.neo4jData Object
+ *      @param _options.colors Array An array of hex colors
+ *      @param _options.imageMap Object
+ *      @param _options.iconMap Object 
  * @returns {{updateWithD3Data: updateWithD3Data, randomD3Data: (function(*, *): {relationships: *[], nodes: *[]}), size: (function(): {relationships: *, nodes: *}), appendRandomDataToNode: appendRandomDataToNode, updateWithNeo4jData: updateWithNeo4jData, neo4jDataToD3Data: (function(*): {relationships: *[], nodes: *[]}), version: (function(): string), zoomFit: zoomFit}}
  * @constructor
  */
@@ -353,7 +357,6 @@ function Neo4jD3(_selector, _options) {
         let color = classes2colors[cls];
 
         if (!color) {
-//            color = options.colors[Math.min(numClasses, options.colors.length - 1)];
             color = options.colors[numClasses % options.colors.length];
             classes2colors[cls] = color;
             numClasses++;
@@ -588,9 +591,6 @@ function Neo4jD3(_selector, _options) {
 
     function initSimulation() {
         let simulation = d3.forceSimulation()
-            //                           .velocityDecay(0.8)
-            //                           .force('x', d3.force().strength(0.002))
-            //                           .force('y', d3.force().strength(0.002))
             .force('collide', d3.forceCollide().radius(function(d) {
                 return options.minCollision;
             }).iterations(2))
