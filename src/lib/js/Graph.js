@@ -16,11 +16,11 @@ class Graph {
         this.url = ops.url
         this.idKey = ops.idKey || 'uuid'
         this.neighborsKey = ops.neighborsKey || 'ancestors'
-        this.edgeLabels = ops.edgeLabels || {actor: 'USED', entity: 'WAS_GENERATED_BY'}
+        this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
         this.actorLabels = ops.actorLabels || ['Activity']
-        this.traverseAll = false;
+        this.traverseAll = false
         this.result = []
-        this.actIndex = -1;
+        this.actIndex = -1
         this.visited = {}
         this.list = {}
         this.stack = []
@@ -28,10 +28,10 @@ class Graph {
 
     async service(ops = {}) {
         try {
-            const _t = this;
-            let headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", "Bearer " + this.token)
+
+            let headers = ops.headers || new Headers()
+            headers.append('Content-Type', 'application/json')
+            headers.append('Authorization', 'Bearer ' + this.token)
 
             let response = await fetch(ops.url || this.url, {
                 method: ops.method || 'GET',
@@ -42,34 +42,34 @@ class Graph {
             if (ops.callback && typeof ops.callback === 'function') {
                 ops.callback(result)
             } else {
-                _t.list[result[_t.idKey]] = result;
-                _t.stack.push(result[_t.idKey])
-                _t.continueDfs(result, ops);
+                this.list[result[this.idKey]] = result
+                this.stack.push(result[this.idKey])
+                this.continueDfs(result, ops)
             }
-        } catch(e) {
+        } catch (e) {
             console.log(e)
         }
     }
 
     dfs(node) {
-        this.visited[node[this.idKey]] = true;
+        this.visited[node[this.idKey]] = true
         this.stack.push(node[this.idKey])
-        this.list[node[this.idKey]] = node;
-        this.continueDfs({startNode: node[this.idKey], isRoot: true});
+        this.list[node[this.idKey]] = node
+        this.continueDfs({ startNode: node[this.idKey], isRoot: true })
     }
 
     continueDfs(ops) {
-        const _t = this;
+        const _t = this
         while (this.stack.length) {
-            let current = this.stack.pop();
+            let current = this.stack.pop()
 
-            let node = this.list[current];
+            let node = this.list[current]
 
             if (node && !node[this.neighborsKey] && this.traverseAll) {
-                this.service({parent: current, activityIndex: this.actIndex})
+                this.service({ parent: current, activityIndex: this.actIndex })
             } else {
 
-                ++_t.actIndex;
+                ++_t.actIndex
 
                 this.result.push({
                     ...node,
@@ -77,19 +77,18 @@ class Graph {
                     endNode: this.getNodeId(this.actIndex),
                     type: this.edgeLabels.entity,
                     id: current
-                });
+                })
 
                 if (node[this.neighborsKey] && node[this.neighborsKey].length) {
-                    node[this.neighborsKey].forEach(function (neighbor, index) {
-                        let n = neighbor[_t.idKey];
+                    node[this.neighborsKey].forEach(function(neighbor, index) {
+                        let n = neighbor[_t.idKey]
 
                         if (!_t.visited[n]) {
                             _t.addActor(node, n)
 
                             _t.list[n] = neighbor
-                            _t.visited[n] = true;
+                            _t.visited[n] = true
                             _t.stack.push(n)
-
                         }
                     })
                 } else {
@@ -117,11 +116,11 @@ class Graph {
     }
 
     getNodeId(id) {
-        return 'Acv-' + id;
+        return 'Acv-' + id
     }
 
     getResult() {
-        return this.result;
+        return this.result
     }
 
 
