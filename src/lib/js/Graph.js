@@ -45,7 +45,7 @@ class Graph {
             } else {
                 this.list[result[this.idKey]] = result
                 this.stack.push(result[this.idKey])
-                this.continueDfs(result, ops)
+                this.continueDfs(ops)
             }
         } catch (e) {
             console.log(e)
@@ -67,7 +67,7 @@ class Graph {
             let node = this.list[current]
 
             if (node && !node[this.neighborsKey] && this.traverseAll) {
-                this.service({ parent: current, activityIndex: this.actIndex })
+                this.service({ startNode: current, actIndex: this.actIndex })
             } else {
 
                 ++_t.actIndex
@@ -123,7 +123,6 @@ class Graph {
     getResult() {
         return this.result
     }
-
 
 }
 

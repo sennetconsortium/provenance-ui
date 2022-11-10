@@ -28,9 +28,10 @@ export const AppProvider = ({children}) => {
         } catch (e) {
             log.debug('Issue parsing options', e)
         }
-        
+
         let graph = new Graph({ token, url })
         const handleResult = (result) => {
+            log.debug('Result from fetch', result)
             graph.dfs(result)
             log.debug('Graph', graph.getResult())
             const converter = new DataConverter(graph.getResult(), dataMap)
