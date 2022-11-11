@@ -1,6 +1,6 @@
 import {createContext, useState, useEffect} from 'react'
 import log from 'loglevel'
-import Graph from '../lib/js/Graph'
+import NeoGraph from '../lib/js/NeoGraph'
 import DataConverter from '../lib/js/DataConverter'
 import dataMap from '../data/map.sample'
 
@@ -29,11 +29,11 @@ export const AppProvider = ({children}) => {
             log.debug('Issue parsing options', e)
         }
 
-        let graph = new Graph({ token, url })
+        let graph = new NeoGraph({ token, url })
         const handleResult = (result) => {
             log.debug('Result from fetch', result)
             graph.dfs(result)
-            log.debug('Graph', graph.getResult())
+            log.debug('NeoGraph', graph.getResult())
             const converter = new DataConverter(graph.getResult(), dataMap)
             converter.reformatNodes()
             converter.reformatRelationships()
