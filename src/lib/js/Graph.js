@@ -2,8 +2,9 @@ class Graph {
     constructor(ops = {}) {
         this.token = ops.token
         this.url = ops.url
-        this.idKey = ops.idKey || 'uuid'
-        this.neighborsKey = ops.neighborsKey || 'ancestors'
+        this.keys = ops.keys || {}
+        this.keys.id = this.keys.id || 'uuid'
+        this.keys.neighbors = this.keys.neighbors || 'ancestors'
         this.visited = {}
         this.stack = []
         this.list = {}
@@ -32,9 +33,9 @@ class Graph {
     }
 
     dfs(node) {
-        this.visited[node[this.idKey]] = true
-        this.stack.push(node[this.idKey])
-        this.list[node[this.idKey]] = node
+        this.visited[node[this.keys.id]] = true
+        this.stack.push(node[this.keys.id])
+        this.list[node[this.keys.id]] = node
     }
     
     checkVisited(id, node) {

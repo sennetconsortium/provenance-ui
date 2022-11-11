@@ -8,15 +8,16 @@ class NeoGraph extends Graph {
      * Traverses a graph dataset.
      * @param ops Object
      * @param ops.token String Auth token
-     * @param ops.idKey String The name of the id property in the data
-     * @param ops.neighborsKey String The name of the neighbors property in the data
-     * @param ops.edgeLabels Object<String> {actor, entity}
-     * @param ops.actorLabels Array<String>
+     * @param ops.keys.id  String The name of the id property in the data
+     * @param ops.keys.neighbors String The name of the neighbors property in the data
+     * @param ops.labels.edge Object<String> {actor, entity}
+     * @param ops.labels.actor Array<String>
      */
     constructor(ops = {}) {
         super(ops)
-        this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
-        this.actorLabels = ops.actorLabels || ['Activity']
+        this.labels = ops.labels || {}
+        this.labels.edge = this.labels.edge || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
+        this.labels.actor = this.labels.actor || ['Activity']
         this.actIndex = -1
     }
 
@@ -34,13 +35,13 @@ class NeoGraph extends Graph {
                 ...node,
                 startNode: current,
                 endNode: this.getNodeId(this.actIndex),
-                type: this.edgeLabels.entity,
+                type: this.labels.edge.entity,
                 id: current
             })
 
-            if (node[this.neighborsKey] && node[this.neighborsKey].length) {
-                node[this.neighborsKey].forEach(function(neighbor, index) {
-                    let n = neighbor[_t.idKey]
+            if (node[this.keys.neighbors] && node[this.keys.neighbors].length) {
+                node[this.keys.neighbors].forEach(function(neighbor, index) {
+                    let n = neighbor[_t.keys.id]
 
                     _t.addActor(node, n)
                     _t.checkVisited(n, neighbor)
@@ -61,8 +62,8 @@ class NeoGraph extends Graph {
             ...node,
             startNode: this.getNodeId(this.actIndex),
             endNode: nodeId,
-            type: this.edgeLabels.actor,
-            labels: this.actorLabels,
+            type: this.labels.edge.actor,
+            labels: this.labels.actor,
             id: this.getNodeId(this.actIndex),
             isActivity: true
         })
