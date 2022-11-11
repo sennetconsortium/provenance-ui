@@ -1,6 +1,6 @@
 import React from 'react'
 import ProvenanceUI from './components/ProvenanceUI'
-import Graph from './js/Graph'
+import NeoGraph from './js/NeoGraph'
 import DataConverter from './js/DataConverter'
 
-export { ProvenanceUI, Graph, DataConverter }
+export { ProvenanceUI, NeoGraph, DataConverter }
