@@ -39,6 +39,7 @@ class DataConverter {
         this.relationships = []
         this.nodes = []
         this.map = map
+        this.error = null
     }
 
     formatDate(val) {
@@ -121,42 +122,48 @@ class DataConverter {
             ? this.valueCallback(this.map.callbacks[prop], value) : value;
     }
     reformatNodes() {
+        try {
+            for (let item of this.rawNodes) {
+                console.log(item['sennet_id'])
+                let data = {}
+                let type;
 
-        for (let item of this.rawNodes) {
-            let data = {}
-            let type;
-
-            // Capture properties wanted for
-            for (let prop in item) {
-                let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
-                if (this.map.root[prop]) {
-                    if (this.map.root[prop] === 'labels') {
-                        data.labels = item.labels || [value]
-                        type = value;
-                    } else if (prop === this.map.actor.dataProp && item.isActivity ) {
-                        data.properties = {
-                            [this.map.actor.visualProp]: item[this.map.actor.dataProp]
+                // Capture properties wanted for
+                for (let prop in item) {
+                    console.log(prop)
+                    let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
+                    if (this.map.root[prop]) {
+                        if (this.map.root[prop] === 'labels') {
+                            data.labels = item.labels || [value]
+                            type = value;
+                        } else if (prop === this.map.actor.dataProp && item.isActivity ) {
+                            data.properties = {
+                                [this.map.actor.visualProp]: item[this.map.actor.dataProp]
+                            }
+                            data.text = this.evaluateCallbackOnValue(prop, value)
+                        } else if (this.map.root[prop] === 'text') {
+                            data.text = item.isActivity ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')]
+                        }  else {
+                            data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value)
                         }
-                        data.text = this.evaluateCallbackOnValue(prop, value)
-                    } else if (this.map.root[prop] === 'text') {
-                        data.text = item.isActivity ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')]
-                    }  else {
-                        data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value)
                     }
                 }
-            }
-            data.properties = data.properties || {}
-            for (let gProp of this.map.properties) {
-                data.properties[gProp] = item[gProp]
-            }
-
-            if (type) {
-                for (let tProp of this.map.typeProperties[type]) {
-                    data.properties[tProp] = item[tProp]
+                data.properties = data.properties || {}
+                for (let gProp of this.map.properties) {
+                    data.properties[gProp] = item[gProp]
                 }
+
+                if (type && typeof this.map.typeProperties === 'array') {
+                    for (let tProp of this.map.typeProperties[type]) {
+                        data.properties[tProp] = item[tProp]
+                    }
+                }
+                this.nodes.push(data)
             }
-            this.nodes.push(data)
+        } catch (e) {
+            this.error = e
         }
+
         return this;
     }
     
