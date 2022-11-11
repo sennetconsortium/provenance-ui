@@ -84,9 +84,8 @@ class Graph {
                     node[this.neighborsKey].forEach(function(neighbor, index) {
                         let n = neighbor[_t.idKey]
 
+                        _t.addActor(node, n)
                         if (!_t.visited[n]) {
-                            _t.addActor(node, n)
-
                             _t.list[n] = neighbor
                             _t.visited[n] = true
                             _t.stack.push(n)
