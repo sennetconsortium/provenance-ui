@@ -15,18 +15,14 @@ class NeoGraph extends Graph {
      */
     constructor(ops = {}) {
         super(ops)
-        this.neighborsKey = ops.neighborsKey || 'ancestors'
         this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
         this.actorLabels = ops.actorLabels || ['Activity']
-        this.traverseAll = false
         this.actIndex = -1
     }
 
     dfs(node) {
         const _t = this
-        this.visited[node[this.idKey]] = true
-        this.stack.push(node[this.idKey])
-        this.list[node[this.idKey]] = node
+        super.dfs(node)
 
         while (this.stack.length) {
             let current = this.stack.pop()
@@ -47,11 +43,7 @@ class NeoGraph extends Graph {
                     let n = neighbor[_t.idKey]
 
                     _t.addActor(node, n)
-                    if (!_t.visited[n]) {
-                        _t.list[n] = neighbor
-                        _t.visited[n] = true
-                        _t.stack.push(n)
-                    }
+                    _t.checkVisited(n, neighbor)
                 })
             } else {
                 this.addActor(node)
@@ -78,10 +70,6 @@ class NeoGraph extends Graph {
 
     getNodeId(id) {
         return 'Acv-' + id
-    }
-
-    getResult() {
-        return this.result
     }
 }
 

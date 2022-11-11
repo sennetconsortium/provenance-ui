@@ -3,6 +3,7 @@ class Graph {
         this.token = ops.token
         this.url = ops.url
         this.idKey = ops.idKey || 'uuid'
+        this.neighborsKey = ops.neighborsKey || 'ancestors'
         this.visited = {}
         this.stack = []
         this.list = {}
@@ -31,7 +32,21 @@ class Graph {
     }
 
     dfs(node) {
+        this.visited[node[this.idKey]] = true
+        this.stack.push(node[this.idKey])
+        this.list[node[this.idKey]] = node
+    }
+    
+    checkVisited(id, node) {
+        if (!this.visited[id]) {
+            this.list[id] = node
+            this.visited[id] = true
+            this.stack.push(id)
+        }
+    }
 
+    getResult() {
+        return this.result
     }
 }
 
