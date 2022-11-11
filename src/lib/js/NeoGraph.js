@@ -2,7 +2,8 @@
  * Uses DFS algorithm to find all nodes and neighbors.
  * @author dbmi.pitt.edu
  */
-class NeoGraph {
+import Graph from './Graph'
+class NeoGraph extends Graph {
     /**
      * Traverses a graph dataset.
      * @param ops Object
@@ -13,18 +14,12 @@ class NeoGraph {
      * @param ops.actorLabels Array<String>
      */
     constructor(ops = {}) {
-        this.token = ops.token
-        this.url = ops.url
-        this.idKey = ops.idKey || 'uuid'
+        super(ops)
         this.neighborsKey = ops.neighborsKey || 'ancestors'
         this.edgeLabels = ops.edgeLabels || { actor: 'USED', entity: 'WAS_GENERATED_BY' }
         this.actorLabels = ops.actorLabels || ['Activity']
         this.traverseAll = false
-        this.result = []
         this.actIndex = -1
-        this.visited = {}
-        this.list = {}
-        this.stack = []
     }
 
     async service(ops = {}) {
@@ -42,10 +37,6 @@ class NeoGraph {
 
             if (ops.callback && typeof ops.callback === 'function') {
                 ops.callback(result)
-            } else {
-                this.list[result[this.idKey]] = result
-                this.stack.push(result[this.idKey])
-                this.continueDfs(ops)
             }
         } catch (e) {
             console.log(e)
@@ -53,47 +44,38 @@ class NeoGraph {
     }
 
     dfs(node) {
+        const _t = this
         this.visited[node[this.idKey]] = true
         this.stack.push(node[this.idKey])
         this.list[node[this.idKey]] = node
-        this.continueDfs({ startNode: node[this.idKey], isRoot: true })
-    }
 
-    continueDfs(ops) {
-        const _t = this
         while (this.stack.length) {
             let current = this.stack.pop()
-
             let node = this.list[current]
 
-            if (node && !node[this.neighborsKey] && this.traverseAll) {
-                this.service({ startNode: current, actIndex: this.actIndex })
-            } else {
+            ++_t.actIndex
 
-                ++_t.actIndex
+            this.result.push({
+                ...node,
+                startNode: current,
+                endNode: this.getNodeId(this.actIndex),
+                type: this.edgeLabels.entity,
+                id: current
+            })
 
-                this.result.push({
-                    ...node,
-                    startNode: current,
-                    endNode: this.getNodeId(this.actIndex),
-                    type: this.edgeLabels.entity,
-                    id: current
+            if (node[this.neighborsKey] && node[this.neighborsKey].length) {
+                node[this.neighborsKey].forEach(function(neighbor, index) {
+                    let n = neighbor[_t.idKey]
+
+                    _t.addActor(node, n)
+                    if (!_t.visited[n]) {
+                        _t.list[n] = neighbor
+                        _t.visited[n] = true
+                        _t.stack.push(n)
+                    }
                 })
-
-                if (node[this.neighborsKey] && node[this.neighborsKey].length) {
-                    node[this.neighborsKey].forEach(function(neighbor, index) {
-                        let n = neighbor[_t.idKey]
-
-                        _t.addActor(node, n)
-                        if (!_t.visited[n]) {
-                            _t.list[n] = neighbor
-                            _t.visited[n] = true
-                            _t.stack.push(n)
-                        }
-                    })
-                } else {
-                    this.addActor(node)
-                }
+            } else {
+                this.addActor(node)
             }
         }
     }
@@ -122,7 +104,6 @@ class NeoGraph {
     getResult() {
         return this.result
     }
-
 }
 
-export default Graph
+export default NeoGraph
