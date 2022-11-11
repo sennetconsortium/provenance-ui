@@ -2,7 +2,7 @@
  * Uses DFS algorithm to find all nodes and neighbors.
  * @author dbmi.pitt.edu
  */
-class Graph {
+class NeoGraph {
     /**
      * Traverses a graph dataset.
      * @param ops Object
