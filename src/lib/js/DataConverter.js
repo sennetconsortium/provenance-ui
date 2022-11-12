@@ -130,7 +130,6 @@ class DataConverter {
 
                 // Capture properties wanted for
                 for (let prop in item) {
-                    console.log(prop)
                     let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
                     if (this.map.root[prop]) {
                         if (this.map.root[prop] === 'labels') {

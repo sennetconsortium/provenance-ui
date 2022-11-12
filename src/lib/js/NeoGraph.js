@@ -39,8 +39,15 @@ class NeoGraph extends Graph {
                 id: current
             })
 
-            if (node[this.keys.neighbors] && node[this.keys.neighbors].length) {
-                node[this.keys.neighbors].forEach(function(neighbor, index) {
+            let neighbors = null
+            if (this.ops.getNeighbors && typeof this.ops.getNeighbors === 'function') {
+                neighbors = this.ops.getNeighbors(node)
+            } else {
+                neighbors = node[this.keys.neighbors]
+            }
+
+            if (neighbors && neighbors.length) {
+                neighbors.forEach(function(neighbor, index) {
                     let n = neighbor[_t.keys.id]
 
                     _t.addActor(node, n)
