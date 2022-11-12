@@ -1,5 +1,6 @@
 class Graph {
     constructor(ops = {}) {
+        this.ops = ops
         this.token = ops.token
         this.url = ops.url
         this.keys = ops.keys || {}
@@ -7,7 +8,10 @@ class Graph {
         this.keys.neighbors = this.keys.neighbors || 'ancestors'
         this.visited = {}
         this.stack = []
-        this.list = {}
+        this.list = ops.list || {}
+        if (ops.isNeo) {
+            console.log('NeoList',this.list)
+        }
         this.result = []
         this.root = null
     }
@@ -26,23 +30,38 @@ class Graph {
             const result = await response.json()
 
             if (ops.callback && typeof ops.callback === 'function') {
-                ops.callback(result)
+                ops.callback(result, ops)
+            } else {
+
+                this.stack.push(ops.id)
+                this.list[ops.id] = result
+                this.serviced[ops.id] = true
+                this.continueDfs()
             }
         } catch (e) {
             console.log(e)
         }
+        return this
     }
 
     dfs(node) {
         this.root = node
-        this.visited[node[this.keys.id]] = true
-        this.stack.push(node[this.keys.id])
-        this.list[node[this.keys.id]] = node
+        const id = node[this.keys.id]
+        this.visited[id] = true
+        this.stack.push(id)
+        if (this.list[id] === undefined) {
+            this.list[id] = node
+        }
+
     }
+
+    continueDfs(ops = {}) {}
     
     checkVisited(id, node) {
         if (!this.visited[id]) {
-            this.list[id] = node
+            if (this.list[id] === undefined) {
+                this.list[id] = node
+            }
             this.visited[id] = true
             this.stack.push(id)
         }
