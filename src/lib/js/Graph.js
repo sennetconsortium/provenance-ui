@@ -9,6 +9,7 @@ class Graph {
         this.stack = []
         this.list = {}
         this.result = []
+        this.root = null
     }
 
     async service(ops = {}) {
@@ -33,6 +34,7 @@ class Graph {
     }
 
     dfs(node) {
+        this.root = node
         this.visited[node[this.keys.id]] = true
         this.stack.push(node[this.keys.id])
         this.list[node[this.keys.id]] = node

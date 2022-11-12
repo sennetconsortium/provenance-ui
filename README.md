@@ -108,11 +108,11 @@ const dataMap = {
 
 #### Step 2. Preparing Your Data For Conversion
 ```
-    import { Graph, DataConverter } from 'provenance-ui/dist/index'
-    let graph = new Graph()
-    graph.dfs(data)
+    import { NeoGraph, DataConverter } from 'provenance-ui/dist/index'
+    let neoGraph = new NeoGraph()
+    neoGraph.dfs(data)
     
-    let converter = new DataConverter(graph.getResult(), dataMap)
+    let converter = new DataConverter(neoGraph.getResult(), dataMap)
     converter.reformatNodes()
     converter.reformatRelationships()
     // This is the node that is highlighted in the visualization, can be multiple.
