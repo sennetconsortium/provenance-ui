@@ -76,7 +76,7 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
     }, []);
 
     return (
-        <div className='c-provenance'>
+        <div className='c-provenance js-provenance'>
             <div id="neo4jd3"></div>
         </div>
     );

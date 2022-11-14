@@ -91,7 +91,13 @@ export const AppProvider = ({children}) => {
                         value: n[dataMap.highlight.prop]
                     })
                 }
-                const ops =  {...getOptions(), highlight}
+                const colorMap = {
+                    "Dataset": "#8ecb93",
+                    "Activity": "#f16766",
+                    "Sample": "#ebb5c8",
+                    "Source": "#ffc255"
+                }
+                const ops =  {...getOptions(), highlight, colorMap}
                 setOptions(ops)
                 log.debug('Options', ops)
                 setContextData(neoData)

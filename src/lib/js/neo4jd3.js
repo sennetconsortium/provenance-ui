@@ -160,6 +160,8 @@ function Neo4jD3(_selector, _options) {
                     classes = 'node',
                     label = d.labels[0];
 
+                classes += ` node--${d.labels[0]}`
+
                 if (icon(d)) {
                     classes += ' node--icon';
                 }

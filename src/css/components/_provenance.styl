@@ -1,6 +1,14 @@
 .c-provenance
   height 100%
-  font-family -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif
+  font-family $font-family
+  &.has-hover
+    .node:not(.has-hover)
+      circle.outline
+        fill #ddd !important
+        stroke grey !important
+      text
+        fill $col-dk-grey !important
+
   .neo4jd3__graph
     min-height 500px
     background-color $col-selago

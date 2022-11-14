@@ -1,8 +1,17 @@
 .c-legend
+  font-family $font-family
+  padding 20px
+  &.has-hover
+    .c-legend__color
+      opacity .5
   li
     list-style none
   span
     display inline-block
+  &__item
+    &.has-hover
+      .c-legend__color
+        opacity 1
   &__color
     width 20px
     height 20px
