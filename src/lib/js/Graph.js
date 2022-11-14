@@ -9,9 +9,6 @@ class Graph {
         this.visited = {}
         this.stack = []
         this.list = ops.list || {}
-        if (ops.isNeo) {
-            console.log('NeoList',this.list)
-        }
         this.result = []
         this.root = null
     }
@@ -39,7 +36,7 @@ class Graph {
                 this.continueDfs()
             }
         } catch (e) {
-            console.log(e)
+            console.error(e)
         }
         return this
     }
