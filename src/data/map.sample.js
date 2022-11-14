@@ -13,7 +13,7 @@ const dataMap = {
         visualProp: 'researcher'
     },
     props: ['uuid', 'sennet_id'],
-    typeProperties: {
+    typeProps: {
         Source: ['source_type'],
         Sample: ['sample_category'],
         Activity: ['created_timestamp']
