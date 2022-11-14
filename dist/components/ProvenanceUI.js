@@ -6,7 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.promise.js");
-require("core-js/modules/es.json.stringify.js");
 var _react = _interopRequireWildcard(require("react"));
 var _neo4jd = _interopRequireDefault(require("../js/neo4jd3"));
 var _useD = _interopRequireDefault(require("../hooks/useD3"));
@@ -16,7 +15,8 @@ function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "functio
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 /**
  *
- * @param data Object
+ * @param data Object Required if no dataUrl is provided
+ * @param dataUrl String Required if no data is provided
  * @param ops Object<Object>
  *     @param ops.highlight Array<Object>
  *          @param ops.higlight.class String
@@ -25,8 +25,12 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  *     @param ops.noStyles Boolean Whether to set styles
  *     @param ops.colorMaps Object The color maps for each node class/type and hex code
  *     @param ops.setNodeLabels Boolean Whether to set labels on the nodes
- *
- * @param dataUrl String
+ *     @param ops.idNavigate Object Url settings for the entity id property
+ *          @param ops.idNavigate.url The url 
+ *          @param ops.idNavigate.prop The name of the id property in the dataset
+ *     @param ops.onNodeDoubleClick Function Pass a custom function to run on double click of a node
+ *     @param ops.onRelationshipDoubleClick Function Pass a custom function to run on double click of an edge/relationship
+ *     @param ops.nodeRadius Integer
  * @returns {JSX.Element}
  * @constructor
  */
@@ -60,11 +64,14 @@ function ProvenanceUI(_ref) {
         "Sample": "#ebb5c8",
         "Source": "#ffc255"
       },
-      minCollision: 60,
+      idNavigate: ops.idNavigate || {
+        prop: ''
+      },
+      minCollision: ops.minCollison || 60,
       neo4jData: graphData,
       neo4jDataUrl: graphDataUrl,
-      nodeRadius: 25,
-      onNodeDoubleClick: function onNodeDoubleClick(node) {
+      nodeRadius: ops.nodeRadius || 25,
+      onNodeDoubleClick: ops.onNodeDoubleClick || function (node) {
         switch (node.action) {
           case 'url':
             window.open(node.properties.url, '_blank');
@@ -73,14 +80,15 @@ function ProvenanceUI(_ref) {
             break;
         }
       },
-      onRelationshipDoubleClick: function onRelationshipDoubleClick(relationship) {
-        console.log('double click on relationship: ' + JSON.stringify(relationship));
+      onRelationshipDoubleClick: ops.onRelationshipDoubleClick || function (relationship) {
+        // console.log('double click on relationship: ' + JSON.stringify(relationship));
       },
-      zoomFit: true
+      zoomFit: ops.zoomFit || false
     });
+    window.ProvenanceUId3 = neo4jd3;
   }, []);
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "c-provenance"
+    className: "c-provenance js-provenance"
   }, /*#__PURE__*/_react.default.createElement("div", {
     id: "neo4jd3"
   }));

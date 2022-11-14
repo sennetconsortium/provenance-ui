@@ -8,6 +8,10 @@ require("core-js/modules/web.dom-collections.iterator.js");
 var _Graph = _interopRequireDefault(require("./Graph"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /**
+ * Converts any data object to neo4j formatted data for the visualization.
+ * Requires provision of a properties map. See example below.
+ * @author dbmi.pitt.edu
+ *
  * map = {
  *     // Map Specific properties from raw data to required properties of the ProvenanceUI API
  *     root: {
@@ -15,12 +19,15 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *         'uuid': 'id',
  *         'created_by_user_displayname': 'text'
  *     },
- *
+ *     actor: {
+ *         dataProp: 'created_by_user_displayname',
+ *         visualProp: 'researcher'
+ *     },
  *     // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
- *     properties: ['uuid', 'sennet_id'],
+ *     props: ['uuid', 'sennet_id'],
  *
  *     // Capture specific properties from type raw data into the properties sub object of the ProvenanceUI API
- *     typeProperties: {
+ *     typeProps: {
  *         'Source': ['source_type'],
  *         'Sample': ['sample_category'],
  *         'Activity': ['created_timestamp', 'created_by_user_displayname']
@@ -33,37 +40,58 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  *     }
  * }
  */
-
 class DataConverter {
   constructor(rawData, map) {
     this.rawNodes = rawData;
     this.relationships = [];
     this.nodes = [];
     this.map = map;
+    this.error = null;
   }
   formatDate(val) {
     return new Date(val * 1000).toLocaleString();
   }
+  lastNameFirstInitial(val) {
+    let name = val.split(' ');
+    return name.length > 1 ? "".concat(name[1], ", ").concat(name[0][0], ".") : val;
+  }
   valueCallback(cb, val) {
     if (typeof cb === 'string') {
-      if (cb === 'formatDate') {
-        return this.formatDate(val);
+      if (typeof this[cb] === 'function') {
+        return this[cb](val);
       }
       return val;
     } else {
-      return cb(val);
+      try {
+        return cb(val);
+      } catch (e) {
+        console.log(e);
+      }
     }
   }
-  getRootAsHighlight(prop) {
-    const node = this.nodes[0];
+  getNodeAsHighlight(prop) {
+    let index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+    const node = this.nodes[index];
     return {
       'class': node.labels[0],
       property: prop,
       value: node.properties[prop]
     };
   }
+  getPropFromMap() {
+    let key = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 'id';
+    let result = '_id';
+    for (let prop in this.map.root) {
+      if (this.map.root[prop] === key) {
+        return prop;
+      }
+    }
+    return result;
+  }
   reformatRelationships() {
     let i = 0;
+    const idProp = this.getPropFromMap();
+    const actorProp = this.map.actor.dataProp;
     for (let item of this.rawNodes) {
       if (item.endNode) {
         this.relationships.push({
@@ -71,45 +99,63 @@ class DataConverter {
           type: item.type,
           startNode: item.startNode,
           endNode: item.endNode,
-          properties: {}
+          properties: {
+            [idProp]: item[idProp],
+            [this.map.actor.visualProp || 'actor']: item[actorProp]
+          }
         });
         i++;
       }
     }
   }
-  runFormatting() {
+  runFormatting(nodes) {
     let graph = new _Graph.default();
-    graph.dfs(this.rawNodes);
+    graph.dfs(nodes);
     this.rawNodes = graph.getResult();
     this.reformatNodes();
+    this.reformatRelationships();
+  }
+  evaluateCallbackOnValue(prop, value) {
+    return this.map.callbacks[prop] ? this.valueCallback(this.map.callbacks[prop], value) : value;
   }
   reformatNodes() {
-    for (let item of this.rawNodes) {
-      let data = {};
-      let type;
+    try {
+      for (let item of this.rawNodes) {
+        let data = {};
+        let type;
 
-      // Capture properties wanted for
-      for (let prop in item) {
-        let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
-        if (this.map.root[prop]) {
-          if (this.map.root[prop] === 'labels') {
-            data.labels = item.labels || [value];
-            type = value;
-          } else {
-            data[this.map.root[prop]] = this.map.callbacks[prop] ? this.valueCallback(this.map.callbacks[prop], value) : value;
+        // Capture properties wanted for
+        for (let prop in item) {
+          let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
+          if (this.map.root[prop]) {
+            if (this.map.root[prop] === 'labels') {
+              data.labels = item.labels || [value];
+              type = value;
+            } else if (prop === this.map.actor.dataProp && item.isActivity) {
+              data.properties = {
+                [this.map.actor.visualProp]: item[this.map.actor.dataProp]
+              };
+              data.text = this.evaluateCallbackOnValue(prop, value);
+            } else if (this.map.root[prop] === 'text') {
+              data.text = item.isActivity ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')];
+            } else {
+              data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value);
+            }
           }
         }
-      }
-      data.properties = {};
-      for (let gProp of this.map.properties) {
-        data.properties[gProp] = item[gProp];
-      }
-      if (type) {
-        for (let tProp of this.map.typeProperties[type]) {
-          data.properties[tProp] = item[tProp];
+        data.properties = data.properties || {};
+        for (let gProp of this.map.props) {
+          data.properties[gProp] = item[gProp];
         }
+        if (type && typeof this.map.typeProps === 'array') {
+          for (let tProp of this.map.typeProps[type]) {
+            data.properties[tProp] = item[tProp];
+          }
+        }
+        this.nodes.push(data);
       }
-      this.nodes.push(data);
+    } catch (e) {
+      this.error = e;
     }
     return this;
   }
