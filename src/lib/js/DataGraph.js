@@ -4,6 +4,7 @@ class DataGraph extends Graph {
     constructor(ops = {}) {
         super(ops)
         this.serviced = {}
+        this.storeResult = ops.storeResult || false
     }
 
     async dfsWithPromise(node) {
@@ -37,7 +38,7 @@ class DataGraph extends Graph {
             } else {
 
                 if (neighbors.length) {
-                    this.result.push(node)
+                    if (this.storeResult) this.result.push(node)
                     neighbors.forEach((function(neighbor, index) {
 
                         let id = neighbor[this.keys.id]
@@ -54,12 +55,12 @@ class DataGraph extends Graph {
                     }).bind(this))
                 } else {
                     node[this.keys.neighbors] = []
-                    this.result.push(node)
+                    if (this.storeResult) this.result.push(node)
                 }
             }
         }
         await Promise.all(this.promisesToAwait)
-        this.ops.continueVisual(this)
+        this.ops.onDataAcquired(this)
         return this
     }
 }
