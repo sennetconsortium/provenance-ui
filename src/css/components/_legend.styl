@@ -1,6 +1,12 @@
 .c-legend
   font-family $font-family
   padding 20px
+  &--filterable
+    &:hover
+      cursor pointer
+    .c-legend__label
+      &:hover
+        color $col-malibu
   &.has-hover
     .c-legend__color
       opacity .5
@@ -10,8 +16,11 @@
     display inline-block
   &__item
     &.has-hover
-      .c-legend__color
-        opacity 1
+      .c-legend
+        &__color
+          opacity 1
+        &__label
+          color $col-malibu
   &__color
     width 20px
     height 20px

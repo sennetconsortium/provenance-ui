@@ -124,7 +124,6 @@ class DataConverter {
     reformatNodes() {
         try {
             for (let item of this.rawNodes) {
-                console.log(item['sennet_id'])
                 let data = {}
                 let type;
 

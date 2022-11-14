@@ -18,7 +18,7 @@ export const AppProvider = ({children}) => {
     }
 
     useEffect(() => {
-        log.setLevel(getEnv('LOG_LEVEL'))
+        log.setLevel(getEnv('LOG_LEVEL') || 'silent')
         const token = getEnv('API_TOKEN')
         const url = getEnv('API_URL')
         const itemId = getEnv('API_ITEM_ID')

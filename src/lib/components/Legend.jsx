@@ -1,28 +1,45 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 
-function Legend({ colorMap }) {
+const Legend = ({ colorMap, filterNodes }) => {
     const [colors, setColors] = useState(colorMap)
+    const [filterable, setFilterable] = useState(filterNodes)
+    const loaded = useRef(false)
+    const $previous = useRef(null)
 
     useEffect(() => {
-        setEvents()
+        if (filterable && !loaded.current) setEvents()
     }, [])
 
     const setEvents = () => {
-        const toggleClass = (e, fn = 'addClass') => {
-            const hoverClass = 'has-hover'
-            const $el = $(e.currentTarget)
+        loaded.current = true
+        const stickClass = 'stickFilters'
+
+        const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
+            const $el = e ? $(e.currentTarget) : $previous.current
+            if (className === stickClass) {
+                $previous.current = e ? $el : null
+            }
             const node = $el.data('node')
-            $el[fn](hoverClass).parent()[fn](hoverClass)
-            $(`.node--${node}`)[fn](hoverClass)
-            $('.js-provenance')[fn](hoverClass)
+            $el[fn](className).parent()[fn](className)
+            $(`.node--${node}`)[fn](className)
+            $('.js-provenance')[fn](className)
         }
 
+        $('.js-legend__item').on('click', (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+            const fn = $(e.currentTarget).hasClass(stickClass) ? 'removeClass' : 'addClass'
+            //if ($previous.current && $(e.currentTarget) !== $previous.current) toggleClass(null, 'removeClass', stickClass)
+            toggleClass(e, fn, stickClass)
+
+        })
+
         $('.js-legend__item').on('mouseover', (e) => {
-            toggleClass(e)
+            if (!$('.js-provenance').hasClass(stickClass)) toggleClass(e)
         }).on('mouseleave', (e) => {
-            toggleClass(e, 'removeClass')
+            if (!$('.js-provenance').hasClass(stickClass)) toggleClass(e, 'removeClass')
         })
     }
 
@@ -44,14 +61,19 @@ function Legend({ colorMap }) {
     }
 
     return (
-        <div className={`c-legend`}>
+        <div className={`c-legend ${filterable ? 'c-legend--filterable' : ''}`}>
             {buildLegend()}
         </div>
     )
 }
 
+Legend.defaultProps = {
+    filterNodes: true
+}
+
 Legend.propTypes = {
-    colorMap: PropTypes.object.isRequired
+    colorMap: PropTypes.object.isRequired,
+    filterNodes: PropTypes.bool
 }
 
 export default Legend
