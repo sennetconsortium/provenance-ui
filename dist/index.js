@@ -15,6 +15,12 @@ Object.defineProperty(exports, "DataGraph", {
     return _DataGraph.default;
   }
 });
+Object.defineProperty(exports, "Graph", {
+  enumerable: true,
+  get: function get() {
+    return _Graph.default;
+  }
+});
 Object.defineProperty(exports, "Legend", {
   enumerable: true,
   get: function get() {
@@ -36,6 +42,7 @@ Object.defineProperty(exports, "ProvenanceUI", {
 var _react = _interopRequireDefault(require("react"));
 var _ProvenanceUI = _interopRequireDefault(require("./components/ProvenanceUI"));
 var _Legend = _interopRequireDefault(require("./components/Legend"));
+var _Graph = _interopRequireDefault(require("./js/Graph"));
 var _DataGraph = _interopRequireDefault(require("./js/DataGraph"));
 var _NeoGraph = _interopRequireDefault(require("./js/NeoGraph"));
 var _DataConverter = _interopRequireDefault(require("./js/DataConverter"));
