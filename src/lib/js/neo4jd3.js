@@ -15,7 +15,7 @@
 function Neo4jD3(_selector, _options) {
     let d3 = window.d3
 
-    let container, graph, info, node, nodes, relationship, relationshipOutline, relationshipOverlay, relationshipText, relationships, selector, simulation, svg, svgNodes, svgRelationships, svgScale, svgTranslate,
+    let container, graph, info, node, nodes, relationship, relationshipOutline, relationshipOverlay, relationshipText, relationships, selector, simulation, svg, svgNodes, svgRelationships, svgScale, svgTranslate, currentDataItem,
         classes2colors = {},
         justLoaded = false,
         numClasses = 0,
@@ -117,8 +117,13 @@ function Neo4jD3(_selector, _options) {
     function appendInfoElement(cls, isNode, property, value) {
         const isNavigation = property === options.idNavigate.prop
         let elem = info.append('a');
+        let href = '#'
+        if (isNavigation && options.idNavigate && options.idNavigate.url) {
+            href = options.idNavigate.url.replace('{classType}', currentDataItem.labels[0].toLowerCase()) + value
+        }
 
-        elem.attr('href', isNavigation ?  options.idNavigate.url + value : '#')
+        elem.attr('href', isNavigation ?  href : '#')
+            .attr('target', '_blank')
             .attr('class', cls + (!isNavigation ? ' flat' : ' has-hover'))
             .html('<strong>' + property + '</strong>' + (value ? (': ' + value) : ''));
 
@@ -914,6 +919,7 @@ function Neo4jD3(_selector, _options) {
 
     function updateInfo(d, isNode) {
         clearInfo();
+        currentDataItem = d
 
         isNode ? getInfoElement().classList.add(options.classes.infoNode) : getInfoElement().classList.remove(options.classes.infoNode)
         !isNode ? getInfoElement().classList.add(options.classes.infoRelation) : getInfoElement().classList.remove(options.classes.infoRelation)
