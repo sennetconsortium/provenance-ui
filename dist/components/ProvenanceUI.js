@@ -43,11 +43,12 @@ function ProvenanceUI(_ref) {
   (0, _useD.default)();
   const [graphData, setGraphData] = (0, _react.useState)(data);
   const [graphDataUrl, setDataUrl] = (0, _react.useState)(dataUrl);
+  const [selectorId, setSelectorId] = (0, _react.useState)(ops.selectorId || 'neo4jd3');
   (0, _react.useEffect)(() => {
     if (!ops.noStyles) {
       Promise.resolve("../ProvenanceUI.css").then(s => _interopRequireWildcard(require(s)));
     }
-    let neo4jd3 = new _neo4jd.default('#neo4jd3', {
+    let neo4jd3 = new _neo4jd.default("#".concat(selectorId), {
       highlight: ops.highlight || [{
         class: 'Dataset',
         property: 'sennet_id',
@@ -90,7 +91,7 @@ function ProvenanceUI(_ref) {
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "c-provenance js-provenance"
   }, /*#__PURE__*/_react.default.createElement("div", {
-    id: "neo4jd3"
+    id: selectorId
   }));
 }
 ProvenanceUI.propTypes = {

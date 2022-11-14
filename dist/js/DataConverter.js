@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+require("core-js/modules/es.object.assign.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _Graph = _interopRequireDefault(require("./Graph"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -41,12 +42,13 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  * }
  */
 class DataConverter {
-  constructor(rawData, map) {
+  constructor(rawData, map, list) {
     this.rawNodes = rawData;
     this.relationships = [];
     this.nodes = [];
     this.map = map;
     this.error = null;
+    this.list = list || {};
   }
   formatDate(val) {
     return new Date(val * 1000).toLocaleString();
@@ -54,6 +56,20 @@ class DataConverter {
   lastNameFirstInitial(val) {
     let name = val.split(' ');
     return name.length > 1 ? "".concat(name[1], ", ").concat(name[0][0], ".") : val;
+  }
+  getParentEntityTypeFromId(id) {
+    const rootKeys = Object.assign({}, ...Object.entries(this.map.root).map(_ref => {
+      let [a, b] = _ref;
+      return {
+        [b]: a
+      };
+    }));
+    try {
+      const type = this.list[id] ? this.list[id][rootKeys.labels] : '';
+      return type;
+    } catch (e) {
+      console.error(e);
+    }
   }
   valueCallback(cb, val) {
     if (typeof cb === 'string') {
@@ -99,6 +115,7 @@ class DataConverter {
           type: item.type,
           startNode: item.startNode,
           endNode: item.endNode,
+          parentType: this.getParentEntityTypeFromId(item.startNode),
           properties: {
             [idProp]: item[idProp],
             [this.map.actor.visualProp || 'actor']: item[actorProp]
@@ -147,11 +164,12 @@ class DataConverter {
         for (let gProp of this.map.props) {
           data.properties[gProp] = item[gProp];
         }
-        if (type && typeof this.map.typeProps === 'array') {
+        if (type && typeof this.map.typeProps[type] === 'object') {
           for (let tProp of this.map.typeProps[type]) {
-            data.properties[tProp] = item[tProp];
+            data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp]);
           }
         }
+        data.parentType = this.getParentEntityTypeFromId(item.parentId);
         this.nodes.push(data);
       }
     } catch (e) {

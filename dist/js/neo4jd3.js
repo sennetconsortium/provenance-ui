@@ -120,7 +120,8 @@ function Neo4jD3(_selector, _options) {
     let elem = info.append('a');
     let href = '#';
     if (isNavigation && options.idNavigate && options.idNavigate.url) {
-      href = options.idNavigate.url.replace('{classType}', currentDataItem.labels[0].toLowerCase()) + value;
+      const label = currentDataItem.labels ? currentDataItem.labels[0] : currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown';
+      href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value;
     }
     elem.attr('href', isNavigation ? href : '#').attr('target', '_blank').attr('class', cls + (!isNavigation ? ' flat' : ' has-hover')).html('<strong>' + property + '</strong>' + (value ? ': ' + value : ''));
     if (!value) {
@@ -149,6 +150,7 @@ function Neo4jD3(_selector, _options) {
         classes = 'node',
         label = d.labels[0];
       classes += " node--".concat(d.labels[0]);
+      if (d.parentType) classes += " for--".concat(d.parentType);
       if (icon(d)) {
         classes += ' node--icon';
       }
@@ -167,7 +169,7 @@ function Neo4jD3(_selector, _options) {
       }
       return classes;
     }).on('click', function (d) {
-      if (options.stickNodeInfoOnClick && info) {
+      if (options.stickNodeInfoOnClick) {
         updateInfo(d, true);
       }
       if (typeof options.onNodeClick === 'function') {
@@ -249,7 +251,11 @@ function Neo4jD3(_selector, _options) {
     updateWithNeo4jData(data);
   }
   function appendRelationship() {
-    return relationship.enter().append('g').attr('class', 'relationship').on('dblclick', function (d) {
+    return relationship.enter().append('g').attr('class', function (d) {
+      let className = 'relationship';
+      className = d.parentType ? "for--".concat(d.parentType, " ").concat(className) : className;
+      return className;
+    }).on('dblclick', function (d) {
       if (typeof options.onRelationshipDoubleClick === 'function') {
         options.onRelationshipDoubleClick(d);
       }

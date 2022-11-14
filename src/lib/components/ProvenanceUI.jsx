@@ -25,16 +25,16 @@ import PropTypes from 'prop-types';
  * @constructor
  */
 function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
-
     useD3()
     const [graphData, setGraphData] = useState(data)
     const [graphDataUrl, setDataUrl] = useState(dataUrl)
+    const [selectorId, setSelectorId] = useState(ops.selectorId || 'neo4jd3')
 
     useEffect(() => {
         if (!ops.noStyles) {
             import (`../ProvenanceUI.css`)
         }
-        let neo4jd3 = new Neo4jd3('#neo4jd3', {
+        let neo4jd3 = new Neo4jd3(`#${selectorId}`, {
             highlight: ops.highlight || [
                 {
                     class: 'Dataset',
@@ -77,7 +77,7 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
 
     return (
         <div className='c-provenance js-provenance'>
-            <div id="neo4jd3"></div>
+            <div id={selectorId}></div>
         </div>
     );
 }
