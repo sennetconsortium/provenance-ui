@@ -1,4 +1,5 @@
 .neo4jd3
+  opacity 0
   &__graph
     border 1px solid $col-alto
     border-radius 5px
@@ -44,8 +45,11 @@
         -ms-filter 'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)'
         filter unquote('alpha(opacity=50)')
         opacity .5
-        stroke $col-grey
+        stroke $col-lime
         stroke-width 12px
+      &.is-secondary
+        .ring
+          stroke $col-grey
 
     .outline
       cursor pointer

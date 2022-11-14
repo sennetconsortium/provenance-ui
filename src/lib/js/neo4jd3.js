@@ -174,6 +174,7 @@ function Neo4jD3(_selector, _options) {
 
                         if (d.labels[0] === highlight.class && d.properties[highlight.property] === highlight.value) {
                             classes += ' node--highlighted';
+                            classes = highlight.isSecondary ? classes + ' is-secondary' : classes
                             break;
                         }
                     }
@@ -595,6 +596,7 @@ function Neo4jD3(_selector, _options) {
     }
 
     function initSimulation() {
+
         let simulation = d3.forceSimulation()
             .force('collide', d3.forceCollide().radius(function(d) {
                 return options.minCollision;
@@ -613,7 +615,7 @@ function Neo4jD3(_selector, _options) {
                     zoomFit(2);
                 }
             });
-
+        fadeIn(document.querySelector(selector))
         return simulation;
     }
 
@@ -974,6 +976,21 @@ function Neo4jD3(_selector, _options) {
 
         relationshipText = svg.selectAll('.relationship .text');
         relationshipText = relationshipEnter.text.merge(relationshipText);
+    }
+
+    function fadeIn(element, duration = 600) {
+        if (!element) return
+        element.style.display = '';
+        element.style.opacity = 0;
+        var last = +new Date();
+        var tick = function() {
+            element.style.opacity = +element.style.opacity + (new Date() - last) / duration;
+            last = +new Date();
+            if (+element.style.opacity < 1) {
+                (window.requestAnimationFrame && requestAnimationFrame(tick)) || setTimeout(tick, 16);
+            }
+        };
+        tick();
     }
 
     function version() {

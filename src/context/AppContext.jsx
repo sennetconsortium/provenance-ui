@@ -77,11 +77,20 @@ export const AppProvider = ({children}) => {
                 //     property: 'sennet_id',
                 //     value: result.sennet_id
                 // }]
-                const highlight = [{
+                const neighbors = getNeighbors(result)
+                let highlight = [{
                     class: result[dataMap.highlight.labels],
                     property: dataMap.highlight.prop,
                     value: result[dataMap.highlight.prop]
                 }]
+                for (let n of neighbors ) {
+                    highlight.push({
+                        class: n[dataMap.highlight.labels],
+                        property: dataMap.highlight.prop,
+                        isSecondary: true,
+                        value: n[dataMap.highlight.prop]
+                    })
+                }
                 const ops =  {...getOptions(), highlight}
                 setOptions(ops)
                 log.debug('Options', ops)
