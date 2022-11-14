@@ -17,10 +17,10 @@ import Graph from './Graph'
  *         visualProp: 'researcher'
  *     },
  *     // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
- *     properties: ['uuid', 'sennet_id'],
+ *     props: ['uuid', 'sennet_id'],
  *
  *     // Capture specific properties from type raw data into the properties sub object of the ProvenanceUI API
- *     typeProperties: {
+ *     typeProps: {
  *         'Source': ['source_type'],
  *         'Sample': ['sample_category'],
  *         'Activity': ['created_timestamp', 'created_by_user_displayname']
@@ -148,12 +148,12 @@ class DataConverter {
                     }
                 }
                 data.properties = data.properties || {}
-                for (let gProp of this.map.properties) {
+                for (let gProp of this.map.props) {
                     data.properties[gProp] = item[gProp]
                 }
 
-                if (type && typeof this.map.typeProperties === 'array') {
-                    for (let tProp of this.map.typeProperties[type]) {
+                if (type && typeof this.map.typeProps === 'array') {
+                    for (let tProp of this.map.typeProps[type]) {
                         data.properties[tProp] = item[tProp]
                     }
                 }
