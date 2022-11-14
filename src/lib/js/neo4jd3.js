@@ -119,7 +119,9 @@ function Neo4jD3(_selector, _options) {
         let elem = info.append('a');
         let href = '#'
         if (isNavigation && options.idNavigate && options.idNavigate.url) {
-            href = options.idNavigate.url.replace('{classType}', currentDataItem.labels[0].toLowerCase()) + value
+            const label = currentDataItem.labels ? currentDataItem.labels[0]
+                : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
+            href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value
         }
 
         elem.attr('href', isNavigation ?  href : '#')
@@ -186,7 +188,7 @@ function Neo4jD3(_selector, _options) {
             })
             .on('click', function(d) {
 
-                if (options.stickNodeInfoOnClick && info) {
+                if (options.stickNodeInfoOnClick) {
                     updateInfo(d, true);
                 }
 

@@ -151,9 +151,9 @@ class DataConverter {
                     data.properties[gProp] = item[gProp]
                 }
 
-                if (type && typeof this.map.typeProps === 'array') {
+                if (type && typeof this.map.typeProps[type] === 'object') {
                     for (let tProp of this.map.typeProps[type]) {
-                        data.properties[tProp] = item[tProp]
+                        data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
                     }
                 }
                 this.nodes.push(data)
