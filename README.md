@@ -92,9 +92,9 @@ const dataMap = {
             created_by_user_displayname: 'text'
         },
         // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
-        properties: ['uuid', 'sennet_id'],
+        props: ['uuid', 'sennet_id'],
         // Capture specific properties from class/type raw data into the properties sub object of the ProvenanceUI API
-        typeProperties: {
+        typeProps: {
             Source: ['source_type'],
             Sample: ['sample_category'],
             Activity: ['created_timestamp', 'created_by_user_displayname']

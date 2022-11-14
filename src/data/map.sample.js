@@ -4,11 +4,15 @@ const dataMap = {
         uuid: 'id',
         created_by_user_displayname: 'text',
     },
+    highlight: {
+        labels: 'entity_type',
+        prop: 'sennet_id'
+    },
     actor: {
         dataProp: 'created_by_user_displayname',
         visualProp: 'researcher'
     },
-    properties: ['uuid', 'sennet_id'],
+    props: ['uuid', 'sennet_id'],
     typeProperties: {
         Source: ['source_type'],
         Sample: ['sample_category'],
