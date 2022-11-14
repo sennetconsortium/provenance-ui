@@ -15,6 +15,15 @@ const Legend = ({ colorMap, filterNodes }) => {
     const setEvents = () => {
         loaded.current = true
         const stickClass = 'stickFilters'
+        const selectors = {
+            legendItem: '.js-legend__item',
+            provenance: '.js-provenance'
+        }
+
+        const classFns = {
+            add: 'addClass',
+            remove: 'removeClass'
+        }
 
         const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
             const $el = e ? $(e.currentTarget) : $previous.current
@@ -24,22 +33,23 @@ const Legend = ({ colorMap, filterNodes }) => {
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
-            $('.js-provenance')[fn](className)
+            $(selectors.provenance)[fn](className)
         }
 
-        $('.js-legend__item').on('click', (e) => {
-            e.stopPropagation()
-            e.preventDefault()
-            const fn = $(e.currentTarget).hasClass(stickClass) ? 'removeClass' : 'addClass'
-            //if ($previous.current && $(e.currentTarget) !== $previous.current) toggleClass(null, 'removeClass', stickClass)
-            toggleClass(e, fn, stickClass)
+        // $(selectors.legendItem).on('click', (e) => {
+        //     e.stopPropagation()
+        //     e.preventDefault()
+        //
+        //     const fn = $(e.currentTarget).hasClass(stickClass) ? classFns.remove : classFns.add
+        //     let r = (fn === classFns.add) ? toggleClass(e) : toggleClass(e, classFns.remove)
+        //     //if ($previous.current && $(e.currentTarget) !== $previous.current) toggleClass(null, classFns.remove, stickClass)
+        //     toggleClass(e, fn, stickClass)
+        // })
 
-        })
-
-        $('.js-legend__item').on('mouseover', (e) => {
-            if (!$('.js-provenance').hasClass(stickClass)) toggleClass(e)
+        $(selectors.legendItem).on('mouseover', (e) => {
+            if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
         }).on('mouseleave', (e) => {
-            if (!$('.js-provenance').hasClass(stickClass)) toggleClass(e, 'removeClass')
+            if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass')
         })
     }
 
