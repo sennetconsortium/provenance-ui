@@ -1027,6 +1027,7 @@ function Neo4jD3(_selector, _options) {
         zoomFit: zoomFit,
         updateWithD3Data: updateWithD3Data,
         updateWithNeo4jData: updateWithNeo4jData,
+        classes2colors: classes2colors,
         version: version
     };
 }
