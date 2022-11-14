@@ -49,12 +49,12 @@ class NeoGraph extends Graph {
             if (neighbors && neighbors.length) {
                 neighbors.forEach(function(neighbor, index) {
                     let n = neighbor[_t.keys.id]
-
-                    _t.addActor(node, n)
+                    
+                    _t.addActor(node, n, current)
                     _t.checkVisited(n, neighbor)
                 })
             } else {
-                this.addActor(node)
+                this.addActor(node, null, current)
             }
         }
     }
@@ -64,7 +64,7 @@ class NeoGraph extends Graph {
      * @param node Object
      * @param nodeId String
      */
-    addActor(node, nodeId) {
+    addActor(node, nodeId, parentId) {
         this.result.push({
             ...node,
             startNode: this.getNodeId(this.actIndex),
@@ -72,7 +72,8 @@ class NeoGraph extends Graph {
             type: this.labels.edge.actor,
             labels: this.labels.actor,
             id: this.getNodeId(this.actIndex),
-            isActivity: true
+            isActivity: true,
+            parentId: parentId
         })
     }
 

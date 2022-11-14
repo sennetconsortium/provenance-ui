@@ -60,7 +60,7 @@ export const AppProvider = ({children}) => {
                 log.debug('NeoGraph', neoGraph.getResult())
 
                 // Convert the data into a format usable by the graph visual, i.e. neo4j format
-                const converter = new DataConverter(neoGraph.getResult(), dataMap)
+                const converter = new DataConverter(neoGraph.getResult(), dataMap, dataGraph.list)
                 converter.reformatNodes()
                 converter.reformatRelationships()
 

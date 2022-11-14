@@ -34,12 +34,13 @@ import Graph from './Graph'
  * }
  */
 class DataConverter {
-    constructor(rawData, map) {
+    constructor(rawData, map, list) {
         this.rawNodes = rawData;
         this.relationships = []
         this.nodes = []
         this.map = map
         this.error = null
+        this.list = list || {}
     }
 
     formatDate(val) {
@@ -49,6 +50,17 @@ class DataConverter {
     lastNameFirstInitial(val) {
         let name = val.split(' ')
         return name.length > 1 ? `${name[1]}, ${name[0][0]}.` : val
+    }
+
+    getParentEntityTypeFromId(id) {
+        const rootKeys = Object.assign({}, ...Object.entries(this.map.root).map(([a,b]) => ({ [b]: a })))
+        try {
+            const type = this.list[id] ? this.list[id][rootKeys.labels] : ''
+            return type
+        } catch (e) {
+            console.error(e)
+        }
+
     }
 
     valueCallback(cb, val) {
@@ -98,6 +110,7 @@ class DataConverter {
                     type: item.type,
                     startNode: item.startNode,
                     endNode: item.endNode,
+                    parentType: this.getParentEntityTypeFromId(item.startNode),
                     properties: {
                         [idProp] : item[idProp],
                         [this.map.actor.visualProp || 'actor']: item[actorProp]
@@ -156,6 +169,7 @@ class DataConverter {
                         data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
                     }
                 }
+                data.parentType = this.getParentEntityTypeFromId(item.parentId)
                 this.nodes.push(data)
             }
         } catch (e) {

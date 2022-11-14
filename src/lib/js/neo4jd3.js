@@ -164,6 +164,8 @@ function Neo4jD3(_selector, _options) {
 
                 classes += ` node--${d.labels[0]}`
 
+                if (d.parentType) classes += ` for--${d.parentType}`
+
                 if (icon(d)) {
                     classes += ' node--icon';
                 }
@@ -305,9 +307,14 @@ function Neo4jD3(_selector, _options) {
     }
 
     function appendRelationship() {
+
         return relationship.enter()
             .append('g')
-            .attr('class', 'relationship')
+            .attr('class', function(d) {
+                let className = 'relationship'
+                className = d.parentType ? `for--${d.parentType} ${className}` : className
+                return className
+            })
             .on('dblclick', function(d) {
                 if (typeof options.onRelationshipDoubleClick === 'function') {
                     options.onRelationshipDoubleClick(d);
