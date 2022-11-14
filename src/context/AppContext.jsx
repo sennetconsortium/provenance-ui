@@ -22,20 +22,23 @@ export const AppProvider = ({children}) => {
         const token = getEnv('API_TOKEN')
         const url = getEnv('API_URL')
         const itemId = getEnv('API_ITEM_ID')
-        let ops = getEnv('OPTIONS')
-        log.debug('Environment options', ops)
-        try {
-            if (ops) {
-                setOptions(JSON.parse(ops))
+
+        const getOptions = () => {
+            let ops = getEnv('OPTIONS')
+            log.debug('Environment options', ops)
+            try {
+                if (ops) {
+                    return JSON.parse(ops)
+                }
+            } catch (e) {
+                log.debug('Issue parsing options', e)
             }
-        } catch (e) {
-            log.debug('Issue parsing options', e)
+            return {}
         }
 
         const graphOps = { token, url, keys: {neighbors: 'direct_ancestors'} }
 
-
-        const handleResult = async (result) => {
+        const handleResult = (result) => {
 
             const rawData = result.descendants ? (!result.descendants.length ? result : result.descendants) : result
             log.debug('Result from fetch', result)
@@ -48,10 +51,11 @@ export const AppProvider = ({children}) => {
                 return neighbors
             }
 
-            const continueVisual = (dataGraph) => {
+            const onDataAcquired = (dataGraph) => {
+                log.debug('DataGraph', dataGraph.list)
+
                 // Traverse graph data and create graph properties
-                const neoGraph = new NeoGraph({... graphOps, getNeighbors, list: dataGraph.list, isNeo: true })
-                //neoGraph.dfs(dataGraph.getResult()[])
+                const neoGraph = new NeoGraph({... graphOps, getNeighbors, list: dataGraph.list })
                 neoGraph.dfs(rawData)
                 log.debug('NeoGraph', neoGraph.getResult())
 
@@ -67,14 +71,27 @@ export const AppProvider = ({children}) => {
                 })
 
                 log.debug('NeoData for graph visual ...', neoData)
+
+                // const highlight = [{
+                //     class: result.entity_type,
+                //     property: 'sennet_id',
+                //     value: result.sennet_id
+                // }]
+                const highlight = [{
+                    class: result[dataMap.highlight.labels],
+                    property: dataMap.highlight.prop,
+                    value: result[dataMap.highlight.prop]
+                }]
+                const ops =  {...getOptions(), highlight}
+                setOptions(ops)
+                log.debug('Options', ops)
                 setContextData(neoData)
                 setLoading(false)
             }
 
             // Traverse the data and fetch all neighbors for each node.
-            const dataGraph = new DataGraph({... graphOps, getNeighbors, continueVisual })
-            await dataGraph.dfsWithPromise(rawData)
-            log.debug('DataGraph', dataGraph.list)
+            const dataGraph = new DataGraph({... graphOps, getNeighbors, onDataAcquired })
+            dataGraph.dfsWithPromise(rawData)
             return dataGraph
         }
         if (token.length && url.length && itemId.length) {
