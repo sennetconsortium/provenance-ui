@@ -49,7 +49,7 @@ class NeoGraph extends Graph {
             if (neighbors && neighbors.length) {
                 neighbors.forEach(function(neighbor, index) {
                     let n = neighbor[_t.keys.id]
-                    
+
                     _t.addActor(node, n, current)
                     _t.checkVisited(n, neighbor)
                 })
