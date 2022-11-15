@@ -171,6 +171,8 @@ function Neo4jD3(_selector, _options) {
 
                 if (d.parentType) classes += ` for--${d.parentType}`
 
+                if (d.wasClicked) classes += ` is-visited`
+
                 if (icon(d)) {
                     classes += ' node--icon';
                 }
@@ -194,7 +196,7 @@ function Neo4jD3(_selector, _options) {
                 return classes;
             })
             .on('click', function(d) {
-
+                d.wasClicked = true
                 if (options.stickNodeInfoOnClick) {
                     updateInfo(d, true);
                 }
