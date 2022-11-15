@@ -10,7 +10,7 @@ function App() {
     return (
         <div className={`c-App`}>
             { loading && <ProvenanceUI data={sample} /> }
-            { !loading && contextData && <ProvenanceUI data={contextData} ops={ options } /> }
+            { !loading && contextData && <ProvenanceUI data={contextData} options={ options } /> }
             { options.colorMap && <Legend colorMap={options.colorMap} /> }
         </div>
     )

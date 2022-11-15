@@ -36,20 +36,21 @@ function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && 
  */
 function ProvenanceUI(_ref) {
   let {
+    children,
     data,
-    ops = {},
+    options = {},
     dataUrl = null
   } = _ref;
   (0, _useD.default)();
   const [graphData, setGraphData] = (0, _react.useState)(data);
   const [graphDataUrl, setDataUrl] = (0, _react.useState)(dataUrl);
-  const [selectorId, setSelectorId] = (0, _react.useState)(ops.selectorId || 'neo4jd3');
+  const selectorId = options.selectorId || 'neo4jd3';
   (0, _react.useEffect)(() => {
-    if (!ops.noStyles) {
+    if (!options.noStyles) {
       Promise.resolve("../ProvenanceUI.css").then(s => _interopRequireWildcard(require(s)));
     }
     let neo4jd3 = new _neo4jd.default("#".concat(selectorId), {
-      highlight: ops.highlight || [{
+      highlight: options.highlight || [{
         class: 'Dataset',
         property: 'sennet_id',
         value: 'SNT264.VWKZ.629'
@@ -58,21 +59,21 @@ function ProvenanceUI(_ref) {
         property: 'sennet_id',
         value: 'SNT385.FJPB.242'
       }],
-      setNodeLabels: ops.setNodeLabels !== undefined ? ops.setNodeLabels : true,
-      colorMaps: ops.colorMaps || {
+      setNodeLabels: options.setNodeLabels !== undefined ? options.setNodeLabels : true,
+      colorMaps: options.colorMaps || {
         "Dataset": "#8ecb93",
         "Activity": "#f16766",
         "Sample": "#ebb5c8",
         "Source": "#ffc255"
       },
-      idNavigate: ops.idNavigate || {
+      idNavigate: options.idNavigate || {
         prop: ''
       },
-      minCollision: ops.minCollison || 60,
+      minCollision: options.minCollison || 60,
       neo4jData: graphData,
       neo4jDataUrl: graphDataUrl,
-      nodeRadius: ops.nodeRadius || 25,
-      onNodeDoubleClick: ops.onNodeDoubleClick || function (node) {
+      nodeRadius: options.nodeRadius || 25,
+      onNodeDoubleClick: options.onNodeDoubleClick || function (node) {
         switch (node.action) {
           case 'url':
             window.open(node.properties.url, '_blank');
@@ -81,10 +82,10 @@ function ProvenanceUI(_ref) {
             break;
         }
       },
-      onRelationshipDoubleClick: ops.onRelationshipDoubleClick || function (relationship) {
+      onRelationshipDoubleClick: options.onRelationshipDoubleClick || function (relationship) {
         // console.log('double click on relationship: ' + JSON.stringify(relationship));
       },
-      zoomFit: ops.zoomFit || false
+      zoomFit: options.zoomFit || false
     });
     window.ProvenanceUId3 = neo4jd3;
   }, []);
@@ -92,12 +93,13 @@ function ProvenanceUI(_ref) {
     className: "c-provenance js-provenance"
   }, /*#__PURE__*/_react.default.createElement("div", {
     id: selectorId
-  }));
+  }), children);
 }
 ProvenanceUI.propTypes = {
-  ops: _propTypes.default.object,
+  options: _propTypes.default.object,
   data: _propTypes.default.object,
-  dataUrl: _propTypes.default.string
+  dataUrl: _propTypes.default.string,
+  children: _propTypes.default.node
 };
 var _default = ProvenanceUI;
 exports.default = _default;

@@ -24,18 +24,18 @@ import PropTypes from 'prop-types';
  * @returns {JSX.Element}
  * @constructor
  */
-function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
+function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
     useD3()
     const [graphData, setGraphData] = useState(data)
     const [graphDataUrl, setDataUrl] = useState(dataUrl)
-    const [selectorId, setSelectorId] = useState(ops.selectorId || 'neo4jd3')
+    const selectorId = options.selectorId || 'neo4jd3'
 
     useEffect(() => {
-        if (!ops.noStyles) {
+        if (!options.noStyles) {
             import (`../ProvenanceUI.css`)
         }
         let neo4jd3 = new Neo4jd3(`#${selectorId}`, {
-            highlight: ops.highlight || [
+            highlight: options.highlight || [
                 {
                     class: 'Dataset',
                     property: 'sennet_id',
@@ -46,19 +46,19 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
                     value: 'SNT385.FJPB.242'
                 }
             ],
-            setNodeLabels: (ops.setNodeLabels !== undefined) ? ops.setNodeLabels : true,
-            colorMaps: ops.colorMaps || {
+            setNodeLabels: (options.setNodeLabels !== undefined) ? options.setNodeLabels : true,
+            colorMaps: options.colorMaps || {
                 "Dataset": "#8ecb93",
                 "Activity": "#f16766",
                 "Sample": "#ebb5c8",
                 "Source": "#ffc255"
             },
-            idNavigate: ops.idNavigate || { prop: '' },
-            minCollision: ops.minCollison || 60,
+            idNavigate: options.idNavigate || { prop: '' },
+            minCollision: options.minCollison || 60,
             neo4jData: graphData,
             neo4jDataUrl: graphDataUrl,
-            nodeRadius: ops.nodeRadius || 25,
-            onNodeDoubleClick: ops.onNodeDoubleClick || function (node) {
+            nodeRadius: options.nodeRadius || 25,
+            onNodeDoubleClick: options.onNodeDoubleClick || function (node) {
                 switch (node.action) {
                     case 'url':
                         window.open(node.properties.url, '_blank');
@@ -67,10 +67,10 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
                         break;
                 }
             },
-            onRelationshipDoubleClick: ops.onRelationshipDoubleClick || function (relationship) {
+            onRelationshipDoubleClick: options.onRelationshipDoubleClick || function (relationship) {
                 // console.log('double click on relationship: ' + JSON.stringify(relationship));
             },
-            zoomFit: ops.zoomFit || false
+            zoomFit: options.zoomFit || false
         });
         window.ProvenanceUId3 = neo4jd3
     }, []);
@@ -78,14 +78,16 @@ function ProvenanceUI({ data, ops = {}, dataUrl = null }) {
     return (
         <div className='c-provenance js-provenance'>
             <div id={selectorId}></div>
+            {children}
         </div>
     );
 }
 
 ProvenanceUI.propTypes = {
-    ops: PropTypes.object,
+    options: PropTypes.object,
     data: PropTypes.object,
-    dataUrl: PropTypes.string
+    dataUrl: PropTypes.string,
+    children: PropTypes.node
 }
 
 export default ProvenanceUI;
