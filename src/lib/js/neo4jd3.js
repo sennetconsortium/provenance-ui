@@ -39,7 +39,8 @@ function Neo4jD3(_selector, _options) {
             zoomFit: false,
             idNavigate: {
                 prop: '',
-                url: ''
+                url: '',
+                exclude: []
             },
             theme: {
                 colors: {
@@ -116,17 +117,21 @@ function Neo4jD3(_selector, _options) {
 
     function appendInfoElement(cls, isNode, property, value) {
         const isNavigation = property === options.idNavigate.prop
+        let formattedUrl = false;
         let elem = info.append('a');
-        let href = '#'
+        let href = '#';
         if (isNavigation && options.idNavigate && options.idNavigate.url) {
             const label = currentDataItem.labels ? currentDataItem.labels[0]
                 : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
-            href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value
+            if (options.idNavigate.exclude.indexOf(label) === -1) {
+                formattedUrl = true;
+                href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value;
+            }
         }
 
-        elem.attr('href', isNavigation ?  href : '#')
-            .attr('target', '_blank')
-            .attr('class', cls + (!isNavigation ? ' flat' : ' has-hover'))
+        elem.attr('href', formattedUrl ?  href : '#')
+            .attr('target', formattedUrl ? '_blank' : '_parent')
+            .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
             .html('<strong>' + property + '</strong>' + (value ? (': ' + value) : ''));
 
         if (!value) {

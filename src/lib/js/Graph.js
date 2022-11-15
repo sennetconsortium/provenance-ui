@@ -1,3 +1,9 @@
+/**
+ * Base class with common options.
+ * @author dbmi.pitt.edu
+ * @param ops Object
+ **/
+
 class Graph {
     constructor(ops = {}) {
         this.ops = ops

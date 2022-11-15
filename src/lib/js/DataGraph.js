@@ -1,5 +1,11 @@
 import Graph from './Graph'
 
+/**
+ * Gathers all data and relationships.
+ * @author dbmi.pitt.edu
+ *
+ **/
+
 class DataGraph extends Graph {
     constructor(ops = {}) {
         super(ops)

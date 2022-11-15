@@ -6,6 +6,12 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.promise.js");
+/**
+ * Base class with common options.
+ * @author dbmi.pitt.edu
+ * @param ops Object
+ **/
+
 class Graph {
   constructor() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};

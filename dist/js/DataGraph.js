@@ -8,6 +8,12 @@ require("core-js/modules/es.promise.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _Graph = _interopRequireDefault(require("./Graph"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/**
+ * Gathers all data and relationships.
+ * @author dbmi.pitt.edu
+ *
+ **/
+
 class DataGraph extends _Graph.default {
   constructor() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
