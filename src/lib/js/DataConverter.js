@@ -4,7 +4,9 @@ import Graph from './Graph'
  * Converts any data object to neo4j formatted data for the visualization.
  * Requires provision of a properties map. See example below.
  * @author dbmi.pitt.edu
- *
+ * @param rawData {object}
+ * @param map {object}
+ * @param list {object} Key value pair of nodes and the corresponding node data with all its neighbors
  * map = {
  *     // Map Specific properties from raw data to required properties of the ProvenanceUI API
  *     root: {
@@ -43,15 +45,30 @@ class DataConverter {
         this.list = list || {}
     }
 
+    /**
+     * Formats a date.
+     * @param val
+     * @returns {string}
+     */
     formatDate(val) {
         return new Date(val * 1000).toLocaleString()
     }
 
+    /**
+     * Formats a given name into "Last name, F." initial format
+     * @param val
+     * @returns {string|*}
+     */
     lastNameFirstInitial(val) {
         let name = val.split(' ')
         return name.length > 1 ? `${name[1]}, ${name[0][0]}.` : val
     }
 
+    /**
+     * Returns a parent entity type from provided list object
+     * @param id
+     * @returns {*|string}
+     */
     getParentEntityTypeFromId(id) {
         const rootKeys = Object.assign({}, ...Object.entries(this.map.root).map(([a,b]) => ({ [b]: a })))
         try {
@@ -63,8 +80,13 @@ class DataConverter {
 
     }
 
+    /**
+     * Runs a callback on a given value
+     * @param cb {function}
+     * @param val {string}
+     * @returns {string}
+     */
     valueCallback(cb, val) {
-
         if (typeof cb === 'string') {
             if (typeof this[cb]  === 'function') {
                 return this[cb](val)
@@ -76,10 +98,16 @@ class DataConverter {
             } catch (e) {
                 console.log(e)
             }
-
         }
+        return val
     }
 
+    /**
+     * Returns a particular node as a highlight
+     * @param prop {string}
+     * @param index {int}
+     * @returns {{property: string, class: string, value: string}}
+     */
     getNodeAsHighlight(prop, index = 0) {
         const node = this.nodes[index]
         return {
@@ -89,6 +117,11 @@ class DataConverter {
         }
     }
 
+    /**
+     * Returns a property name from the map.root
+     * @param key {string}
+     * @returns {string}
+     */
     getPropFromMap(key = 'id') {
         let result = '_id'
         for (let prop in this.map.root) {
@@ -99,6 +132,9 @@ class DataConverter {
         return result
     }
 
+    /**
+     * Formats the relationships for the graph visualization.
+     */
     reformatRelationships() {
         let i = 0;
         const idProp = this.getPropFromMap()
@@ -130,10 +166,21 @@ class DataConverter {
         this.reformatRelationships()
     }
 
+    /**
+     * Determines if a callback should be run.
+     * @param prop {string}
+     * @param value
+     * @returns {string|*}
+     */
     evaluateCallbackOnValue(prop, value) {
         return this.map.callbacks[prop]
             ? this.valueCallback(this.map.callbacks[prop], value) : value;
     }
+
+    /**
+     * Reformates node entities for graph visualization.
+     * @returns {DataConverter}
+     */
     reformatNodes() {
         try {
             for (let item of this.rawNodes) {
@@ -178,17 +225,25 @@ class DataConverter {
 
         return this;
     }
-    
+
+    /**
+     * Returns all node
+     * @returns {[]}
+     */
     getNodes() {
         return this.nodes;
     }
 
+    /**
+     * Return all relationships
+     * @returns {[]}
+     */
     getRelationships() {
         return this.relationships;
     }
 
     /**
-     *
+     * Return neo4jFormatted data
      * @param data
      * @returns {{results: [{data: [{graph: {relationships: *, nodes: *}}], columns: []}], errors: *[]}}
      */

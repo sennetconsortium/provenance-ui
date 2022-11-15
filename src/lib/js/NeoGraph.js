@@ -21,15 +21,18 @@ class NeoGraph extends Graph {
         this.actIndex = -1
     }
 
+    /**
+     * Traverses graph given a root note.
+     * @param node {object}
+     */
     dfs(node) {
-        const _t = this
         super.dfs(node)
 
         while (this.stack.length) {
             let current = this.stack.pop()
             let node = this.list[current]
 
-            ++_t.actIndex
+            ++this.actIndex
 
             this.result.push({
                 ...node,
@@ -47,12 +50,11 @@ class NeoGraph extends Graph {
             }
 
             if (neighbors && neighbors.length) {
-                neighbors.forEach(function(neighbor, index) {
-                    let n = neighbor[_t.keys.id]
-
-                    _t.addActor(node, n, current)
-                    _t.checkVisited(n, neighbor)
-                })
+                neighbors.forEach((function(neighbor, index) {
+                    let n = neighbor[this.keys.id]
+                    this.addActor(node, n, current)
+                    this.checkVisited(n, neighbor)
+                }).bind(this))
             } else {
                 this.addActor(node, null, current)
             }
@@ -60,9 +62,9 @@ class NeoGraph extends Graph {
     }
 
     /**
-     *
-     * @param node Object
-     * @param nodeId String
+     * Adds an actor node.
+     * @param node {object}
+     * @param nodeId {string}
      */
     addActor(node, nodeId, parentId) {
         this.result.push({
@@ -77,8 +79,13 @@ class NeoGraph extends Graph {
         })
     }
 
+    /**
+     * Returns a node id.
+     * @param id
+     * @returns {string}
+     */
     getNodeId(id) {
-        return 'Acv-' + id
+        return 'Act-' + id
     }
 }
 

@@ -1,11 +1,10 @@
 import Graph from './Graph'
 
 /**
- * Gathers all data and relationships.
+ * Uses DFS algorithm to gather all data and relationships via ajax calls.
  * @author dbmi.pitt.edu
  *
  **/
-
 class DataGraph extends Graph {
     constructor(ops = {}) {
         super(ops)
@@ -13,6 +12,11 @@ class DataGraph extends Graph {
         this.storeResult = ops.storeResult || false
     }
 
+    /**
+     * Initializes a dfs setup with promise
+     * @param node
+     * @returns {Promise<DataGraph>}
+     */
     async dfsWithPromise(node) {
         this.root = node
         const id = node[this.keys.id]
@@ -26,6 +30,11 @@ class DataGraph extends Graph {
         return this
     }
 
+    /**
+     * Continues the dfs algorithm with promise
+     * @param ops
+     * @returns {Promise<DataGraph>}
+     */
     async continueDfs(ops = {}) {
         while (this.stack.length) {
             let current = this.stack.pop()

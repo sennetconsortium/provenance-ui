@@ -8,6 +8,13 @@ import dataMap from '../data/map.sample'
 
 const AppContext = createContext()
 
+/**
+ * This sets up an example for usage and testing by developer. Use the .env to pass in values.
+ * @param children
+ * @returns {JSX.Element}
+ * @constructor
+ */
+
 export const AppProvider = ({children}) => {
     const [contextData, setContextData] = useState(null)
     const [loading, setLoading] = useState(false)
@@ -72,11 +79,6 @@ export const AppProvider = ({children}) => {
 
                 log.debug('NeoData for graph visual ...', neoData)
 
-                // const highlight = [{
-                //     class: result.entity_type,
-                //     property: 'sennet_id',
-                //     value: result.sennet_id
-                // }]
                 const neighbors = getNeighbors(result)
                 let highlight = [{
                     class: result[dataMap.highlight.labels],

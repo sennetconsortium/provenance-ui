@@ -27,6 +27,12 @@ class Graph {
     this.result = [];
     this.root = null;
   }
+
+  /**
+   * Makes a ajax call
+   * @param ops {object}
+   * @returns {Promise<Graph>}
+   */
   async service() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     try {
@@ -51,6 +57,11 @@ class Graph {
     }
     return this;
   }
+
+  /**
+   * DFS initialization
+   * @param node {object}
+   */
   dfs(node) {
     this.root = node;
     const id = node[this.keys.id];
@@ -63,6 +74,12 @@ class Graph {
   continueDfs() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   }
+
+  /**
+   * Determines if a node has already been visited
+   * @param id {string}
+   * @param node {object}
+   */
   checkVisited(id, node) {
     if (!this.visited[id]) {
       if (this.list[id] === undefined) {
@@ -72,6 +89,11 @@ class Graph {
       this.stack.push(id);
     }
   }
+
+  /**
+   * Returns result
+   * @returns {[]}
+   */
   getResult() {
     return this.result;
   }

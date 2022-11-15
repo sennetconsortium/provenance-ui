@@ -31,13 +31,17 @@ class NeoGraph extends _Graph.default {
     this.labels.actor = this.labels.actor || ['Activity'];
     this.actIndex = -1;
   }
+
+  /**
+   * Traverses graph given a root note.
+   * @param node {object}
+   */
   dfs(node) {
-    const _t = this;
     super.dfs(node);
     while (this.stack.length) {
       let current = this.stack.pop();
       let node = this.list[current];
-      ++_t.actIndex;
+      ++this.actIndex;
       this.result.push(_objectSpread(_objectSpread({}, node), {}, {
         startNode: current,
         endNode: this.getNodeId(this.actIndex),
@@ -52,10 +56,10 @@ class NeoGraph extends _Graph.default {
       }
       if (neighbors && neighbors.length) {
         neighbors.forEach(function (neighbor, index) {
-          let n = neighbor[_t.keys.id];
-          _t.addActor(node, n, current);
-          _t.checkVisited(n, neighbor);
-        });
+          let n = neighbor[this.keys.id];
+          this.addActor(node, n, current);
+          this.checkVisited(n, neighbor);
+        }.bind(this));
       } else {
         this.addActor(node, null, current);
       }
@@ -63,9 +67,9 @@ class NeoGraph extends _Graph.default {
   }
 
   /**
-   *
-   * @param node Object
-   * @param nodeId String
+   * Adds an actor node.
+   * @param node {object}
+   * @param nodeId {string}
    */
   addActor(node, nodeId, parentId) {
     this.result.push(_objectSpread(_objectSpread({}, node), {}, {
@@ -78,8 +82,14 @@ class NeoGraph extends _Graph.default {
       parentId: parentId
     }));
   }
+
+  /**
+   * Returns a node id.
+   * @param id
+   * @returns {string}
+   */
   getNodeId(id) {
-    return 'Acv-' + id;
+    return 'Act-' + id;
   }
 }
 var _default = NeoGraph;

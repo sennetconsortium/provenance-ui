@@ -9,11 +9,10 @@ require("core-js/modules/web.dom-collections.iterator.js");
 var _Graph = _interopRequireDefault(require("./Graph"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /**
- * Gathers all data and relationships.
+ * Uses DFS algorithm to gather all data and relationships via ajax calls.
  * @author dbmi.pitt.edu
  *
  **/
-
 class DataGraph extends _Graph.default {
   constructor() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
@@ -21,6 +20,12 @@ class DataGraph extends _Graph.default {
     this.serviced = {};
     this.storeResult = ops.storeResult || false;
   }
+
+  /**
+   * Initializes a dfs setup with promise
+   * @param node
+   * @returns {Promise<DataGraph>}
+   */
   async dfsWithPromise(node) {
     this.root = node;
     const id = node[this.keys.id];
@@ -33,6 +38,12 @@ class DataGraph extends _Graph.default {
     this.continueDfs();
     return this;
   }
+
+  /**
+   * Continues the dfs algorithm with promise
+   * @param ops
+   * @returns {Promise<DataGraph>}
+   */
   async continueDfs() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     while (this.stack.length) {
