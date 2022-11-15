@@ -187,7 +187,7 @@ function Neo4jD3(_selector, _options) {
 
                         if (d.labels[0] === highlight.class && d.properties[highlight.property] === highlight.value) {
                             classes += ' node--highlighted';
-                            classes = highlight.isSecondary ? classes + ' is-secondary' : classes
+                            classes = highlight.isSecondary ? classes + ' is-secondary' : classes + ' is-primary'
                             break;
                         }
                     }
