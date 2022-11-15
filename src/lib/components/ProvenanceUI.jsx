@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import Neo4jd3 from '../js/neo4jd3'
 import useD3 from '../hooks/useD3'
-import PropTypes from 'prop-types';
+import PropTypes from 'prop-types'
+import $ from 'jquery'
 
 /**
  *
@@ -29,6 +30,12 @@ function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
     const [graphData, setGraphData] = useState(data)
     const [graphDataUrl, setDataUrl] = useState(dataUrl)
     const selectorId = options.selectorId || 'neo4jd3'
+
+    const addVisitedClass = () => {
+        $(`#${selectorId}`).on('click', '.node', function(e) {
+            $(e.currentTarget).addClass('is-visited')
+        })
+    }
 
     useEffect(() => {
         if (!options.noStyles) {
@@ -73,6 +80,7 @@ function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
             zoomFit: options.zoomFit || false
         });
         window.ProvenanceUId3 = neo4jd3
+        addVisitedClass()
     }, []);
 
     return (

@@ -10,6 +10,7 @@ var _react = _interopRequireWildcard(require("react"));
 var _neo4jd = _interopRequireDefault(require("../js/neo4jd3"));
 var _useD = _interopRequireDefault(require("../hooks/useD3"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
+var _jquery = _interopRequireDefault(require("jquery"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -45,6 +46,11 @@ function ProvenanceUI(_ref) {
   const [graphData, setGraphData] = (0, _react.useState)(data);
   const [graphDataUrl, setDataUrl] = (0, _react.useState)(dataUrl);
   const selectorId = options.selectorId || 'neo4jd3';
+  const addVisitedClass = () => {
+    (0, _jquery.default)("#".concat(selectorId)).on('click', '.node', function (e) {
+      (0, _jquery.default)(e.currentTarget).addClass('is-visited');
+    });
+  };
   (0, _react.useEffect)(() => {
     if (!options.noStyles) {
       Promise.resolve("../ProvenanceUI.css").then(s => _interopRequireWildcard(require(s)));
@@ -88,6 +94,7 @@ function ProvenanceUI(_ref) {
       zoomFit: options.zoomFit || false
     });
     window.ProvenanceUId3 = neo4jd3;
+    addVisitedClass();
   }, []);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "c-provenance js-provenance"
