@@ -1,7 +1,7 @@
 import {createContext, useState, useEffect, useRef} from 'react'
 import log from 'loglevel'
 
-import OneNodeAndArray from '../usage/OneNodeAndArray'
+import  GenericObject from '../usage/GenericObject'
 
 const AppContext = createContext()
 
@@ -44,7 +44,7 @@ export const AppProvider = ({children}) => {
         }
         const handleOneNode = async () => {
             setLoading(true)
-            const result = await OneNodeAndArray({token, url, itemId, getOptions, setOptions, setContextData, setLoading})
+            const result = await  GenericObject({token, url, itemId, getOptions, setOptions, setContextData, setLoading})
         }
         handleOneNode()
 

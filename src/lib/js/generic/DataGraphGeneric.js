@@ -1,11 +1,11 @@
-import Graph from './Graph'
+import GraphGeneric from './GraphGeneric'
 
 /**
  * Uses DFS algorithm to gather all data and relationships via ajax calls.
  * @author dbmi.pitt.edu
  *
  **/
-class DataGraph extends Graph {
+class DataGraphGeneric extends GraphGeneric {
     constructor(ops = {}) {
         super(ops)
         this.serviced = {}
@@ -72,4 +72,4 @@ class DataGraph extends Graph {
     }
 }
 
-export default DataGraph
+export default DataGraphGeneric

@@ -2,8 +2,8 @@
  * Uses DFS algorithm to find all nodes and neighbors.
  * @author dbmi.pitt.edu
  */
-import Graph from './Graph'
-class NeoGraph extends Graph {
+import GraphGeneric from './GraphGeneric'
+class NeoGraphGeneric extends GraphGeneric {
     /**
      * Traverses a graph dataset.
      * @param ops Object
@@ -89,4 +89,4 @@ class NeoGraph extends Graph {
     }
 }
 
-export default NeoGraph
+export default NeoGraphGeneric

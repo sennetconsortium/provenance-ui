@@ -1,11 +1,11 @@
-import NeoGraph from '../lib/js/NeoGraph'
-import DataGraph from '../lib/js/DataGraph'
-import Graph from '../lib/js/Graph'
-import DataConverter from '../lib/js/DataConverter'
-import dataMap from '../data/map.sample'
+import NeoGraphGeneric from '../lib/js/generic/NeoGraphGeneric'
+import DataGraphGeneric from '../lib/js/generic/DataGraphGeneric'
+import GraphGeneric from '../lib/js/generic/GraphGeneric'
+import DataConverterGeneric from '../lib/js/generic/DataConverterGeneric'
+import dataMap from '../data/generic/map.sample'
 import log from 'loglevel'
 
-async function OneNodeAndArray(serviceOps) {
+async function  GenericObject(serviceOps) {
     const { token, url, itemId, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url, keys: {neighbors: 'direct_ancestors'} }
     let options = null;
@@ -29,12 +29,12 @@ async function OneNodeAndArray(serviceOps) {
             log.debug('DataGraph', dataGraph.list)
 
             // Traverse graph data and create graph properties
-            const neoGraph = new NeoGraph({... graphOps, getNeighbors, list: dataGraph.list })
+            const neoGraph = new NeoGraphGeneric({... graphOps, getNeighbors, list: dataGraph.list })
             neoGraph.dfs(rawData.length ? rawData[0] : rawData)
             log.debug('NeoGraph', neoGraph.getResult())
 
             // Convert the data into a format usable by the graph visual, i.e. neo4j format
-            const converter = new DataConverter(neoGraph.getResult(), dataMap, dataGraph.list)
+            const converter = new DataConverterGeneric(neoGraph.getResult(), dataMap, dataGraph.list)
             converter.reformatNodes()
             converter.reformatRelationships()
 
@@ -77,15 +77,15 @@ async function OneNodeAndArray(serviceOps) {
         }
 
         // Traverse the data and fetch all neighbors for each node.
-        const dataGraph = new DataGraph({... graphOps, getNeighbors, onDataAcquired })
+        const dataGraph = new DataGraphGeneric({... graphOps, getNeighbors, onDataAcquired })
         let dataResult = await dataGraph.dfsWithPromise(rawData.length ? rawData[0] : rawData)
         return dataResult
     }
     if (token.length && url.length && itemId.length) {
-        const graph = new Graph(graphOps)
+        const graph = new GraphGeneric(graphOps)
         return graph.service({ callback: handleResult, url: url + itemId })
     }
 
 }
 
-export default OneNodeAndArray
+export default GenericObject

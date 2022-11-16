@@ -1,4 +1,4 @@
-import Graph from './Graph'
+import GraphGeneric from './GraphGeneric'
 
 /**
  * Converts any data object to neo4j formatted data for the visualization.
@@ -35,7 +35,7 @@ import Graph from './Graph'
  *     }
  * }
  */
-class DataConverter {
+class DataConverterGeneric {
     constructor(rawData, map, list) {
         this.rawNodes = rawData;
         this.relationships = []
@@ -159,7 +159,7 @@ class DataConverter {
     }
 
     runFormatting(nodes) {
-        let graph = new Graph()
+        let graph = new GraphGeneric()
         graph.dfs(nodes)
         this.rawNodes = graph.getResult()
         this.reformatNodes()
@@ -263,4 +263,4 @@ class DataConverter {
     }
 }
 
-export default DataConverter
+export default DataConverterGeneric
