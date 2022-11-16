@@ -73,17 +73,15 @@ async function  GenericObject(serviceOps) {
             setOptions(options)
             setContextData(data)
             setLoading(false)
-            return {data, options}
         }
 
         // Traverse the data and fetch all neighbors for each node.
         const dataGraph = new DataGraphGeneric({... graphOps, getNeighbors, onDataAcquired })
         let dataResult = await dataGraph.dfsWithPromise(rawData.length ? rawData[0] : rawData)
-        return dataResult
     }
     if (token.length && url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
-        return graph.service({ callback: handleResult, url: url + itemId })
+        graph.service({ callback: handleResult, url: url + itemId })
     }
 
 }

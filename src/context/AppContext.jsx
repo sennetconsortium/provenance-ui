@@ -2,6 +2,7 @@ import {createContext, useState, useEffect, useRef} from 'react'
 import log from 'loglevel'
 
 import  GenericObject from '../usage/GenericObject'
+import  Neo4JGraphObject from '../usage/Neo4JGraphObject'
 
 const AppContext = createContext()
 
@@ -29,6 +30,7 @@ export const AppProvider = ({children}) => {
         const token = getEnv('API_TOKEN')
         const url = getEnv('API_URL')
         const itemId = getEnv('API_ITEM_ID')
+        const feature = getEnv('API_FEATURE')
 
         const getOptions = () => {
             let ops = getEnv('OPTIONS')
@@ -42,11 +44,19 @@ export const AppProvider = ({children}) => {
             }
             return {}
         }
-        const handleOneNode = async () => {
+
+        const handleFeature = async (fn) => {
             setLoading(true)
-            const result = await  GenericObject({token, url, itemId, getOptions, setOptions, setContextData, setLoading})
+            const result = await fn({token, url, itemId, getOptions, setOptions, setContextData, setLoading})
         }
-        handleOneNode()
+
+        if (feature === 'generic') {
+            handleFeature(GenericObject)
+        } else if (feature === 'neo4j') {
+            handleFeature(Neo4JGraphObject)
+        } else {
+            console.error('Current features are generic or neo4j.')
+        }
 
     }, [])
 

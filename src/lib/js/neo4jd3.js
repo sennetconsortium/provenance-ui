@@ -614,12 +614,11 @@ function Neo4jD3(_selector, _options) {
     }
 
     function initSimulation() {
-
         let simulation = d3.forceSimulation()
             .force('collide', d3.forceCollide().radius(function(d) {
                 return options.minCollision;
             }).iterations(2))
-            .force('charge', d3.forceManyBody())
+            .force('charge', d3.forceManyBody().strength(-2000))
             .force('link', d3.forceLink().id(function(d) {
                 return d.id;
             }))
