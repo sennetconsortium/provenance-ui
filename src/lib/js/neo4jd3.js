@@ -125,7 +125,7 @@ function Neo4jD3(_selector, _options) {
                 : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
             if (options.idNavigate.exclude.indexOf(label) === -1) {
                 formattedUrl = true;
-                href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value;
+                href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value.replaceAll('"', '');
             }
         }
 

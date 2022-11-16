@@ -40,16 +40,24 @@ class Graph {
             if (ops.callback && typeof ops.callback === 'function') {
                 ops.callback(result, ops)
             } else {
-
                 this.stack.push(ops.id)
-                this.list[ops.id] = result
+                this.appendList(ops.id, result)
                 this.serviced[ops.id] = true
                 this.continueDfs()
+
             }
         } catch (e) {
             console.error(e)
         }
         return this
+    }
+    
+    dfsInit(node) {
+        this.root = node
+        const id = node[this.keys.id]
+        this.visited[id] = true
+        this.stack.push(id)
+        this.appendList(id, node)
     }
 
     /**
@@ -57,13 +65,7 @@ class Graph {
      * @param node {object}
      */
     dfs(node) {
-        this.root = node
-        const id = node[this.keys.id]
-        this.visited[id] = true
-        this.stack.push(id)
-        if (this.list[id] === undefined) {
-            this.list[id] = node
-        }
+        this.dfsInit(node)
     }
 
     continueDfs(ops = {}) {}
@@ -75,14 +77,25 @@ class Graph {
      */
     checkVisited(id, node) {
         if (!this.visited[id]) {
-            if (this.list[id] === undefined) {
-                this.list[id] = node
-            }
+            this.appendList(id, node)
             this.visited[id] = true
             this.stack.push(id)
         }
     }
 
+    getItem(obj) {
+        if (typeof obj === 'array') {
+            return obj.length ? obj[0] : null
+        } else {
+            return obj
+        }
+    }
+
+    appendList(id, obj) {
+        if (this.list[id] === undefined) {
+            this.list[id] = this.getItem(obj)
+        }
+    }
     /**
      * Returns result
      * @returns {[]}

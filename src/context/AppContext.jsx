@@ -1,4 +1,4 @@
-import {createContext, useState, useEffect} from 'react'
+import {createContext, useState, useEffect, useRef} from 'react'
 import log from 'loglevel'
 import NeoGraph from '../lib/js/NeoGraph'
 import DataGraph from '../lib/js/DataGraph'
@@ -19,12 +19,15 @@ export const AppProvider = ({children}) => {
     const [contextData, setContextData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [options, setOptions] = useState({})
+    const initialized = useRef(false)
 
     const getEnv = (key) => {
         return process.env[`REACT_APP_${key}`]
     }
 
     useEffect(() => {
+        if (initialized.current) return
+        initialized.current = true
         log.setLevel(getEnv('LOG_LEVEL') || 'silent')
         const token = getEnv('API_TOKEN')
         const url = getEnv('API_URL')
@@ -45,7 +48,7 @@ export const AppProvider = ({children}) => {
 
         const graphOps = { token, url, keys: {neighbors: 'direct_ancestors'} }
 
-        const handleResult = (result) => {
+        const handleResult = async (result) => {
 
             const rawData = result.descendants ? (!result.descendants.length ? result : result.descendants) : result
             log.debug('Result from fetch', result)
@@ -59,11 +62,13 @@ export const AppProvider = ({children}) => {
             }
 
             const onDataAcquired = (dataGraph) => {
+                // delete dataGraph.list[undefined]
+                // console.log('undefined', dataGraph.list[undefined])
                 log.debug('DataGraph', dataGraph.list)
 
                 // Traverse graph data and create graph properties
                 const neoGraph = new NeoGraph({... graphOps, getNeighbors, list: dataGraph.list })
-                neoGraph.dfs(rawData)
+                neoGraph.dfs(rawData.length ? rawData[0] : rawData)
                 log.debug('NeoGraph', neoGraph.getResult())
 
                 // Convert the data into a format usable by the graph visual, i.e. neo4j format
@@ -108,7 +113,7 @@ export const AppProvider = ({children}) => {
 
             // Traverse the data and fetch all neighbors for each node.
             const dataGraph = new DataGraph({... graphOps, getNeighbors, onDataAcquired })
-            dataGraph.dfsWithPromise(rawData)
+            await dataGraph.dfsWithPromise(rawData.length ? rawData[0] : rawData)
             return dataGraph
         }
         if (token.length && url.length && itemId.length) {
