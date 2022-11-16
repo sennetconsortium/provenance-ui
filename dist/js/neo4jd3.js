@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 require("core-js/modules/es.regexp.exec.js");
 require("core-js/modules/es.string.replace.js");
+require("core-js/modules/esnext.string.replace-all.js");
 require("core-js/modules/es.parse-int.js");
 require("core-js/modules/es.array.sort.js");
 require("core-js/modules/es.json.stringify.js");
@@ -125,7 +126,7 @@ function Neo4jD3(_selector, _options) {
       const label = currentDataItem.labels ? currentDataItem.labels[0] : currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown';
       if (options.idNavigate.exclude.indexOf(label) === -1) {
         formattedUrl = true;
-        href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value;
+        href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value.replaceAll('"', '');
       }
     }
     elem.attr('href', formattedUrl ? href : '#').attr('target', formattedUrl ? '_blank' : '_parent').attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover')).html('<strong>' + property + '</strong>' + (value ? ': ' + value : ''));

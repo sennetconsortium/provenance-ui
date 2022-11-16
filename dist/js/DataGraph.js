@@ -27,13 +27,7 @@ class DataGraph extends _Graph.default {
    * @returns {Promise<DataGraph>}
    */
   async dfsWithPromise(node) {
-    this.root = node;
-    const id = node[this.keys.id];
-    this.visited[id] = true;
-    this.stack.push(id);
-    if (this.list[id] === undefined) {
-      this.list[id] = node;
-    }
+    this.dfsInit(node);
     this.promisesToAwait = [];
     this.continueDfs();
     return this;
@@ -57,7 +51,7 @@ class DataGraph extends _Graph.default {
       } else {
         neighbors = node[this.keys.neighbors];
       }
-      if (!neighbors.length && !this.serviced[current]) {
+      if (!neighbors.length && !this.serviced[current] && current !== undefined) {
         this.promisesToAwait.push(this.service({
           url: this.url + current,
           id: current
@@ -66,11 +60,10 @@ class DataGraph extends _Graph.default {
         if (neighbors.length) {
           if (this.storeResult) this.result.push(node);
           neighbors.forEach(function (neighbor, index) {
-            let id = neighbor[this.keys.id];
+            const neighborNode = this.getItem(neighbor);
+            let id = neighborNode[this.keys.id];
             if (!this.visited[id]) {
-              if (this.list[id] === undefined) {
-                this.list[id] = neighbor;
-              }
+              this.appendList(id, neighborNode);
               this.visited[id] = true;
               this.stack.push(id);
             }
