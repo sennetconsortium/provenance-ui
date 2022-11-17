@@ -75,6 +75,9 @@ class DataConverter {
                 data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
             }
         }
+        if (!data.labels && this.isActivity(item)) {
+            data.labels = [this.map.actvityTypeName]
+        }
         data.parentType = item.parentId ? this.getParentEntityTypeFromId(item.parentId) : this.getParentEntityType(item)
         this.nodes.push(data)
     }
