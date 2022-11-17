@@ -6,6 +6,7 @@ import dataMap from '../data/generic/map.sample'
 import log from 'loglevel'
 
 async function  GenericObject(serviceOps) {
+    const feature = 'generic';
     const { token, url, itemId, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url, keys: {neighbors: 'direct_ancestors'} }
     let options = null;
@@ -13,8 +14,8 @@ async function  GenericObject(serviceOps) {
     const handleResult = async (result) => {
 
         const rawData = result.descendants ? (!result.descendants.length ? result : result.descendants) : result
-        log.debug('Result from fetch', result)
-        log.debug('Raw data', rawData)
+        log.debug(`${feature}: Result from fetch`, result)
+        log.debug(`${feature}: Raw data`, rawData)
         const getNeighbors = (node) => {
             let neighbors = node[graphOps.keys.neighbors]
             if (!neighbors) {
@@ -26,12 +27,12 @@ async function  GenericObject(serviceOps) {
         const onDataAcquired = (dataGraph) => {
             // delete dataGraph.list[undefined]
             // console.log('undefined', dataGraph.list[undefined])
-            log.debug('DataGraph', dataGraph.list)
+            log.debug(`${feature}: DataGraph`, dataGraph.list)
 
             // Traverse graph data and create graph properties
             const neoGraph = new NeoGraphGeneric({... graphOps, getNeighbors, list: dataGraph.list })
             neoGraph.dfs(rawData.length ? rawData[0] : rawData)
-            log.debug('NeoGraph', neoGraph.getResult())
+            log.debug(`${feature}: NeoGraph`, neoGraph.getResult())
 
             // Convert the data into a format usable by the graph visual, i.e. neo4j format
             const converter = new DataConverterGeneric(neoGraph.getResult(), dataMap, dataGraph.list)
@@ -44,7 +45,7 @@ async function  GenericObject(serviceOps) {
                 relationships: converter.getRelationships()
             })
 
-            log.debug('NeoData for graph visual ...', neoData)
+            log.debug(`${feature}: NeoData for graph visual ...`, neoData)
 
             const neighbors = getNeighbors(result)
             let highlight = [{

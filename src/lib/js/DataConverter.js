@@ -5,10 +5,11 @@ class DataConverter {
         this.relationships = []
         this.nodes = []
         this.error = null
+        this.actvityTypeName = this.map.actvityTypeName || 'Activity'
     }
 
     isActivity(item) {
-        return item.isActivity || (this.keys && this.keys.type ? item[this.keys.type] === 'Activity' : false)
+        return item.isActivity || (this.keys && this.keys.prov ? item[this.keys.prov] === this.actvityTypeName : false)
     }
 
     /**
@@ -74,7 +75,7 @@ class DataConverter {
                 data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
             }
         }
-        data.parentType = this.getParentEntityTypeFromId(item.parentId)
+        data.parentType = item.parentId ? this.getParentEntityTypeFromId(item.parentId) : this.getParentEntityType(item)
         this.nodes.push(data)
     }
 

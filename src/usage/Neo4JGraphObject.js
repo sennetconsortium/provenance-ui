@@ -1,15 +1,41 @@
 import log from 'loglevel'
 import GraphGeneric from '../lib/js/generic/GraphGeneric'
+import DataConverterNeo4J from '../lib/js/neo4j/DataConverterNeo4J'
+import $ from 'jquery'
+import dataMap from '../data/neo4j/map.sample'
 
 async function Neo4JGraphObject(serviceOps) {
+    const feature = 'neo4j';
     const { token, url, itemId, getOptions, setContextData, setLoading, setOptions } = serviceOps;
+    const graphOps = { token, url }
 
     const handleResult = async (result) => {
+        log.debug(`${feature}: Result from fetch`, result)
+        const data = $.extend(result, result.descendants)
+        const converter = new DataConverterNeo4J(result, dataMap)
+        converter.flatten()
+        converter.reformatNodes()
+        converter.reformatRelationships()
+        log.debug(`${feature}: Nodes ...`, converter.getNodes())
+        log.debug(`${feature}: Relationships ...`, converter.getRelationships())
+
+        const neoData = converter.getNeo4jFormat({
+            columns: ['user', 'entity'],
+            nodes: converter.getNodes(),
+            relationships: converter.getRelationships()
+        })
+
+        log.debug(`${feature}: NeoData for graph visual ...`, neoData)
+
+        log.debug('Options', getOptions())
+        setOptions(getOptions())
+        setContextData(neoData)
+        setLoading(false)
 
     }
 
     if (token.length && url.length && itemId.length) {
-        const graph = new GraphGeneric()
+        const graph = new GraphGeneric(graphOps)
         return graph.service({ callback: handleResult, url: url.replace('{id}', itemId) })
     }
 }

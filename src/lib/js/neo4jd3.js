@@ -125,7 +125,8 @@ function Neo4jD3(_selector, _options) {
                 : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
             if (options.idNavigate.exclude.indexOf(label) === -1) {
                 formattedUrl = true;
-                href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value.replaceAll('"', '');
+                href = options.idNavigate.url.replace('{classType}', label.toLowerCase());
+                href = href.replace('{id}', value).replaceAll('"', '')
             }
         }
 
@@ -614,15 +615,17 @@ function Neo4jD3(_selector, _options) {
     }
 
     function initSimulation() {
+        //TODO: investigate
         let simulation = d3.forceSimulation()
-            .force('collide', d3.forceCollide().radius(function(d) {
-                return options.minCollision;
-            }).iterations(2))
-            .force('charge', d3.forceManyBody().strength(-2000))
+            // .force('collide', d3.forceCollide().radius(function(d) {
+            //     return options.minCollision;
+            // }).iterations(2))
+            .force('collide', d3.forceCollide(options.nodeRadius).strength(0.6))
+            .force('charge', d3.forceManyBody().strength(-1000))
             .force('link', d3.forceLink().id(function(d) {
                 return d.id;
             }))
-            .force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 2))
+            .force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 3))
             .on('tick', function() {
                 tick();
             })
@@ -971,6 +974,7 @@ function Neo4jD3(_selector, _options) {
         updateRelationships(r);
         updateNodes(n);
 
+        // TODO: Update to use tree layout
         simulation.nodes(nodes);
         simulation.force('link').links(relationships);
     }
