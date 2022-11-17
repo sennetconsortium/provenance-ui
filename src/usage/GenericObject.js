@@ -81,7 +81,7 @@ async function  GenericObject(serviceOps) {
     }
     if (token.length && url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
-        graph.service({ callback: handleResult, url: url + itemId })
+        graph.service({ callback: handleResult, url: url.replace('{id}', itemId) })
     }
 
 }

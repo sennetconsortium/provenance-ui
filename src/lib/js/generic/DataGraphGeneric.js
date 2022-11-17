@@ -43,7 +43,7 @@ class DataGraphGeneric extends GraphGeneric {
             }
 
             if (!neighbors.length && !this.serviced[current] && current !== undefined) {
-                this.promisesToAwait.push(this.service({ url: this.url + current, id: current }))
+                this.promisesToAwait.push(this.service({ url: this.url.replace('{id}', current), id: current }))
             } else {
 
                 if (neighbors.length) {
