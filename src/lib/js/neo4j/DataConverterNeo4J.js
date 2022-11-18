@@ -1,7 +1,7 @@
 import DataConverter from '../DataConverter'
 class DataConverterNeo4J extends DataConverter {
-    constructor(data, map) {
-        super(data, map)
+    constructor(data, map, ops = {}) {
+        super(data, map, ops)
         this.keys = {
             generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
             prov: this.map.keys.prov || 'prov:type',
@@ -30,8 +30,7 @@ class DataConverterNeo4J extends DataConverter {
                 let i = 0;
                 for (let _prop in this.data[key]) {
 
-                    const idProp = this.getPropFromMap()
-                    const actorProp = this.map.actor.dataProp
+                  
                     const node = this.data[key][_prop]
 
                     const startNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.startNode]) : this.getNodeIdFromValue(node[this.map.keys.endNode])
@@ -43,6 +42,7 @@ class DataConverterNeo4J extends DataConverter {
                         endNode: endNode,
                         parentType: this.getParentEntityTypeFromId(startNode),
                         properties: {
+                            [this.map.keys.startNode]: this.getNodeIdFromValue(node[this.map.keys.startNode])
                         }
                     })
                     i++

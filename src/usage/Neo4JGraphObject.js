@@ -23,7 +23,7 @@ async function Neo4JGraphObject(serviceOps) {
         $.extend(result.entity, result.descendants.entity)
         log.debug(`${feature}: Result width appended descendants...`, result)
         
-        const converter = new DataConverterNeo4J(result, dataMap)
+        const converter = new DataConverterNeo4J(result, dataMap, {setTextForNoneActivity: false})
         converter.flatten()
         converter.reformatNodes()
         converter.reformatRelationships()

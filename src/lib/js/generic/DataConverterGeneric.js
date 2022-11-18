@@ -37,8 +37,8 @@ import DataConverter from '../DataConverter'
  * }
  */
 class DataConverterGeneric extends DataConverter {
-    constructor(data, map, list) {
-        super(data, map)
+    constructor(data, map, list, ops = {}) {
+        super(data, map, ops)
         this.error = null
         this.list = list || {}
     }
