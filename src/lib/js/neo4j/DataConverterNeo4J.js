@@ -34,12 +34,13 @@ class DataConverterNeo4J extends DataConverter {
                     const actorProp = this.map.actor.dataProp
                     const node = this.data[key][_prop]
 
-                    const startNode = this.getNodeIdFromValue(node[this.map.keys.startNode])
+                    const startNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.startNode]) : this.getNodeIdFromValue(node[this.map.keys.endNode])
+                    const endNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.endNode]) : this.getNodeIdFromValue(node[this.map.keys.startNode])
                     this.relationships.push({
                         id: i.toString(),
                         type: this.getRelationshipType(key),
                         startNode: startNode,
-                        endNode: this.getNodeIdFromValue(node[this.map.keys.endNode]),
+                        endNode: endNode,
                         parentType: this.getParentEntityTypeFromId(startNode),
                         properties: {
                         }

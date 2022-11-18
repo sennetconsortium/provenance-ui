@@ -11,10 +11,18 @@ async function Neo4JGraphObject(serviceOps) {
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
+        let keys = ['used', 'wasGeneratedBy']
+        for (let key of keys) {
+            for (let _prop in result.descendants[key]) {
+                result[key] = result[key] || {}
+                // Must update key to avoid key collisions with original result.used and result.wasGeneratedBy
+                result[key][`des${_prop}`] = result.descendants[key][_prop]
+            }
+        }
         $.extend(result.activity, result.descendants.activity)
         $.extend(result.entity, result.descendants.entity)
-        $.extend(result.used, result.descendants.used)
-        $.extend(result.wasGeneratedBy, result.descendants.wasGeneratedBy)
+        log.debug(`${feature}: Result width appended descendants...`, result)
+        
         const converter = new DataConverterNeo4J(result, dataMap)
         converter.flatten()
         converter.reformatNodes()
