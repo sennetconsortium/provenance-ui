@@ -27,3 +27,4 @@ yarn-error.log*
 
 .idea
 src/data/local.sample.js
+.vscode

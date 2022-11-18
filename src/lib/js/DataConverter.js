@@ -85,6 +85,10 @@ class DataConverter {
         this.nodes.push(data)
     }
 
+    getParentEntityType(item) {
+        return ''
+    }
+
     /**
      * Returns a particular node as a highlight
      * @param prop {string}

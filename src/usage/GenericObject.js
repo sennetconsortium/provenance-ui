@@ -12,10 +12,8 @@ async function  GenericObject(serviceOps) {
     let options = null;
     let data = null
     const handleResult = async (result) => {
-
-        const rawData = result.descendants ? (!result.descendants.length ? result : result.descendants) : result
         log.debug(`${feature}: Result from fetch`, result)
-        log.debug(`${feature}: Raw data`, rawData)
+
         const getNeighbors = (node) => {
             let neighbors = node[graphOps.keys.neighbors]
             if (!neighbors) {
@@ -24,14 +22,18 @@ async function  GenericObject(serviceOps) {
             return neighbors
         }
 
-        const onDataAcquired = (dataGraph) => {
+        const getRootNode = () => {
+            return result.length ? result[0] : result
+        }
+
+        const onDataAcquired = (dataGraph, data) => {
             // delete dataGraph.list[undefined]
             // console.log('undefined', dataGraph.list[undefined])
             log.debug(`${feature}: DataGraph`, dataGraph.list)
 
             // Traverse graph data and create graph properties
             const neoGraph = new NeoGraphGeneric({... graphOps, getNeighbors, list: dataGraph.list })
-            neoGraph.dfs(rawData.length ? rawData[0] : rawData)
+            neoGraph.dfs(data || getRootNode())
             log.debug(`${feature}: NeoGraph`, neoGraph.getResult())
 
             // Convert the data into a format usable by the graph visual, i.e. neo4j format
@@ -78,7 +80,7 @@ async function  GenericObject(serviceOps) {
 
         // Traverse the data and fetch all neighbors for each node.
         const dataGraph = new DataGraphGeneric({... graphOps, getNeighbors, onDataAcquired })
-        let dataResult = await dataGraph.dfsWithPromise(rawData.length ? rawData[0] : rawData)
+        let dataResult = await dataGraph.dfsWithPromise(getRootNode())
     }
     if (token.length && url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)

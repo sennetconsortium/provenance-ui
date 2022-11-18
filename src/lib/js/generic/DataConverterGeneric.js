@@ -87,6 +87,7 @@ class DataConverterGeneric extends DataConverter {
                 this.formatNode(item)
             }
         } catch (e) {
+            console.error(e)
             this.error = e
         }
 
