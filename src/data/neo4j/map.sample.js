@@ -11,6 +11,7 @@ const dataMap = {
         edge: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' }
     },
     root: {
+        'prov:type': 'category',
         'sennet:entity_type': 'labels',
         'sennet:uuid': 'id',
         'sennet:created_by_user_displayname': 'text',

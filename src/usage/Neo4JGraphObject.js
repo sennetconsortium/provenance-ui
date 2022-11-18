@@ -11,7 +11,10 @@ async function Neo4JGraphObject(serviceOps) {
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
-        const data = $.extend(result, result.descendants)
+        $.extend(result.activity, result.descendants.activity)
+        $.extend(result.entity, result.descendants.entity)
+        $.extend(result.used, result.descendants.used)
+        $.extend(result.wasGeneratedBy, result.descendants.wasGeneratedBy)
         const converter = new DataConverterNeo4J(result, dataMap)
         converter.flatten()
         converter.reformatNodes()

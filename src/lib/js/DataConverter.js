@@ -50,9 +50,9 @@ class DataConverter {
         for (let prop in item) {
             let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
             if (this.map.root[prop]) {
-                if (this.map.root[prop] === 'labels') {
+                 if (this.map.root[prop] === 'labels' || (this.map.root[prop] === 'category' && this.isActivity(item))) {
                     data.labels = item.labels || [value]
-                    type = value;
+                    type = value
                 } else if (prop === this.map.actor.dataProp && this.isActivity(item) ) {
                     data.properties = {
                         [this.map.actor.visualProp]: item[this.map.actor.dataProp]
@@ -62,9 +62,12 @@ class DataConverter {
                     data.text = this.isActivity(item) ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')]
                 }  else {
                     data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value)
+
                 }
             }
         }
+
+
         data.properties = data.properties || {}
         for (let gProp of this.map.props) {
             data.properties[gProp] = item[gProp]
@@ -75,9 +78,7 @@ class DataConverter {
                 data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
             }
         }
-        if (!data.labels && this.isActivity(item)) {
-            data.labels = [this.map.actvityTypeName]
-        }
+
         data.parentType = item.parentId ? this.getParentEntityTypeFromId(item.parentId) : this.getParentEntityType(item)
         this.nodes.push(data)
     }

@@ -27,15 +27,16 @@ class DataConverterNeo4J extends DataConverter {
     reformatRelationships() {
         try {
             for (let key of this.keys.relationships) {
+                let i = 0;
                 for (let _prop in this.data[key]) {
-                    let i = 0;
+
                     const idProp = this.getPropFromMap()
                     const actorProp = this.map.actor.dataProp
                     const node = this.data[key][_prop]
 
                     const startNode = this.getNodeIdFromValue(node[this.map.keys.startNode])
                     this.relationships.push({
-                        id: i,
+                        id: i.toString(),
                         type: this.getRelationshipType(key),
                         startNode: startNode,
                         endNode: this.getNodeIdFromValue(node[this.map.keys.endNode]),
@@ -44,7 +45,6 @@ class DataConverterNeo4J extends DataConverter {
                         }
                     })
                     i++
-
                 }
             }
         } catch (e) {
@@ -63,7 +63,6 @@ class DataConverterNeo4J extends DataConverter {
         } catch (e) {
             console.error(e)
         }
-        console.log(this.list)
     }
 
     getParentEntityType(item) {
