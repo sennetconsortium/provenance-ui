@@ -41,7 +41,7 @@ class Graph {
                 ops.callback(result, ops)
             } else {
                 this.stack.push(ops.id)
-                this.appendList(ops.id, result)
+                this.list[ops.id] = this.getItem(result)
                 this.serviced[ops.id] = true
                 this.continueDfs()
 
