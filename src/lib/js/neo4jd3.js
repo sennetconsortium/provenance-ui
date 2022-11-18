@@ -122,6 +122,7 @@ function Neo4jD3(_selector, _options) {
 
     function appendInfoElement(cls, isNode, property, value) {
         const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
+        value = value ? value.replaceAll('"', '') : value
         let formattedUrl = false;
         let elem = info.append('a');
         let href = '#';
@@ -132,7 +133,6 @@ function Neo4jD3(_selector, _options) {
             if (!excludeList || (excludeList &&
                 excludeList.indexOf(property) === -1)) {
                 formattedUrl = true;
-                value = value.replaceAll('"', '')
                 const url = isValidURL(value) ? value : options.idNavigate.url
                 href = url.replace('{classType}', label.toLowerCase())
                 href = href.replace('{id}', value)
@@ -143,7 +143,7 @@ function Neo4jD3(_selector, _options) {
         elem.attr('href', formattedUrl ?  href : '#')
             .attr('target', formattedUrl ? '_blank' : '_parent')
             .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
-            .html('<strong>' + property + '</strong>' + (value ? (': ' + value) : ''));
+            .html('<strong>' + property + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
 
         if (!value) {
             elem.style('background-color', function(d) {
