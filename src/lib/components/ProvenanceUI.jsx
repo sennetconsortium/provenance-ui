@@ -60,6 +60,7 @@ function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
                 "Sample": "#ebb5c8",
                 "Source": "#ffc255"
             },
+            simulation: options.simulation || {simulation: { charge: -250 }},
             idNavigate: options.idNavigate || { prop: '' },
             minCollision: options.minCollison || 40,
             neo4jData: graphData,

@@ -72,6 +72,11 @@ function ProvenanceUI(_ref) {
         "Sample": "#ebb5c8",
         "Source": "#ffc255"
       },
+      simulation: options.simulation || {
+        simulation: {
+          charge: -250
+        }
+      },
       idNavigate: options.idNavigate || {
         prop: ''
       },

@@ -17,8 +17,9 @@ const dataMap = {
         'sennet:created_by_user_displayname': 'text',
     },
     highlight: {
-        labels: 'prov:type',
-        prop: 'sennet:sennet_id'
+        labels: 'entity_type',
+        dataProp: 'sennet_id',
+        visualProp: 'sennet:sennet_id'
     },
     actor: {
         dataProp: 'sennet:created_by_user_displayname',

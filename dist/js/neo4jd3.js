@@ -66,6 +66,9 @@ function Neo4jD3(_selector, _options) {
       neo4jDataUrl: undefined,
       nodeRadius: 25,
       zoomFit: false,
+      simulation: {
+        charge: -250
+      },
       idNavigate: {
         prop: '',
         url: '',
@@ -1156,7 +1159,7 @@ function Neo4jD3(_selector, _options) {
     // .force('collide', d3.forceCollide().radius(function(d) {
     //     return options.minCollision;
     // }).iterations(2))
-    .force('collide', d3.forceCollide(options.nodeRadius).strength(0.6)).force('charge', d3.forceManyBody().strength(-1000)).force('link', d3.forceLink().id(function (d) {
+    .force('collide', d3.forceCollide(options.nodeRadius).strength(0.6)).force('charge', d3.forceManyBody().strength(options.simulation.charge)).force('link', d3.forceLink().id(function (d) {
       return d.id;
     })).force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 3)).on('tick', function () {
       tick();
