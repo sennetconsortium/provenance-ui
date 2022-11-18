@@ -139,7 +139,7 @@ function Neo4jD3(_selector, _options) {
         const url = isValidURL(value) ? value : options.idNavigate.url;
         href = url.replace('{classType}', label.toLowerCase());
         href = href.replace('{id}', value);
-        href = href.indexOf('://') === -1 ? '//' + href : href;
+        href = isValidURL(value) && href.indexOf('://') === -1 ? '//' + href : href;
       }
     }
     elem.attr('href', formattedUrl ? href : '#').attr('target', formattedUrl ? '_blank' : '_parent').attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover')).html('<strong>' + property + '</strong>' + (value ? ": <span>".concat(value, "</span>") : ''));
