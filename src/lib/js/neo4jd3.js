@@ -115,18 +115,28 @@ function Neo4jD3(_selector, _options) {
             .attr('class', options.classes.info);
     }
 
+    function isValidURL(string) {
+        var res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        return (res !== null)
+    }
+
     function appendInfoElement(cls, isNode, property, value) {
-        const isNavigation = property === options.idNavigate.prop
+        const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
         let formattedUrl = false;
         let elem = info.append('a');
         let href = '#';
         if (isNavigation && options.idNavigate && options.idNavigate.url) {
             const label = currentDataItem.labels ? currentDataItem.labels[0]
                 : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
-            if (options.idNavigate.exclude.indexOf(label) === -1) {
+            const excludeList = options.idNavigate.exclude[label]
+            if (!excludeList || (excludeList &&
+                excludeList.indexOf(property) === -1)) {
                 formattedUrl = true;
-                href = options.idNavigate.url.replace('{classType}', label.toLowerCase());
-                href = href.replace('{id}', value).replaceAll('"', '')
+                value = value.replaceAll('"', '')
+                const url = isValidURL(value) ? value : options.idNavigate.url
+                href = url.replace('{classType}', label.toLowerCase())
+                href = href.replace('{id}', value)
+                href = href.indexOf('://') === -1 ? '//' + href : href
             }
         }
 

@@ -67,7 +67,6 @@ class DataConverter {
             }
         }
 
-
         data.properties = data.properties || {}
         for (let gProp of this.map.props) {
             data.properties[gProp] = item[gProp]
@@ -75,7 +74,10 @@ class DataConverter {
 
         if (type && typeof this.map.typeProps[type] === 'object') {
             for (let tProp of this.map.typeProps[type]) {
-                data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
+                if (item[tProp] !== undefined) {
+                    data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
+                }
+
             }
         }
 
@@ -121,12 +123,21 @@ class DataConverter {
     }
 
     /**
+     * Formats a date timestamp.
+     * @param val
+     * @returns {string}
+     */
+    formatDateTimestamp(val) {
+        return new Date(val * 1000).toLocaleString()
+    }
+
+    /**
      * Formats a date.
      * @param val
      * @returns {string}
      */
     formatDate(val) {
-        return new Date(val * 1000).toLocaleString()
+        return new Date(val).toLocaleString()
     }
 
     /**

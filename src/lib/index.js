@@ -5,6 +5,7 @@ import GraphGeneric from './js/generic/GraphGeneric'
 import DataGraphGeneric from './js/generic/DataGraphGeneric'
 import NeoGraphGeneric from './js/generic/NeoGraphGeneric'
 import DataConverterGeneric from './js/generic/DataConverterGeneric'
+import DataConverterNeo4J from './js/neo4j/DataConverterNeo4J'
 
 
-export { ProvenanceUI, Legend, NeoGraphGeneric, DataGraphGeneric, GraphGeneric, DataConverterGeneric }
+export { ProvenanceUI, Legend, DataConverterNeo4J, NeoGraphGeneric, DataGraphGeneric, GraphGeneric, DataConverterGeneric }
