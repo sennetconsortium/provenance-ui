@@ -12,7 +12,7 @@ require("core-js/modules/es.promise.js");
  * @param ops Object
  **/
 
-class Graph {
+class GraphGeneric {
   constructor() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     this.ops = ops;
@@ -48,7 +48,7 @@ class Graph {
         ops.callback(result, ops);
       } else {
         this.stack.push(ops.id);
-        this.appendList(ops.id, result);
+        this.list[ops.id] = this.getItem(result);
         this.serviced[ops.id] = true;
         this.continueDfs();
       }
@@ -108,5 +108,5 @@ class Graph {
     return this.result;
   }
 }
-var _default = Graph;
+var _default = GraphGeneric;
 exports.default = _default;

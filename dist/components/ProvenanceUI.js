@@ -75,10 +75,10 @@ function ProvenanceUI(_ref) {
       idNavigate: options.idNavigate || {
         prop: ''
       },
-      minCollision: options.minCollison || 60,
+      minCollision: options.minCollison || 40,
       neo4jData: graphData,
       neo4jDataUrl: graphDataUrl,
-      nodeRadius: options.nodeRadius || 25,
+      nodeRadius: options.nodeRadius || 22,
       onNodeDoubleClick: options.onNodeDoubleClick || function (node) {
         switch (node.action) {
           case 'url':

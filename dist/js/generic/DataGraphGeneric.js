@@ -6,14 +6,16 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 require("core-js/modules/es.promise.js");
 require("core-js/modules/web.dom-collections.iterator.js");
-var _Graph = _interopRequireDefault(require("./Graph"));
+require("core-js/modules/es.regexp.exec.js");
+require("core-js/modules/es.string.replace.js");
+var _GraphGeneric = _interopRequireDefault(require("./GraphGeneric"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /**
  * Uses DFS algorithm to gather all data and relationships via ajax calls.
  * @author dbmi.pitt.edu
  *
  **/
-class DataGraph extends _Graph.default {
+class DataGraphGeneric extends _GraphGeneric.default {
   constructor() {
     let ops = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
     super(ops);
@@ -53,7 +55,7 @@ class DataGraph extends _Graph.default {
       }
       if (!neighbors.length && !this.serviced[current] && current !== undefined) {
         this.promisesToAwait.push(this.service({
-          url: this.url + current,
+          url: this.url.replace('{id}', current),
           id: current
         }));
       } else {
@@ -79,5 +81,5 @@ class DataGraph extends _Graph.default {
     return this;
   }
 }
-var _default = DataGraph;
+var _default = DataGraphGeneric;
 exports.default = _default;
