@@ -4,7 +4,7 @@
  * @param ops Object
  **/
 
-class Graph {
+class GraphGeneric {
     constructor(ops = {}) {
         this.ops = ops
         this.token = ops.token
@@ -105,4 +105,4 @@ class Graph {
     }
 }
 
-export default Graph
+export default GraphGeneric

@@ -115,24 +115,35 @@ function Neo4jD3(_selector, _options) {
             .attr('class', options.classes.info);
     }
 
+    function isValidURL(string) {
+        var res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        return (res !== null)
+    }
+
     function appendInfoElement(cls, isNode, property, value) {
-        const isNavigation = property === options.idNavigate.prop
+        const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
+        value = value ? value.replaceAll('"', '') : value
         let formattedUrl = false;
         let elem = info.append('a');
         let href = '#';
         if (isNavigation && options.idNavigate && options.idNavigate.url) {
             const label = currentDataItem.labels ? currentDataItem.labels[0]
                 : (currentDataItem.target && currentDataItem.target.labels ? currentDataItem.target.labels[0] : 'Unknown')
-            if (options.idNavigate.exclude.indexOf(label) === -1) {
+            const excludeList = options.idNavigate.exclude[label]
+            if (!excludeList || (excludeList &&
+                excludeList.indexOf(property) === -1)) {
                 formattedUrl = true;
-                href = options.idNavigate.url.replace('{classType}', label.toLowerCase()) + value.replaceAll('"', '');
+                const url = isValidURL(value) ? value : options.idNavigate.url
+                href = url.replace('{classType}', label.toLowerCase())
+                href = href.replace('{id}', value)
+                href = href.indexOf('://') === -1 ? '//' + href : href
             }
         }
 
         elem.attr('href', formattedUrl ?  href : '#')
             .attr('target', formattedUrl ? '_blank' : '_parent')
             .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
-            .html('<strong>' + property + '</strong>' + (value ? (': ' + value) : ''));
+            .html('<strong>' + property + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
 
         if (!value) {
             elem.style('background-color', function(d) {
@@ -614,16 +625,17 @@ function Neo4jD3(_selector, _options) {
     }
 
     function initSimulation() {
-
+        //TODO: investigate
         let simulation = d3.forceSimulation()
-            .force('collide', d3.forceCollide().radius(function(d) {
-                return options.minCollision;
-            }).iterations(2))
-            .force('charge', d3.forceManyBody())
+            // .force('collide', d3.forceCollide().radius(function(d) {
+            //     return options.minCollision;
+            // }).iterations(2))
+            .force('collide', d3.forceCollide(options.nodeRadius).strength(0.6))
+            .force('charge', d3.forceManyBody().strength(-1000))
             .force('link', d3.forceLink().id(function(d) {
                 return d.id;
             }))
-            .force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 2))
+            .force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 3))
             .on('tick', function() {
                 tick();
             })
@@ -972,6 +984,7 @@ function Neo4jD3(_selector, _options) {
         updateRelationships(r);
         updateNodes(n);
 
+        // TODO: Update to use tree layout
         simulation.nodes(nodes);
         simulation.force('link').links(relationships);
     }

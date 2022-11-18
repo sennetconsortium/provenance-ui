@@ -19,7 +19,7 @@ const dataMap = {
         Activity: ['created_timestamp']
     },
     callbacks: {
-        created_timestamp: 'formatDate',
+        created_timestamp: 'formatDateTimestamp',
         created_by_user_displayname: 'lastNameFirstInitial'
     }
 }
