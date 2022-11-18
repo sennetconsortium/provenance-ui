@@ -12,7 +12,8 @@ var _DataConverter = _interopRequireDefault(require("../DataConverter"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 class DataConverterNeo4J extends _DataConverter.default {
   constructor(data, map) {
-    super(data, map);
+    let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    super(data, map, ops);
     this.keys = {
       generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
       prov: this.map.keys.prov || 'prov:type',
@@ -38,17 +39,18 @@ class DataConverterNeo4J extends _DataConverter.default {
       for (let key of this.keys.relationships) {
         let i = 0;
         for (let _prop in this.data[key]) {
-          const idProp = this.getPropFromMap();
-          const actorProp = this.map.actor.dataProp;
           const node = this.data[key][_prop];
-          const startNode = this.getNodeIdFromValue(node[this.map.keys.startNode]);
+          const startNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.startNode]) : this.getNodeIdFromValue(node[this.map.keys.endNode]);
+          const endNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.endNode]) : this.getNodeIdFromValue(node[this.map.keys.startNode]);
           this.relationships.push({
             id: i.toString(),
             type: this.getRelationshipType(key),
             startNode: startNode,
-            endNode: this.getNodeIdFromValue(node[this.map.keys.endNode]),
+            endNode: endNode,
             parentType: this.getParentEntityTypeFromId(startNode),
-            properties: {}
+            properties: {
+              [this.map.keys.startNode]: this.getNodeIdFromValue(node[this.map.keys.startNode])
+            }
           });
           i++;
         }

@@ -8,6 +8,8 @@ require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.object.assign.js");
 class DataConverter {
   constructor(data, map) {
+    let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    this.ops = ops;
     this.data = data;
     this.map = map;
     this.relationships = [];
@@ -71,7 +73,7 @@ class DataConverter {
           };
           data.text = this.evaluateCallbackOnValue(prop, value);
         } else if (this.map.root[prop] === 'text') {
-          data.text = this.isActivity(item) ? this.evaluateCallbackOnValue(prop, value) : item[this.getPropFromMap('labels')];
+          data.text = this.isActivity(item) ? this.evaluateCallbackOnValue(prop, value) : this.ops.setTextForNoneActivity ? item[this.getPropFromMap('labels')] : '';
         } else {
           data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value);
         }
@@ -90,6 +92,9 @@ class DataConverter {
     }
     data.parentType = item.parentId ? this.getParentEntityTypeFromId(item.parentId) : this.getParentEntityType(item);
     this.nodes.push(data);
+  }
+  getParentEntityType(item) {
+    return '';
   }
 
   /**

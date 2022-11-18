@@ -77,7 +77,8 @@ function Neo4jD3(_selector, _options) {
       theme: {
         colors: {
           nodeOutlineFill: undefined,
-          relationship: '#a5abb6'
+          relationship: '#a5abb6',
+          gray: '#ced2d9'
         }
       },
       classes: {
@@ -390,7 +391,7 @@ function Neo4jD3(_selector, _options) {
     return options.theme.colors.relationship;
   }
   function defaultDarkenColor() {
-    return d3.rgb(options.colors[options.colors.length - 1]).darker(1);
+    return d3.rgb(options.theme.colors.gray).darker(1);
   }
   function dragEnded(d) {
     if (!d3.event.active) {

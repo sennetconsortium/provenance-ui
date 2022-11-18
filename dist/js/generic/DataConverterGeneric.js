@@ -45,7 +45,8 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
  */
 class DataConverterGeneric extends _DataConverter.default {
   constructor(data, map, list) {
-    super(data, map);
+    let ops = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
+    super(data, map, ops);
     this.error = null;
     this.list = list || {};
   }
@@ -92,6 +93,7 @@ class DataConverterGeneric extends _DataConverter.default {
         this.formatNode(item);
       }
     } catch (e) {
+      console.error(e);
       this.error = e;
     }
     return this;
