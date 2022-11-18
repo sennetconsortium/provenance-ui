@@ -26,20 +26,35 @@ async function  GenericObject(serviceOps) {
             return result.length ? result[0] : result
         }
 
-        const onDataAcquired = (dataGraph, data) => {
+        
+        const onDataAcquired = (dataGraph) => {
             // delete dataGraph.list[undefined]
             // console.log('undefined', dataGraph.list[undefined])
             log.debug(`${feature}: DataGraph`, dataGraph.list)
 
             // Traverse graph data and create graph properties
             const neoGraph = new NeoGraphGeneric({... graphOps, getNeighbors, list: dataGraph.list })
-            neoGraph.dfs(data || getRootNode())
+            neoGraph.dfs(getRootNode())
             log.debug(`${feature}: NeoGraph`, neoGraph.getResult())
 
             // Convert the data into a format usable by the graph visual, i.e. neo4j format
-            const converter = new DataConverterGeneric(neoGraph.getResult(), dataMap, dataGraph.list)
+            let converter = new DataConverterGeneric(neoGraph.getResult(), dataMap, dataGraph.list)
             converter.reformatNodes()
             converter.reformatRelationships()
+
+            let allNodes = converter.getNodes()
+            let allRels = converter.getRelationships()
+            for (let node of getRootNode().descendants) {
+                neoGraph.dfs(node)
+                converter = new DataConverterGeneric(neoGraph.getResult(), dataMap, dataGraph.list)
+                converter.reformatNodes()
+                converter.reformatRelationships()
+                allNodes = [... allNodes, converter.getNodes()]
+                allRels = [... allRels, converter.getRelationships()]
+            }
+
+            log.debug(`${feature}: Descendants`, allNodes, allRels)
+
 
             const neoData = converter.getNeo4jFormat({
                 columns: ['user', 'entity'],
@@ -80,7 +95,9 @@ async function  GenericObject(serviceOps) {
 
         // Traverse the data and fetch all neighbors for each node.
         const dataGraph = new DataGraphGeneric({... graphOps, getNeighbors, onDataAcquired })
-        let dataResult = await dataGraph.dfsWithPromise(getRootNode())
+        await dataGraph.dfsWithPromise(getRootNode())
+
+        
     }
     if (token.length && url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
