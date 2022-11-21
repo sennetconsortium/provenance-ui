@@ -27,8 +27,6 @@ import $ from 'jquery'
  */
 function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
     useD3()
-    const [graphData, setGraphData] = useState(data)
-    const [graphDataUrl, setDataUrl] = useState(dataUrl)
     const selectorId = options.selectorId || 'neo4jd3'
 
     const addVisitedClass = () => {
@@ -63,9 +61,9 @@ function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
             simulation: options.simulation || {simulation: { charge: -250 }},
             idNavigate: options.idNavigate || { prop: '' },
             minCollision: options.minCollison || 40,
-            neo4jData: graphData,
-            neo4jDataUrl: graphDataUrl,
-            nodeRadius: options.nodeRadius || 22,
+            neo4jData: data,
+            neo4jDataUrl: dataUrl,
+            nodeRadius: options.nodeRadius || 18,
             onNodeDoubleClick: options.onNodeDoubleClick || function (node) {
                 switch (node.action) {
                     case 'url':

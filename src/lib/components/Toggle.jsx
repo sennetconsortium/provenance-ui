@@ -3,7 +3,7 @@ import NodeToggle from '../js/NodeToggle'
 import log from 'loglevel'
 import $ from 'jquery'
 
-function Toggle({ context, data, label = 'Toggle', className = 'btn'}) {
+function Toggle({ context, data, ariaLabel = 'Toggle', text='', className = ''}) {
     const toggleData = (e) => {
         const provenanceData = window.provenanceData
 
@@ -38,7 +38,11 @@ function Toggle({ context, data, label = 'Toggle', className = 'btn'}) {
         }
     }
     return (
-        <button className={className} onClick={toggleData}><span>{label}</span></button>
+        <label className={`c-toggle ${className}`} >
+            <span className='c-toggle__text'>{text}</span>
+            <input type="checkbox" onClick={toggleData} />
+            <span className="c-toggle__slider c-toggle__slider--round" aria-label={ariaLabel}></span>
+        </label>
     )
 }
 

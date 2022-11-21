@@ -1,0 +1,57 @@
+ $toggleH = 18px
+ $toggleC = 10px
+.c-toggle
+  pos-rel()
+  display inline-block
+  width 28px
+  height $toggleH
+  border 0 
+  background-color transparent
+
+  input
+    opacity 0
+    width 0
+    height 0
+
+  &__slider
+    pos-abs()
+    cursor pointer
+    top 0
+    left 0
+    right 0
+    bottom 0
+    background-color $col-silver
+    -webkit-transition .4s
+    transition .4s
+
+    &:before
+      pos-abs()
+      content ""
+      height $toggleC
+      width $toggleC
+      left 4px
+      bottom 4px
+      background-color white
+      -webkit-transition .4s
+      transition .4s
+
+    &--round
+      border-radius $toggleH
+
+      &:before
+        border-radius 50%
+
+  input
+    &:checked
+      & + .c-toggle__slider
+        background-color $col-malibu
+
+        &:before
+          -webkit-transform translateX($toggleC)
+          -ms-transform translateX($toggleC)
+          transform translateX($toggleC)
+
+    &:focus
+
+      & + .c-toggle__slider
+        box-shadow 0 0 1px $col-malibu

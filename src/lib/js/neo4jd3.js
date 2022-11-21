@@ -15,6 +15,8 @@
 function Neo4jD3(_selector, _options) {
     let d3 = window.d3
 
+    let isTransition = false
+    let graphList = {}
     let container, graph, info, node, nodes, relationship, relationshipOutline, relationshipOverlay, relationshipText, relationships, selector, simulation, svg, svgNodes, svgRelationships, svgScale, svgTranslate, currentDataItem,
         classes2colors = {},
         justLoaded = false,
@@ -182,7 +184,7 @@ function Neo4jD3(_selector, _options) {
                     classes = 'node',
                     label = d.labels[0];
 
-                classes += ` node--${d.labels[0]}`
+                classes += ` node--${label}`
 
                 if (d.parentType) classes += ` for--${d.parentType}`
 
@@ -200,7 +202,7 @@ function Neo4jD3(_selector, _options) {
                     for (i = 0; i < options.highlight.length; i++) {
                         highlight = options.highlight[i];
 
-                        if (d.labels[0] === highlight.class && d.properties[highlight.property] === highlight.value) {
+                        if (label === highlight.class && d.properties[highlight.property] === highlight.value) {
                             classes += ' node--highlighted';
                             classes = highlight.isSecondary ? classes + ' is-secondary' : classes + ' is-primary'
                             break;
@@ -329,7 +331,6 @@ function Neo4jD3(_selector, _options) {
     }
 
     function appendRelationship() {
-
         return relationship.enter()
             .append('g')
             .attr('class', function(d) {
@@ -579,18 +580,7 @@ function Neo4jD3(_selector, _options) {
 
         selector = _selector;
 
-        container = d3.select(selector);
-
-        container.attr('class', 'neo4jd3')
-            .html('');
-
-        if (options.infoPanel) {
-            info = appendInfoPanel(container);
-        }
-
-        appendGraph(container);
-
-        simulation = initSimulation();
+        clearCanvas()
 
         if (options.neo4jData) {
             loadNeo4jData(options.neo4jData);
@@ -639,6 +629,7 @@ function Neo4jD3(_selector, _options) {
             .force('link', d3.forceLink().id(function(d) {
                 return d.id;
             }))
+            .force('y', d3.forceY(0).strength(0.5))
             .force('center', d3.forceCenter(svg.node().parentElement.parentElement.clientWidth / 2, svg.node().parentElement.parentElement.clientHeight / 3))
             .on('tick', function() {
                 tick();
@@ -975,9 +966,42 @@ function Neo4jD3(_selector, _options) {
         });
     }
 
-    function updateNodes(n) {
-        Array.prototype.push.apply(nodes, n);
+    function setTransition(transitioning) {
+        isTransition = transitioning
+    }
 
+    function setCharge(charge) {
+        options.simulation.charge = charge
+    }
+
+    function getCharge(charge) {
+        return options.simulation.charge
+    }
+
+    function clearCanvas() {
+        container = d3.select(selector);
+
+        container.attr('class', 'neo4jd3')
+            .html('');
+
+        if (options.infoPanel) {
+            info = appendInfoPanel(container);
+        }
+
+        appendGraph(container);
+
+        simulation = initSimulation();
+
+    }
+
+    function updateNodes(n) {
+        if (isTransition) {
+            nodes = Array.from(n)
+        } else {
+            Array.prototype.push.apply(nodes, n);
+        }
+        
+        // TODO:
         node = svgNodes.selectAll('.node')
             .data(nodes, function(d) { return d.id; });
         let nodeEnter = appendNodeToGraph();
@@ -988,14 +1012,17 @@ function Neo4jD3(_selector, _options) {
         updateRelationships(r);
         updateNodes(n);
 
-        // TODO: Update to use tree layout
         simulation.nodes(nodes);
         simulation.force('link').links(relationships);
     }
 
     function updateRelationships(r) {
-        Array.prototype.push.apply(relationships, r);
-
+        if (isTransition) {
+            relationships = Array.from(r)
+        } else {
+            Array.prototype.push.apply(relationships, r);
+        }
+        
         relationship = svgRelationships.selectAll('.relationship')
             .data(relationships, function(d) { return d.id; });
 
@@ -1060,9 +1087,14 @@ function Neo4jD3(_selector, _options) {
         randomD3Data: randomD3Data,
         size: size,
         zoomFit: zoomFit,
+        setTransition: setTransition,
+        setCharge: setCharge,
+        getCharge: getCharge,
+        clearCanvas: clearCanvas,
         updateWithD3Data: updateWithD3Data,
         updateWithNeo4jData: updateWithNeo4jData,
         classes2colors: classes2colors,
+        options: JSON.parse(JSON.stringify(options)),
         version: version
     };
 }

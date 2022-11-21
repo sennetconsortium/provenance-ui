@@ -26,7 +26,7 @@ function App() {
     return (
         <div className={`c-App`}>
            
-            {/* { loading && <ProvenanceUI data={sample} /> } */}
+            { loading && <ProvenanceUI data={sample} /> }
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
             { options.colorMap && <Legend colorMap={options.colorMap} /> }
             { !loading && data && <Toggle data={data} context={ toggleData } /> }

@@ -6,8 +6,9 @@ import dataMap from '../data/neo4j/map.sample'
 
 async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
-    const { token, url, itemId, getOptions, setContextData, setLoading, setOptions } = serviceOps;
+    const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url }
+    const itemId = '956574ea660178122546e83e2eb4515d'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
