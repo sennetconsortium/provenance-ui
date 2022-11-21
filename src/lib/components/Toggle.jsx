@@ -6,14 +6,15 @@ import $ from 'jquery'
 function Toggle({ context, data, label = 'Toggle', className = 'btn'}) {
     const toggleData = (e) => {
         const provenanceData = window.provenanceData
+
         if (provenanceData && provenanceData.all) {
             data = provenanceData.all
         } else {
-            console.log('The data, the data')
             window.provenanceData = {
                 all: JSON.parse(JSON.stringify(data))
             }
         }
+
         log.debug('Before toggle', data.results[0].data[0].graph)
         const $el =  $(e.currentTarget)
         const className = 'hide-activities'
