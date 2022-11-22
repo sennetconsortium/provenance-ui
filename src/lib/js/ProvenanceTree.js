@@ -12,6 +12,7 @@ function ProvenanceTree(selector, _options) {
             paths: 'edgePaths'
         }
     }
+    const sz = {}
     let simulation
     const data = {}
     const options = {
@@ -32,8 +33,7 @@ function ProvenanceTree(selector, _options) {
 
     function clearCanvas() {
 
-        $el.canvas.attr('class', 'c-provenance--Tree')
-            .html('')
+        $el.canvas.html('')
 
         buildTree()
     }
@@ -49,6 +49,7 @@ function ProvenanceTree(selector, _options) {
         function dragged(event, d) {
             d.fx = event.x;
             d.fy = event.y;
+
         }
 
         function dragended(event, d) {
@@ -115,7 +116,7 @@ function ProvenanceTree(selector, _options) {
         const zoom = d3.zoom()
             .scaleExtent([1, 8])
             .on('zoom', function(event) {
-                $el.svgGroup.selectAll('circle, line')
+                $el.svgGroup.selectAll('.links, .nodes, .labels')
                     .attr('transform', event.transform);
             });
 
@@ -144,10 +145,15 @@ function ProvenanceTree(selector, _options) {
             .selectAll("line")
             .data(data.links)
             .join("line")
+            // .attr("d", d3.linkHorizontal()
+            //     .x(d => d.x)
+            //     .y(d => d.y))
             .attr('marker-end','url(#arrowhead)');
 
+        $el.labelsGroup = $el.svgGroup.append('g')
+            .attr('class', 'labels')
         // Makes path go along with the link by providing position for link labels
-        $el.edgePaths = $el.svgGroup.selectAll(`.${classNames.links.paths}`)
+        $el.edgePaths = $el.labelsGroup.selectAll(`.${classNames.links.paths}`)
             .data(data.links)
             .enter()
             .append('path')
@@ -157,14 +163,14 @@ function ProvenanceTree(selector, _options) {
             .attr('id', function (d, i) {return classNames.links.paths + i})
             .style('pointer-events', 'none');
 
-        $el.edgeLabels = $el.svgGroup.selectAll(`.${classNames.links.labels}`)
+        $el.edgeLabels = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
             .data(data.links)
             .enter()
             .append('text')
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
             .attr('id', function (d, i) {return classNames.links.labels + i})
-            .attr('font-size', 10)
+            .attr('font-size', 8)
             .attr('fill', '#aaa');
 
         //This will render text along the shape of a <path> by enclosing the text in a <textPath> element
@@ -175,12 +181,23 @@ function ProvenanceTree(selector, _options) {
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
             .text(d => {
-                return d.source.data.type
+                return d.source.data.type === 'Entity' ? 'WAS_GENERATED_BY' : 'USED'
             })
     }
 
     function buildNodes() {
+        data.nodes.forEach(function(d, i) {
+            d.y = sz.height/2 + i;
+            d.x = 3000*d.depth + 300;
+        });
+
+        // data.nodes.forEach(function(d, i) {
+        //     d.x = sz.width/2 + i;
+        //     d.y = 100*d.depth + 100;
+        // })
+
         $el.node = $el.svgGroup.append("g")
+            .attr('class', 'nodes')
             .attr("fill", "#fff")
             .attr("stroke", "#000")
             .attr("stroke-width", 1.5)
@@ -198,11 +215,11 @@ function ProvenanceTree(selector, _options) {
 
     function initSimulation() {
         simulation = d3.forceSimulation(data.nodes)
-            .force("link", d3.forceLink(data.links).id(d => d.id).distance(50).strength(1))
-            .force("charge", d3.forceManyBody().strength(-1000))
-            .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 3))
+            //.force("link", d3.forceLink(data.links).id(d => d.depth).distance(20).strength(1))
+            .force("charge", d3.forceManyBody().strength(-700))
+            .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2))
             .force("x", d3.forceX())
-            .force("y", d3.forceY());
+            .force('y', d3.forceY(20).strength(.2));
     }
 
     function buildTree() {
@@ -220,12 +237,12 @@ function ProvenanceTree(selector, _options) {
             left: getMargins()
         }
 
-        const width = parseInt($el.canvas.style('width')) - margin.left - margin.right
-        const height = parseInt($el.canvas.style('height')) - margin.top - margin.bottom
+        sz.width = parseInt($el.canvas.style('width')) - margin.left - margin.right
+        sz.height = parseInt($el.canvas.style('height')) - margin.top - margin.bottom
 
         $el.svg = $el.canvas.append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
+            .attr('width', sz.width + margin.left + margin.right)
+            .attr('height', sz.height + margin.top + margin.bottom)
 
         $el.svgGroup = $el.svg
             .append('g')
@@ -235,7 +252,13 @@ function ProvenanceTree(selector, _options) {
         buildLinks()
         buildNodes()
 
-        simulation.on("tick", () => {
+        simulation.on("tick", (e) => {
+
+            //const ky = simulation.alpha()
+            // data.links.forEach(function(d, i) {
+            //     d.target.y += (d.target.depth * 70 - d.target.y) * 2 * ky;
+            // })
+
             $el.link
                 .attr("x1", d => d.source.x)
                 .attr("y1", d => d.source.y)
@@ -249,7 +272,6 @@ function ProvenanceTree(selector, _options) {
             $el.edgePaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y)
         });
 
-        //invalidation.then(() => simulation.stop());
         createZoom()
         return $el.svg.node()
     }
