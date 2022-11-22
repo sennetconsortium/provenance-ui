@@ -6,11 +6,16 @@ function ProvenanceTree(selector, _options) {
     const $el = {
         canvas: d3.select(selector),
     }
+    let $info
     const classNames = {
+        info: 'c-provenance__info',
+        infoNode: 'c-provenance__info--node',
+        infoRelation: 'c-provenance__info--relationship',
         links: {
             labels: 'edgeLabels',
             paths: 'edgePaths'
-        }
+        },
+        hasDrag: 'has-drag'
     }
     const sz = {}
     let simulation
@@ -22,8 +27,22 @@ function ProvenanceTree(selector, _options) {
             "Sample": "#ebb5c8",
             "Source": "#ffc255"
         },
+        nodeRadius: 15,
         colors: colors(),
         totalTypes: 0,
+        idNavigate: {
+            props: [],
+            url: '',
+            exclude: []
+        },
+        hideElementId: true,
+        theme: {
+            colors: {
+                nodeOutlineFill: undefined,
+                relationship: '#a5abb6',
+                gray: '#ced2d9'
+            }
+        }
     }
 
     function init() {
@@ -44,6 +63,7 @@ function ProvenanceTree(selector, _options) {
             if (!event.active) simulation.alphaTarget(0.3).restart();
             d.fx = d.x;
             d.fy = d.y;
+            $(selector).addClass(classNames.hasDrag)
         }
 
         function dragged(event, d) {
@@ -56,6 +76,7 @@ function ProvenanceTree(selector, _options) {
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
+            $(selector).removeClass(classNames.hasDrag)
         }
 
         return d3.drag()
@@ -145,6 +166,10 @@ function ProvenanceTree(selector, _options) {
             .selectAll("line")
             .data(data.links)
             .join("line")
+            .on('click', function(e, d) {
+                d.wasClicked = true
+                updateInfo(d.data, false)
+            })
             // .attr("d", d3.linkHorizontal()
             //     .x(d => d.x)
             //     .y(d => d.y))
@@ -201,17 +226,125 @@ function ProvenanceTree(selector, _options) {
             .attr("fill", "#fff")
             .attr("stroke", "#000")
             .attr("stroke-width", 1.5)
-            .selectAll("circle")
+            .selectAll('g')
             .data(data.nodes)
-            .join("circle")
+
+        $el.nodeEnter = $el.node.enter()
+            .append('g')
+            .attr('class', d => `node node--${d.data.subType}`)
+            .on('click', function(e, d) {
+                d.wasClicked = true
+                updateInfo(d.data, true)
+            })
+            .call(drag(simulation))
+
+        $el.nodeGlow = $el.nodeEnter.append('circle')
+            .attr('class', 'glow')
+            .attr('r', options.nodeRadius * 1.3)
+            .style('fill', (d) => {
+                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(d.subType);
+            })
+            .style('stroke', (d) => {
+                return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(d.subType);
+            })
+
+        $el.nodeMain = $el.nodeEnter
+            .append("circle")
+            .attr('class', 'main')
             .attr("fill", d => typeToColor(d.data.subType))
             .attr("stroke", d => typeToDarkenColor(d.data.subType))
-            .attr("r", 15)
-            .call(drag(simulation));
+            .attr("r", options.nodeRadius)
 
-        $el.node.append("title")
-            .text(d => d.data.subType);
+        $el.nodeEnter = $el.nodeMain.merge($el.nodeGlow)
+
+        $el.node = $el.nodeEnter.merge($el.node)
+        $el.nodeGlow.append('title').text(d => d.data.subType)
+        $el.node.append('title').text(d => d.data.subType)
     }
+
+    function appendInfoPanel() {
+         $el.info = $el.canvas.append('div')
+            .attr('class', classNames.info);
+        $info = $(selector).find(`.${classNames.info}`)
+    }
+
+    function isValidURL(string) {
+        const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);
+        return (res !== null)
+    }
+
+    function clearInfo() {
+        $info.removeClass(classNames.infoNode)
+        $info.removeClass(classNames.infoRelation)
+        $info.html('');
+    }
+
+    function updateInfo(d, isNode) {
+        clearInfo()
+
+        isNode ? $info.addClass(classNames.infoNode) : $info.removeClass(classNames.infoNode)
+        !isNode ? $info.addClass(classNames.infoRelation) : $info.removeClass(classNames.infoRelation)
+
+        if (d.type) {
+            appendInfoElement(d,'class', isNode, (d.type !== d.subType) ? d.subType : d.type);
+        }
+        if (!options.hideElementId) {
+            appendInfoElement(d,'property', isNode, '&lt;id&gt;', d.id);
+        }
+
+        if (d.properties) {
+            Object.keys(d.properties).forEach(function(property) {
+                appendInfoElement(d,'property', isNode, property, JSON.stringify(d.properties[property]));
+            });
+        }
+
+    }
+
+    function appendInfoElement(d, cls, isNode, property, value) {
+        const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
+        value = value ? value.replaceAll('"', '') : value
+        let formattedUrl = false;
+        let elem = $el.info.append('a');
+        let href = '#';
+        if (isNavigation && options.idNavigate && options.idNavigate.url) {
+            const label = d.subType || 'Unknown'
+            const excludeList = options.idNavigate.exclude[label]
+            if (!excludeList || (excludeList &&
+                excludeList.indexOf(property) === -1)) {
+                formattedUrl = true;
+                const url = isValidURL(value) ? value : options.idNavigate.url
+                href = url.replace('{classType}', label.toLowerCase())
+                href = href.replace('{id}', value)
+                href = (isValidURL(value) && href.indexOf('://') === -1) ? '//' + href : href
+            }
+        }
+
+        elem.attr('href', formattedUrl ?  href : '#')
+            .attr('target', formattedUrl ? '_blank' : '_parent')
+            .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
+            .html('<strong>' + property + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
+
+        if (!value) {
+            elem.style('background-color', function(d) {
+                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : (isNode ? typeToColor(property) : defaultColor());
+            })
+                .style('border-color', function(d) {
+                    return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : (isNode ? typeToDarkenColor(property) : defaultDarkenColor());
+                })
+                .style('color', function(d) {
+                    return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : '#fff';
+                });
+        }
+    }
+
+    function defaultColor() {
+        return options.theme.colors.relationship;
+    }
+
+    function defaultDarkenColor() {
+        return d3.rgb(options.theme.colors.gray).darker(1);
+    }
+
 
     function initSimulation() {
         simulation = d3.forceSimulation(data.nodes)
@@ -251,6 +384,7 @@ function ProvenanceTree(selector, _options) {
         initSimulation()
         buildLinks()
         buildNodes()
+        appendInfoPanel()
 
         simulation.on("tick", (e) => {
 
@@ -268,6 +402,10 @@ function ProvenanceTree(selector, _options) {
             $el.node
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
+            $el.nodeGlow
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
 
             $el.edgePaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y)
         });
