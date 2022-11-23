@@ -1,4 +1,5 @@
 import DataConverter from '../DataConverter'
+
 class DataConverterNeo4J extends DataConverter {
     constructor(data, map, ops = {}) {
         super(data, map, ops)
@@ -7,13 +8,14 @@ class DataConverterNeo4J extends DataConverter {
             prov: this.map.keys.prov || 'prov:type',
             type: this.map.keys.type || 'sennet:entity_type',
             nodes: this.map.keys.nodes || ['activity', 'entity'],
-            relationships: this.map.keys.relationships || ["wasGeneratedBy", "used"]
+            relationships: this.map.keys.relationships || {
+                used: 'prov:entity',
+                wasGeneratedBy: 'prov:activity',
+                dataProps: { used: 'used', generatedBy: 'wasGeneratedBy' }
+            }
         }
+        this.result = []
         this.list = {}
-    }
-
-    getRelationshipType(key) {
-        return this.map.labels ? this.map.labels.edge[key] : key
     }
 
     getNodeIdFromValue(value) {
@@ -21,75 +23,43 @@ class DataConverterNeo4J extends DataConverter {
         return parts[parts.length - 1]
     }
 
-    /**
-     * Formats the relationships for the graph visualization.
-     */
-    reformatRelationships() {
+    hierarchy(root) {
+        root = root || this.data.root
+        this.dict = {}
+
         try {
-            for (let key of this.keys.relationships) {
-                let i = 0;
-                for (let _prop in this.data[key]) {
+            let id
 
-                  
-                    const node = this.data[key][_prop]
-
-                    const startNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.startNode]) : this.getNodeIdFromValue(node[this.map.keys.endNode])
-                    const endNode = key === this.keys.generatedBy ? this.getNodeIdFromValue(node[this.map.keys.endNode]) : this.getNodeIdFromValue(node[this.map.keys.startNode])
-                    this.relationships.push({
-                        id: i.toString(),
-                        type: this.getRelationshipType(key),
-                        startNode: startNode,
-                        endNode: endNode,
-                        parentType: this.getParentEntityTypeFromId(startNode),
-                        properties: {
-                            [this.map.keys.startNode]: this.getNodeIdFromValue(node[this.map.keys.startNode])
-                        }
-                    })
-                    i++
-                }
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    flatten() {
-        try {
-            for (let key of this.keys.nodes) {
-                for (let item in this.data[key]) {
-                    const id = this.data[key][item][this.getPropFromMap()]
-                    this.list[id] = this.data[key][item]
-                }
-            }
-        } catch (e) {
-            console.error(e)
-        }
-    }
-
-    getParentEntityType(item) {
-        if (item[this.keys.prov] === this.actvityTypeName) {
-            const idProp = this.getPropFromMap()
-            for (let _prop in this.data[this.keys.generatedBy]) {
-                const node = this.data[this.keys.generatedBy][_prop];
-                try {
-                    if (node[this.map.keys.endNode].indexOf(item[idProp]) !== -1) {
-                        const parentNode = this.list[this.getNodeIdFromValue(node[this.map.keys.startNode])]
-                        if (parentNode) {
-                            return parentNode[this.keys.type]
-                        }
+            // Create dictionaries for constant time access
+            for (let key in this.keys.relationships) {
+                let data = this.data[key]
+                if (data) {
+                    let idKey = this.keys.relationships[key]
+                    for (let _prop in data) {
+                        id = this.getNodeIdFromValue(data[_prop][idKey])
+                        this.dict[key][id] = data[_prop]
                     }
-                } catch (e) {
-                    console.error(e)
                 }
             }
-        }
-    }
 
-    reformatNodes() {
-        try {
             for (let key of this.keys.nodes) {
-                for (let _prop in this.data[key]) {
-                    this.formatNode(this.data[key][_prop])
+                let data = this.data[key]
+                for (let _prop in data) {
+                    let item = data[_prop]
+                    id = item[this.getPropFromMap()]
+                    const usedDict = this.keys.relationships.dataProps.used
+                    let used = this.dict[usedDict][id]
+                    const genDict =
+                        this.keys.relationships.dataProps.generatedBy
+                    const propKey = this.keys.relationships[genDict]
+                    let actId = this.getNodeIdFromValue(used[propKey])
+                    let gen = this.dict[genDict][actId]
+                    this.result.push(...item, {
+                        activityAsParent: actId,
+                        entityAsParent: this.getNodeIdFromValue(
+                            gen[this.map.keys.startNode]
+                        )
+                    })
                 }
             }
         } catch (e) {

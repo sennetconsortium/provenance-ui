@@ -4,6 +4,7 @@ import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
 import Toggle from './lib/components/Toggle'
 import sample from './data/sample'
+import ProvenanceTree from './lib/js/ProvenanceTree'
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -11,6 +12,9 @@ function App() {
 
     useEffect(() => {
         setData(contextData)
+        let svg = ProvenanceTree('#provenanceTree', {})
+        console.log(svg)
+        import (`./lib/ProvenanceUI.css`)
     })
 
     const toggleData = (data, isFiltered) => {
@@ -25,11 +29,12 @@ function App() {
 
     return (
         <div className={`c-App`}>
-           
-            { loading && <ProvenanceUI data={sample} /> }
-            { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            { options.colorMap && <Legend colorMap={options.colorMap} /> }
-            { !loading && data && <Toggle data={data} context={ toggleData } /> }
+
+            <div className='c-provenance c-provenance--Tree' id='provenanceTree'></div>
+            {/*{  <ProvenanceUI data={sample} /> }*/}
+            {/*{ !loading && data && <ProvenanceUI data={data} options={ options } /> }*/}
+            {/*{ options.colorMap && <Legend colorMap={options.colorMap} /> }*/}
+            {/*{ !loading && data && <Toggle data={data} context={ toggleData } /> }*/}
         </div>
     )
 }

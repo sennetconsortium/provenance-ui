@@ -1,8 +1,8 @@
-import {createContext, useState, useEffect, useRef} from 'react'
+import { createContext, useState, useEffect, useRef } from 'react'
 import log from 'loglevel'
 
-import  GenericObject from '../usage/GenericObject'
-import  Neo4JGraphObject from '../usage/Neo4JGraphObject'
+import GenericObject from '../usage/GenericObject'
+import Neo4JGraphObject from '../usage/Neo4JGraphObject'
 
 const AppContext = createContext()
 
@@ -13,7 +13,7 @@ const AppContext = createContext()
  * @constructor
  */
 
-export const AppProvider = ({children}) => {
+export const AppProvider = ({ children }) => {
     const [contextData, setContextData] = useState(null)
     const [loading, setLoading] = useState(false)
     const [options, setOptions] = useState({})
@@ -23,7 +23,7 @@ export const AppProvider = ({children}) => {
         return process.env[`REACT_APP_${key}`]
     }
 
-    useEffect(()  => {
+    useEffect(() => {
         if (initialized.current) return
         initialized.current = true
         log.setLevel(getEnv('LOG_LEVEL') || 'silent')
@@ -42,12 +42,29 @@ export const AppProvider = ({children}) => {
             } catch (e) {
                 log.debug('Issue parsing options', e)
             }
-            return {}
+
+            return {
+                simulation: { charge: -100 },
+                idNavigate: {
+                    props: ['uuid', 'protocol_url'],
+                    url: 'http://localhost:3000/{classType}?uuid={id}',
+                    exclude: { Activity: ['uuid'] }
+                },
+                selectorId: 'neo4j--app'
+            }
         }
 
         const handleFeature = async (fn) => {
             setLoading(true)
-            const result = await fn({token, url, itemId, getOptions, setOptions, setContextData, setLoading})
+            const result = await fn({
+                token,
+                url,
+                itemId,
+                getOptions,
+                setOptions,
+                setContextData,
+                setLoading
+            })
         }
 
         if (feature === 'generic') {
@@ -57,7 +74,6 @@ export const AppProvider = ({children}) => {
         } else {
             console.error('Current features are generic or neo4j.')
         }
-
     }, [])
 
     return (

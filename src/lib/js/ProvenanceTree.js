@@ -2,6 +2,13 @@ import $ from 'jquery'
 import * as d3 from 'd3'
 import sampleTree from '../../data/sample.tree'
 
+/**
+ * @author dbmi.pitt.edu
+ * @param selector
+ * @param _options
+ * @returns {{}}
+ * @constructor
+ */
 function ProvenanceTree(selector, _options) {
     const $el = {
         canvas: d3.select(selector),
@@ -338,8 +345,6 @@ function ProvenanceTree(selector, _options) {
 
         $el.node = $el.svgGroup.append("g")
             .attr('class', 'nodes')
-            .attr("fill", "#fff")
-            .attr("stroke", "#000")
             .attr("stroke-width", 1.5)
             .selectAll('g')
             .data(data.nodes)
@@ -466,7 +471,6 @@ function ProvenanceTree(selector, _options) {
     function defaultDarkenColor() {
         return d3.rgb(options.theme.colors.gray).darker(1);
     }
-
 
     function initSimulation() {
         simulation = d3.forceSimulation(data.nodes)

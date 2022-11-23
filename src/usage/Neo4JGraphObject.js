@@ -24,25 +24,8 @@ async function Neo4JGraphObject(serviceOps) {
         $.extend(result.entity, result.descendants.entity)
         log.debug(`${feature}: Result width appended descendants...`, result)
         
-        const converter = new DataConverterNeo4J(result, dataMap, {setTextForNoneActivity: false})
-        converter.flatten()
-        converter.reformatNodes()
-        converter.reformatRelationships()
-        log.debug(`${feature}: Nodes ...`, converter.getNodes())
-        log.debug(`${feature}: Relationships ...`, converter.getRelationships())
+        const converter = new DataConverterNeo4J(result, dataMap)
 
-        const neoData = converter.getNeo4jFormat({
-            columns: ['user', 'entity'],
-            nodes: converter.getNodes(),
-            relationships: converter.getRelationships()
-        })
-
-        log.debug(`${feature}: NeoData for graph visual ...`, neoData)
-
-        log.debug('Options', getOptions())
-        setOptions(getOptions())
-        setContextData(neoData)
-        setLoading(false)
 
     }
 
