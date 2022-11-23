@@ -25,7 +25,8 @@ async function Neo4JGraphObject(serviceOps) {
         log.debug(`${feature}: Result width appended descendants...`, result)
         
         const converter = new DataConverterNeo4J(result, dataMap)
-
+        converter.hierarchy(itemId)
+        log.debug(converter)
 
     }
 

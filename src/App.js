@@ -3,7 +3,6 @@ import AppContext from './context/AppContext'
 import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
 import Toggle from './lib/components/Toggle'
-import sample from './data/sample'
 import ProvenanceTree from './lib/js/ProvenanceTree'
 
 function App() {
