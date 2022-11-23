@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
+import ProvenanceTree from '../js/ProvenanceTree'
 
-function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
-    const selectorId = options.selectorId || 'neo4jd3'
+function ProvenanceUI({ children, data, options = {} }) {
+    const selectorId = options.selectorId || 'provenanceTree'
 
     const addVisitedClass = () => {
         $(`#${selectorId}`).on('click', '.node', function(e) {
@@ -12,16 +13,16 @@ function ProvenanceUI({ children, data, options = {}, dataUrl = null }) {
     }
 
     useEffect(() => {
+
+        ProvenanceTree(`#${selectorId}`, {...options, data })
         if (!options.noStyles) {
             import (`../ProvenanceUI.css`)
         }
-
         addVisitedClass()
     }, []);
 
     return (
-        <div className='c-provenance js-provenance'>
-            <div id={selectorId}></div>
+        <div className='c-provenance c-provenance--Tree' id={selectorId} style={{minHeight: options.minHeight || 800}}>
             {children}
         </div>
     );

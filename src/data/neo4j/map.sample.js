@@ -3,7 +3,6 @@ const dataMap = {
         node: '/'
     },
     keys: {
-        type: 'sennet:entity_type',
         startNode: 'prov:entity',
         endNode: 'prov:activity'
     },

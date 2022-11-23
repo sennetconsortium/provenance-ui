@@ -8,7 +8,8 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url }
-    const itemId = '956574ea660178122546e83e2eb4515d'
+    //const itemId = '956574ea660178122546e83e2eb4515d'
+    const itemId = '7784dc1fe53baed4369692732a29a74d'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -26,7 +27,9 @@ async function Neo4JGraphObject(serviceOps) {
         
         const converter = new DataConverterNeo4J(result, dataMap)
         converter.hierarchy(itemId)
-        log.debug(converter)
+        log.debug('Converter details...', converter)
+        setContextData({stratify: converter.result})
+        setLoading(false)
 
     }
 

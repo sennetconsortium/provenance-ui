@@ -51,6 +51,8 @@ class DataConverterNeo4J extends DataConverter {
                 let data = this.data[key]
                 for (let _prop in data) {
                     let item = data[_prop]
+                    item.type = item[this.keys.prov]
+                    item.subType = item[this.keys.type]
                     id = item[this.getPropFromMap()]
                     if (id !== rootId) {
                         const usedDict = this.keys.relationships.dataProps.used
@@ -66,8 +68,8 @@ class DataConverterNeo4J extends DataConverter {
                                 gen[this.map.keys.startNode]
                             )
                         })
-                        this.result.push(item)
                     }
+                    this.result.push(item)
                 }
             }
         } catch (e) {

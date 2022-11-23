@@ -11,9 +11,9 @@ function App() {
 
     useEffect(() => {
         setData(contextData)
-        let svg = ProvenanceTree('#provenanceTree', {})
-        console.log(svg)
-        import (`./lib/ProvenanceUI.css`)
+        // let svg = ProvenanceTree('#provenanceTree', {})
+        // console.log(svg)
+        // import (`./lib/ProvenanceUI.css`)
     })
 
     const toggleData = (data, isFiltered) => {
@@ -29,9 +29,8 @@ function App() {
     return (
         <div className={`c-App`}>
 
-            <div className='c-provenance c-provenance--Tree' id='provenanceTree'></div>
             {/*{  <ProvenanceUI data={sample} /> }*/}
-            {/*{ !loading && data && <ProvenanceUI data={data} options={ options } /> }*/}
+            { !loading && data && <ProvenanceUI data={data} options={ options } /> }
             {/*{ options.colorMap && <Legend colorMap={options.colorMap} /> }*/}
             {/*{ !loading && data && <Toggle data={data} context={ toggleData } /> }*/}
         </div>

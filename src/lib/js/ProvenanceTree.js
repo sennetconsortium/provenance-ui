@@ -58,6 +58,8 @@ function ProvenanceTree(selector, _options) {
 
     function init() {
         $.extend(options, _options)
+        data.stratify = options.data.stratify
+        data.root = options.data.root
         clearCanvas()
     }
 
@@ -230,7 +232,7 @@ function ProvenanceTree(selector, _options) {
     }
 
     function getNodeType(d) {
-        return d.data.subType
+        return d.subType || d.data.subType || d.data.data.subType
     }
 
     function icon(d) {
@@ -351,7 +353,7 @@ function ProvenanceTree(selector, _options) {
 
         $el.nodeEnter = $el.node.enter()
             .append('g')
-            .attr('class', d => `node node--${d.data.subType}`)
+            .attr('class', d => `node node--${getNodeType(d)}`)
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
@@ -362,17 +364,17 @@ function ProvenanceTree(selector, _options) {
             .attr('class', 'glow')
             .attr('r', options.node.radius * 1.3)
             .style('fill', (d) => {
-                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(d.subType);
+                return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeType(d));
             })
             .style('stroke', (d) => {
-                return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(d.subType);
+                return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeType(d));
             })
 
         $el.nodeMain = $el.nodeEnter
             .append("circle")
             .attr('class', 'main')
-            .attr("fill", d => typeToColor(d.data.subType))
-            .attr("stroke", d => typeToDarkenColor(d.data.subType))
+            .attr("fill", d => typeToColor(getNodeType(d)))
+            .attr("stroke", d => typeToDarkenColor(getNodeType(d)))
             .attr("r", options.node.radius)
 
         if (options.node.append) {
@@ -385,8 +387,8 @@ function ProvenanceTree(selector, _options) {
         $el.nodeEnter = $el.nodeMain.merge($el.nodeGlow)
 
         $el.node = $el.nodeEnter.merge($el.node)
-        $el.nodeGlow.append('title').text(d => d.data.subType)
-        $el.node.append('title').text(d => d.data.subType)
+        $el.nodeGlow.append('title').text(d => getNodeType(d))
+        $el.node.append('title').text(d => getNodeType(d))
     }
 
     function appendInfoPanel() {
@@ -413,7 +415,7 @@ function ProvenanceTree(selector, _options) {
         !isNode ? $info.addClass(classNames.infoRelation) : $info.removeClass(classNames.infoRelation)
 
         if (d.type) {
-            appendInfoElement(d,'class', isNode, (d.type !== d.subType) ? d.subType : d.type);
+            appendInfoElement(d,'class', isNode, (d.type !== getNodeType(d)) ? getNodeType(d) : d.type);
         }
         if (!options.hideElementId) {
             appendInfoElement(d,'property', isNode, '&lt;id&gt;', d.id);
@@ -481,8 +483,25 @@ function ProvenanceTree(selector, _options) {
             .force('y', d3.forceY(20).strength(.2));
     }
 
+    function stratify() {
+        const root = d3.stratify()
+            .id(function(d) { return d['sennet:uuid']; })
+            .parentId(function(d) { return d.entityAsParent; })
+            (data.stratify)
+        return root
+    }
+
+    function loadData() {
+        if (data.stratify) {
+            return stratify()
+        } else {
+            return data.root || sampleTree
+        }
+    }
+
     function buildTree() {
-        const root = d3.hierarchy(sampleTree);
+        const root = d3.hierarchy(loadData());
+        console.log(root)
         data.links = root.links();
         data.nodes = root.descendants()
 
