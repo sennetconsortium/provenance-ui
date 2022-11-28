@@ -14,7 +14,7 @@ function ProvenanceUI({ children, data, options = {} }) {
 
     useEffect(() => {
 
-        ProvenanceTree(`#${selectorId}`, {...options, data })
+        window.ProvenanceTreeD3 = ProvenanceTree(`#${selectorId}`, {...options, data })
         if (!options.noStyles) {
             import (`../ProvenanceUI.css`)
         }
@@ -22,7 +22,7 @@ function ProvenanceUI({ children, data, options = {} }) {
     }, []);
 
     return (
-        <div className='c-provenance c-provenance--Tree' id={selectorId} style={{minHeight: options.minHeight || 800}}>
+        <div className='c-provenance c-provenance--Tree js-provenance' id={selectorId} style={{minHeight: options.minHeight || 800}}>
             {children}
         </div>
     );

@@ -18,12 +18,7 @@ function App() {
 
     const toggleData = (data, isFiltered) => {
         setData(data)
-        const ui = window.ProvenanceUId3
-        const charge = ui.options.simulation.charge
-        ui.setCharge(isFiltered ? charge * 4 : charge)
-        ui.setTransition(true)
-        ui.clearCanvas()
-        ui.updateWithNeo4jData(data)
+        const ui = window.ProvenanceTreeD3
     }
 
     return (
@@ -31,7 +26,7 @@ function App() {
 
             {/*{  <ProvenanceUI data={sample} /> }*/}
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            {/*{ options.colorMap && <Legend colorMap={options.colorMap} /> }*/}
+            { options.colorMap && <Legend colorMap={options.colorMap} /> }
             {/*{ !loading && data && <Toggle data={data} context={ toggleData } /> }*/}
         </div>
     )

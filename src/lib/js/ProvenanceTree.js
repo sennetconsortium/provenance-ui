@@ -248,9 +248,7 @@ function ProvenanceTree(selector, _options) {
     function getNodeProp(d, prop) {
         try {
             return d[prop] || d.data[prop] || d.data.data[prop]
-        } catch (e) {
-
-        }
+        } catch (e) {}
     }
 
     function getNodeProperties(d) {
@@ -378,14 +376,13 @@ function ProvenanceTree(selector, _options) {
                 return className
             }
         }
-
         return ''
     }
 
     function buildNodes() {
         data.nodes.forEach(function(d, i) {
             d.y = sz.height/2 + i;
-            d.x = 3000*d.depth + 300;
+            d.x = -3000*d.depth + 300;
         });
 
         // data.nodes.forEach(function(d, i) {
@@ -539,10 +536,10 @@ function ProvenanceTree(selector, _options) {
             .force('y', d3.forceY(20).strength(.2));
     }
 
-    function stratify() {
+    function stratify(parentKey = 'entityAsParent') {
         const root = d3.stratify()
             .id(function(d) { return d.id  })
-            .parentId(function(d) { return d.entityAsParent })
+            .parentId(function(d) { return d[parentKey] })
             (data.stratify)
         return root
     }
@@ -553,6 +550,10 @@ function ProvenanceTree(selector, _options) {
         } else {
             return data.root || sampleTree
         }
+    }
+
+    function toggleData(ops) {
+
     }
 
     function buildTree() {
@@ -621,7 +622,8 @@ function ProvenanceTree(selector, _options) {
 
     init()
     return {
-
+        colorMap: options.colorMap,
+        toggleData: toggleData,
     }
 }
 

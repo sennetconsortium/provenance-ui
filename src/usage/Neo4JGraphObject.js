@@ -8,8 +8,8 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url }
-    //const itemId = '956574ea660178122546e83e2eb4515d'
-    const itemId = 'd0012eff666fb2531d97f379d03de635'
+    const itemId = '956574ea660178122546e83e2eb4515d'
+    //const itemId = 'd0012eff666fb2531d97f379d03de635'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -32,7 +32,13 @@ async function Neo4JGraphObject(serviceOps) {
         log.debug('Converter details...', converter)
         setContextData({stratify: converter.result})
         let ops = getOptions()
-        ops = { ...ops, highlight: [{id: itemId}]}
+        const colorMap = {
+            "Dataset": "#8ecb93",
+            "Activity": "#f16766",
+            "Sample": "#ebb5c8",
+            "Source": "#ffc255"
+        }
+        ops = { ...ops, highlight: [{id: itemId}], colorMap}
         setOptions(ops)
         setLoading(false)
 
