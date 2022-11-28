@@ -46,9 +46,9 @@ export const AppProvider = ({ children }) => {
             return {
                 simulation: { charge: -100 },
                 idNavigate: {
-                    props: ['uuid', 'protocol_url'],
+                    props: ['sennet:uuid', 'sennet:protocol_url'],
                     url: 'http://localhost:3000/{classType}?uuid={id}',
-                    exclude: { Activity: ['uuid'] }
+                    exclude: { Activity: ['sennet:uuid'] }
                 },
                 selectorId: 'neo4j--app'
             }

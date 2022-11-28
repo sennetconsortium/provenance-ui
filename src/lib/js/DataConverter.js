@@ -6,16 +6,16 @@ class DataConverter {
         this.error = null
     }
 
-    setProperties(item, type, data = {}) {
-        data.properties = data.properties || {}
+    setProperties(item, type) {
+        item.properties = item.properties || {}
         for (let gProp of this.map.props) {
-            data.properties[gProp] = item[gProp]
+            item.properties[gProp] = item[gProp]
         }
 
         if (type && typeof this.map.typeProps[type] === 'object') {
             for (let tProp of this.map.typeProps[type]) {
                 if (item[tProp] !== undefined) {
-                    data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
+                    item.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp])
                 }
             }
         }

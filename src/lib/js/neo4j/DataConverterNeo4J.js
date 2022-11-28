@@ -88,6 +88,7 @@ class DataConverterNeo4J extends DataConverter {
                             gen[this.map.keys.startNode]
                         ) : treeRoot.id
                     })
+                    this.setProperties(item, item.subType)
 
                     if (id === rootId) {
                         if (!hasDescendants) {

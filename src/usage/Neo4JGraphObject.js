@@ -31,6 +31,9 @@ async function Neo4JGraphObject(serviceOps) {
         converter.hierarchy(itemId, hasDescendants)
         log.debug('Converter details...', converter)
         setContextData({stratify: converter.result})
+        let ops = getOptions()
+        ops = { ...ops, highlight: [{id: itemId}]}
+        setOptions(ops)
         setLoading(false)
 
     }

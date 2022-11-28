@@ -13,6 +13,9 @@ function ProvenanceTree(selector, _options) {
     const $el = {
         canvas: d3.select(selector),
     }
+    let clickStartTime
+    let clickEndTime
+    let canStartDrag = false
     let $info
     const classNames = {
         info: 'c-provenance__info',
@@ -38,6 +41,7 @@ function ProvenanceTree(selector, _options) {
             append: 'text',
             radius: 15
         },
+        highlight: [],
         iconMap: fontAwesomeIcons(),
         colors: colors(),
         totalTypes: 0,
@@ -70,13 +74,16 @@ function ProvenanceTree(selector, _options) {
         buildTree()
     }
 
-    function drag(simulation) {
+    function getDrag() {
 
-        function dragstarted(event, d) {
-            if (!event.active) simulation.alphaTarget(0.3).restart();
-            d.fx = d.x;
-            d.fy = d.y;
-            $(selector).addClass(classNames.hasDrag)
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.1).restart();
+            if (canStartDrag) {
+                d.fx = d.x;
+                d.fy = d.y;
+                $(selector).addClass(classNames.hasDrag)
+            }
+
         }
 
         function dragged(event, d) {
@@ -84,17 +91,24 @@ function ProvenanceTree(selector, _options) {
             d.fy = event.y;
         }
 
-        function dragended(event, d) {
+        function dragEnded(event, d) {
             if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
             $(selector).removeClass(classNames.hasDrag)
         }
 
+        return {dragStarted, dragged, dragEnded}
+    }
+
+    function drag() {
+
+        const { dragStarted, dragged, dragEnded } = getDrag()
+
         return d3.drag()
-            .on("start", dragstarted)
+            .on("start", dragStarted)
             .on("drag", dragged)
-            .on("end", dragended);
+            .on("end", dragEnded);
     }
 
     function color() {
@@ -231,16 +245,28 @@ function ProvenanceTree(selector, _options) {
         return {text, className};
     }
 
+    function getNodeProp(d, prop) {
+        try {
+            return d[prop] || d.data[prop] || d.data.data[prop]
+        } catch (e) {
+
+        }
+    }
+
     function getNodeProperties(d) {
-        return d.properties || d.data.properties || d.data.data.properties
+        return getNodeProp(d, 'properties')
     }
 
     function getNodeType(d) {
-        return d.type || d.data.type || d.data.data.type
+        return getNodeProp(d, 'type')
     }
 
     function getNodeCat(d) {
-        return d.subType || d.data.subType || d.data.data.subType
+        return getNodeProp(d, 'subType')
+    }
+
+    function getNodeId(d) {
+        return getNodeProp(d, 'id')
     }
 
     function icon(d) {
@@ -342,6 +368,20 @@ function ProvenanceTree(selector, _options) {
             });
     }
 
+    function getHighlightClass(d, isNode = true) {
+        let className = isNode ? 'node--' : 'rel--';
+
+        for (let h of options.highlight) {
+            if (h.id === getNodeId(d)) {
+                className = className + 'highlighted';
+                className += h.isSecondary ? 'is-secondary' : ''
+                return className
+            }
+        }
+
+        return ''
+    }
+
     function buildNodes() {
         data.nodes.forEach(function(d, i) {
             d.y = sz.height/2 + i;
@@ -361,12 +401,17 @@ function ProvenanceTree(selector, _options) {
 
         $el.nodeEnter = $el.node.enter()
             .append('g')
-            .attr('class', d => `node node--${getNodeCat(d)}`)
+            .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
             })
-            .call(drag(simulation))
+            .on('mousedown', function() { clickStartTime = new Date() })
+            .on('mouseup',function(e, d) {
+                clickEndTime = new Date();
+                canStartDrag = ((clickEndTime - clickStartTime) > 2000)
+            })
+            .call(drag())
 
         $el.nodeGlow = $el.nodeEnter.append('circle')
             .attr('class', 'glow')

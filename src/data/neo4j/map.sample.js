@@ -10,19 +10,7 @@ const dataMap = {
         edge: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' }
     },
     root: {
-        'prov:type': 'category',
-        'sennet:entity_type': 'labels',
         'sennet:uuid': 'id',
-        'sennet:created_by_user_displayname': 'text',
-    },
-    highlight: {
-        labels: 'entity_type',
-        dataProp: 'sennet_id',
-        visualProp: 'sennet:sennet_id'
-    },
-    actor: {
-        dataProp: 'sennet:created_by_user_displayname',
-        visualProp: 'agent'
     },
     props: ['sennet:uuid', 'sennet:sennet_id'],
     typeProps: {
