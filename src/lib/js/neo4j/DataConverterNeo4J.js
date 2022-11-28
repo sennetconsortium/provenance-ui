@@ -10,7 +10,7 @@ class DataConverterNeo4J extends DataConverter {
             type: this.map.keys.type || 'sennet:entity_type',
             nodes: this.map.keys.nodes || ['entity'],
             relationships: this.map.keys.relationships || {
-                // The keys in the data object and the corresponding prop that cross references the parent entity.
+                // The keys in the data object and the corresponding prop that cross-references the parent entity.
                 // Generally:
                     // USED starts at activity, ends at entity
                     // GENERATED starts at entity, ends at activity
@@ -29,10 +29,21 @@ class DataConverterNeo4J extends DataConverter {
         return parts[parts.length - 1]
     }
 
-    hierarchy(rootId) {
+    isActivity(key) {
+        return key === 'activity'
+    }
+    hierarchy(rootId, hasDescendants) {
         this.dict = {}
         try {
             let id
+            let shouldAddRoot = false
+            let suffix = hasDescendants ? 'Root' : ''
+            let treeRoot = {
+                type: 'Root',
+                subType: 'Root',
+                id: rootId + suffix,
+                activityId: rootId + suffix+'--Activity'
+            }
 
             // Create dictionaries for constant time access
             for (let key in this.keys.relationships) {
@@ -52,25 +63,49 @@ class DataConverterNeo4J extends DataConverter {
                 for (let _prop in data) {
                     let item = data[_prop]
                     item.type = item[this.keys.prov]
-                    item.subType = item[this.keys.type]
+                    item.subType = item[this.keys.type] || item.type
                     id = item[this.getPropFromMap()]
-                    if (id !== rootId) {
-                        const usedDict = this.keys.relationships.dataProps.used
-                        let used = this.dict[usedDict][id]
-                        const genDict =
-                            this.keys.relationships.dataProps.generatedBy
-                        const propKey = this.keys.relationships[genDict]
-                        let actId = this.getNodeIdFromValue(used[propKey])
-                        let gen = this.dict[genDict][actId]
-                        $.extend(item, {
-                            activityAsParent: actId,
-                            entityAsParent: this.getNodeIdFromValue(
-                                gen[this.map.keys.startNode]
-                            )
-                        })
+
+                    const genKey =
+                        this.keys.relationships.dataProps.generatedBy
+                    const propKey = this.keys.relationships[genKey]
+
+                    let actId = id;
+                    if (!this.isActivity(key)) {
+                        const usedKey = this.keys.relationships.dataProps.used
+                        let used = this.dict[usedKey][id]
+                        actId = used ? this.getNodeIdFromValue(used[propKey]) : null
                     }
-                    this.result.push(item)
+
+                    let gen = this.dict[genKey][actId]
+                    if (!gen) {
+                        shouldAddRoot = true;
+                    }
+                    $.extend(item, {
+                        id: id,
+                        activityAsParent: gen ? actId : treeRoot.activityId,
+                        entityAsParent: gen ? this.getNodeIdFromValue(
+                            gen[this.map.keys.startNode]
+                        ) : treeRoot.id
+                    })
+
+                    if (id === rootId) {
+                        if (!hasDescendants) {
+                            item.activityAsParent = null
+                            item.entityAsParent = null
+                            treeRoot = item
+                        }
+                        if (hasDescendants) {
+                            this.result.push(item)
+                        }
+                    } else {
+                        this.result.push(item)
+                    }
+
                 }
+            }
+            if (shouldAddRoot) {
+                this.result.push(treeRoot)
             }
         } catch (e) {
             console.error(e)

@@ -9,14 +9,16 @@ async function Neo4JGraphObject(serviceOps) {
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url }
     //const itemId = '956574ea660178122546e83e2eb4515d'
-    const itemId = '7784dc1fe53baed4369692732a29a74d'
+    const itemId = 'd0012eff666fb2531d97f379d03de635'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
         let keys = ['used', 'wasGeneratedBy']
+        let hasDescendants = false
         for (let key of keys) {
             for (let _prop in result.descendants[key]) {
                 result[key] = result[key] || {}
+                hasDescendants = true
                 // Must update key to avoid key collisions with original result.used and result.wasGeneratedBy
                 result[key][`des${_prop}`] = result.descendants[key][_prop]
             }
@@ -26,7 +28,7 @@ async function Neo4JGraphObject(serviceOps) {
         log.debug(`${feature}: Result width appended descendants...`, result)
         
         const converter = new DataConverterNeo4J(result, dataMap)
-        converter.hierarchy(itemId)
+        converter.hierarchy(itemId, hasDescendants)
         log.debug('Converter details...', converter)
         setContextData({stratify: converter.result})
         setLoading(false)
