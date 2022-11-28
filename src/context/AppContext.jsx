@@ -49,8 +49,7 @@ export const AppProvider = ({ children }) => {
                     props: ['sennet:uuid', 'sennet:protocol_url'],
                     url: 'http://localhost:3000/{classType}?uuid={id}',
                     exclude: { Activity: ['sennet:uuid'] }
-                },
-                selectorId: 'neo4j--app'
+                }
             }
         }
 

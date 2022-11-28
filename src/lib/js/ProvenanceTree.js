@@ -68,9 +68,7 @@ function ProvenanceTree(selector, _options) {
     }
 
     function clearCanvas() {
-
         $el.canvas.html('')
-
         buildTree()
     }
 
@@ -83,7 +81,6 @@ function ProvenanceTree(selector, _options) {
                 d.fy = d.y;
                 $(selector).addClass(classNames.hasDrag)
             }
-
         }
 
         function dragged(event, d) {
@@ -572,8 +569,8 @@ function ProvenanceTree(selector, _options) {
             left: getMargins()
         }
 
-        sz.width = parseInt($el.canvas.style('width')) - margin.left - margin.right
-        sz.height = parseInt($el.canvas.style('height')) - margin.top - margin.bottom
+        sz.width = $(selector).width() - margin.left - margin.right
+        sz.height = $(selector).height() - margin.top - margin.bottom
 
         $el.svg = $el.canvas.append('svg')
             .attr('width', sz.width + margin.left + margin.right)
@@ -590,7 +587,7 @@ function ProvenanceTree(selector, _options) {
 
         simulation.on("tick", (e) => {
 
-            //const ky = simulation.alpha()
+            // const ky = simulation.alpha()
             // data.links.forEach(function(d, i) {
             //     d.target.y += (d.target.depth * 70 - d.target.y) * 2 * ky;
             // })
