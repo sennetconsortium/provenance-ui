@@ -1,6 +1,5 @@
 import DataGraphGeneric from '../lib/js/generic/DataGraphGeneric'
 import GraphGeneric from '../lib/js/generic/GraphGeneric'
-import dataMap from '../data/generic/map.sample'
 import log from 'loglevel'
 
 async function  GenericObject(serviceOps) {
@@ -24,7 +23,6 @@ async function  GenericObject(serviceOps) {
             return result.length ? result[0] : result
         }
 
-        
         const onDataAcquired = (dataGraph) => {
 
             log.debug(`${feature}: DataGraph`, dataGraph.list)

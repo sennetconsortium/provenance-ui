@@ -190,13 +190,17 @@ function ProvenanceTree(selector, _options) {
             .attr('fill', '#999')
             .style('stroke','none')
 
-        $el.link = $el.svgGroup.append("g")
-            .attr('class', 'links')
-            .attr("stroke", "#999")
-            .attr("stroke-opacity", 0.6)
+        const linkUpdate = $el.linksGroup
             .selectAll("line")
             .data(data.links)
-            .join("line")
+
+        linkUpdate.exit().remove()
+
+        $el.link = linkUpdate
+            .enter()
+            .append("line")
+
+        $el.link.merge(linkUpdate)
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, false)
@@ -206,32 +210,41 @@ function ProvenanceTree(selector, _options) {
             //     .y(d => d.y))
             .attr('marker-end','url(#arrowhead)');
 
-        $el.labelsGroup = $el.svgGroup.append('g')
-            .attr('class', 'labels')
+
+
         // Makes path go along with the link by providing position for link labels
-        $el.edgePaths = $el.labelsGroup.selectAll(`.${classNames.links.paths}`)
+        const tPathUpdate = $el.labelsGroup.selectAll(`.${classNames.links.paths}`)
             .data(data.links)
+
+        tPathUpdate.exit().remove()
+
+        $el.edgePaths = tPathUpdate
             .enter()
             .append('path')
+
+        $el.edgePaths.merge(tPathUpdate)
             .attr('class', classNames.links.paths)
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
             .attr('id', function (d, i) {return classNames.links.paths + i})
             .style('pointer-events', 'none');
 
+        // Labels
         $el.edgeLabels = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
             .data(data.links)
+
+        $el.edgeLabels.exit().remove()
+
+        $el.edgeLabels.attr('font-size', 0)
+        $el.edgeLabels
             .enter()
             .append('text')
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
             .attr('id', function (d, i) {return classNames.links.labels + i})
             .attr('font-size', 8)
-            .attr('fill', '#aaa');
-
-        //This will render text along the shape of a <path> by enclosing the text in a <textPath> element
-        // that has a href attribute with a reference to the <path> element.
-        $el.edgeLabels.append('textPath')
+            .attr('fill', '#aaa')
+            .append('textPath')
             .attr('xlink:href', function (d, i) {return `#${classNames.links.paths}` + i})
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
@@ -393,14 +406,11 @@ function ProvenanceTree(selector, _options) {
         //     d.y = 100*d.depth + 100;
         // })
 
-        $el.node = $el.svgGroup.append("g")
-            .attr('class', 'nodes')
-            .attr("stroke-width", 1.5)
-            .selectAll('g')
+        $el.node = $el.nodeGroup
+            .selectAll('.node')
             .data(data.nodes)
 
         $el.node.exit()
-            .transition(transition)
             .remove()
 
         $el.nodeEnter = $el.node.enter()
@@ -605,6 +615,20 @@ function ProvenanceTree(selector, _options) {
         $el.svgGroup = $el.svg
             .append('g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+        $el.linksGroup = $el.svgGroup.append("g")
+            .attr('class', 'links')
+            .attr("stroke", "#999")
+            .attr("stroke-opacity", 0.6)
+
+        $el.labelsGroup = $el.svgGroup.append('g')
+            .attr('class', 'labels')
+        
+        $el.nodeGroup = $el.svgGroup.append("g")
+            .attr('class', 'nodes')
+            .attr("stroke-width", 1.5)
+
+
     }
 
     function buildTree(_data) {
