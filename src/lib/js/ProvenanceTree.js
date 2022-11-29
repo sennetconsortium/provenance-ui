@@ -406,16 +406,40 @@ function ProvenanceTree(selector, _options) {
         //     d.y = 100*d.depth + 100;
         // })
 
-        $el.node = $el.nodeGroup
+        let nodeUpdate = $el.nodeGroup
             .selectAll('.node')
             .data(data.nodes)
 
-        $el.node.exit()
+        nodeUpdate.exit()
             .remove()
 
-        $el.nodeEnter = $el.node.enter()
+        $el.node = nodeUpdate.enter()
             .append('g')
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
+            .call(drag())
+
+        $el.nodeGlow = $el.node.append('circle')
+            .attr('class', 'glow')
+            .attr('r', options.node.radius * 1.3)
+
+        $el.nodeMain = $el.node
+            .append("circle")
+            .attr('class', 'main')
+            .attr("fill", d => typeToColor(getNodeCat(d)))
+            .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
+            .attr("r", options.node.radius)
+
+        if (options.node.append) {
+            if (options.node.append === 'text') {
+                appendTextToNode($el.node)
+            }
+        }
+
+        nodeUpdate = $el.node.merge(nodeUpdate)
+
+        $el.nodeGlow.append('title').text(d => getNodeCat(d))
+
+        nodeUpdate.select('.node')
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
@@ -427,9 +451,7 @@ function ProvenanceTree(selector, _options) {
             })
             .call(drag())
 
-        $el.nodeGlow = $el.nodeEnter.append('circle')
-            .attr('class', 'glow')
-            .attr('r', options.node.radius * 1.3)
+        nodeUpdate.select('.glow')
             .style('fill', (d) => {
                 return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
             })
@@ -437,25 +459,10 @@ function ProvenanceTree(selector, _options) {
                 return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
             })
 
-        $el.nodeMain = $el.nodeEnter
-            .append("circle")
-            .attr('class', 'main')
+        nodeUpdate.select('.main')
             .attr("fill", d => typeToColor(getNodeCat(d)))
             .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
-            .attr("r", options.node.radius)
-
-        if (options.node.append) {
-            if (options.node.append === 'text') {
-                $el.nodeText = appendTextToNode($el.nodeEnter)
-                $el.nodeMain = $el.nodeMain.merge($el.nodeText)
-            }
-        }
-
-        $el.nodeEnter = $el.nodeMain.merge($el.nodeGlow)
-
-        $el.node = $el.nodeEnter.merge($el.node)
-        $el.nodeGlow.append('title').text(d => getNodeCat(d))
-        $el.node.append('title').text(d => getNodeCat(d))
+            .append('title').text(d => getNodeCat(d))
     }
 
     function appendInfoPanel() {
@@ -623,7 +630,7 @@ function ProvenanceTree(selector, _options) {
 
         $el.labelsGroup = $el.svgGroup.append('g')
             .attr('class', 'labels')
-        
+
         $el.nodeGroup = $el.svgGroup.append("g")
             .attr('class', 'nodes')
             .attr("stroke-width", 1.5)
@@ -655,17 +662,13 @@ function ProvenanceTree(selector, _options) {
                 .attr("x2", d => d.target.x)
                 .attr("y2", d => d.target.y);
 
-            $el.node
+            $el.nodeMain
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
 
             $el.nodeGlow
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
-
-            $el.nodeText
-                .attr("x", d => d.x)
-                .attr("y", d => d.y);
 
             $el.edgePaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y)
         });
