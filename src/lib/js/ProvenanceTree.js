@@ -176,19 +176,7 @@ function ProvenanceTree(selector, _options) {
     }
 
     function buildLinks() {
-        $el.svg.append('defs').append('marker')
-            .attr("id",'arrowhead')
-            .attr('viewBox','-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
-            .attr('refX', 30) // X coordinate for the reference point of the marker. If circle is bigger, this needs to be bigger.
-            .attr('refY', 0)
-            .attr('orient','auto')
-            .attr('markerWidth', 8)
-            .attr('markerHeight', 8)
-            .attr('xoverflow','visible')
-            .append('svg:path')
-            .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-            .attr('fill', '#999')
-            .style('stroke','none')
+
 
         const linkUpdate = $el.linksGroup
             .selectAll("line")
@@ -230,15 +218,16 @@ function ProvenanceTree(selector, _options) {
             .style('pointer-events', 'none');
 
         // Labels
-        $el.edgeLabels = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
+        const labelsUpdate = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
             .data(data.links)
 
-        $el.edgeLabels.exit().remove()
+        labelsUpdate.exit().remove()
 
-        $el.edgeLabels.attr('font-size', 0)
-        $el.edgeLabels
+        $el.edgeLabels = labelsUpdate
             .enter()
             .append('text')
+
+        $el.edgeLabels.merge(labelsUpdate)
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
             .attr('id', function (d, i) {return classNames.links.labels + i})
@@ -416,6 +405,15 @@ function ProvenanceTree(selector, _options) {
         $el.node = nodeUpdate.enter()
             .append('g')
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
+            .on('click', function(e, d) {
+                d.wasClicked = true
+                updateInfo(d.data, true)
+            })
+            .on('mousedown', function() { clickStartTime = new Date() })
+            .on('mouseup',function(e, d) {
+                clickEndTime = new Date();
+                canStartDrag = ((clickEndTime - clickStartTime) > 2000)
+            })
             .call(drag())
 
         $el.nodeGlow = $el.node.append('circle')
@@ -437,19 +435,13 @@ function ProvenanceTree(selector, _options) {
 
         nodeUpdate = $el.node.merge(nodeUpdate)
 
-        $el.nodeGlow.append('title').text(d => getNodeCat(d))
-
         nodeUpdate.select('.node')
-            .on('click', function(e, d) {
-                d.wasClicked = true
-                updateInfo(d.data, true)
-            })
             .on('mousedown', function() { clickStartTime = new Date() })
             .on('mouseup',function(e, d) {
                 clickEndTime = new Date();
                 canStartDrag = ((clickEndTime - clickStartTime) > 2000)
             })
-            .call(drag())
+            .call(drag('Update pattern'))
 
         nodeUpdate.select('.glow')
             .style('fill', (d) => {
@@ -458,11 +450,14 @@ function ProvenanceTree(selector, _options) {
             .style('stroke', (d) => {
                 return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
             })
+            .append('title').text(d => getNodeCat(d))
+
 
         nodeUpdate.select('.main')
             .attr("fill", d => typeToColor(getNodeCat(d)))
             .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
             .append('title').text(d => getNodeCat(d))
+
     }
 
     function appendInfoPanel() {
@@ -623,6 +618,20 @@ function ProvenanceTree(selector, _options) {
             .append('g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
+        $el.svg.append('defs').append('marker')
+            .attr("id",'arrowhead')
+            .attr('viewBox','-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
+            .attr('refX', 30) // X coordinate for the reference point of the marker. If circle is bigger, this needs to be bigger.
+            .attr('refY', 0)
+            .attr('orient','auto')
+            .attr('markerWidth', 8)
+            .attr('markerHeight', 8)
+            .attr('xoverflow','visible')
+            .append('svg:path')
+            .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
+            .attr('fill', '#999')
+            .style('stroke','none')
+
         $el.linksGroup = $el.svgGroup.append("g")
             .attr('class', 'links')
             .attr("stroke", "#999")
@@ -635,7 +644,7 @@ function ProvenanceTree(selector, _options) {
             .attr('class', 'nodes')
             .attr("stroke-width", 1.5)
 
-
+        appendInfoPanel()
     }
 
     function buildTree(_data) {
@@ -647,7 +656,7 @@ function ProvenanceTree(selector, _options) {
         initSimulation()
         buildLinks()
         buildNodes()
-        appendInfoPanel()
+
 
         simulation.on("tick", (e) => {
 
