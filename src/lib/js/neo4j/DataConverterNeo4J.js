@@ -2,13 +2,15 @@ import DataConverter from '../DataConverter'
 import $ from 'jquery'
 
 class DataConverterNeo4J extends DataConverter {
+    static KEY_P_ENTITY = 'entityAsParent';
+    static KEY_P_ACT = 'activityAsParent';
     constructor(data, map, ops = {}) {
         super(data, map, ops)
         this.keys = {
             generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
             prov: this.map.keys.prov || 'prov:type',
             type: this.map.keys.type || 'sennet:entity_type',
-            nodes: this.map.keys.nodes || ['entity'],
+            nodes: this.map.keys.nodes || ['entity', 'activity'],
             relationships: this.map.keys.relationships || {
                 // The keys in the data object and the corresponding prop that cross-references the parent entity.
                 // Generally:
@@ -81,12 +83,13 @@ class DataConverterNeo4J extends DataConverter {
                     if (!gen) {
                         shouldAddRoot = true;
                     }
+                    const entityId = gen ? this.getNodeIdFromValue(
+                        gen[this.map.keys.startNode]
+                    ) : treeRoot.id
                     $.extend(item, {
                         id: id,
-                        activityAsParent: gen ? actId : treeRoot.activityId,
-                        entityAsParent: gen ? this.getNodeIdFromValue(
-                            gen[this.map.keys.startNode]
-                        ) : treeRoot.id
+                        activityAsParent: !this.isActivity(key) ? (gen ? actId : treeRoot.activityId) : entityId,
+                        entityAsParent: entityId
                     })
                     this.setProperties(item, item.subType)
 

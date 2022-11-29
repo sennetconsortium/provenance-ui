@@ -3,7 +3,7 @@ import AppContext from './context/AppContext'
 import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
 import Toggle from './lib/components/Toggle'
-import ProvenanceTree from './lib/js/ProvenanceTree'
+import DataConverterNeo4J from "./lib/js/neo4j/DataConverterNeo4J";
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -13,9 +13,10 @@ function App() {
         setData(contextData)
     })
 
-    const toggleData = (data, isFiltered) => {
-        setData(data)
+    const toggleData = (hideActivity) => {
+
         const ui = window.ProvenanceTreeD3
+        ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }
 
     return (

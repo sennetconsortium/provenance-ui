@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import * as d3 from 'd3'
-import sampleTree from '../../data/sample.tree'
+import DataConverterNeo4J from "./neo4j/DataConverterNeo4J";
 
 /**
  * @author dbmi.pitt.edu
@@ -17,6 +17,10 @@ function ProvenanceTree(selector, _options) {
     let clickEndTime
     let canStartDrag = false
     let $info
+    let dataKey;
+    let allData;
+    let filteredData = {}
+    const transition =  d3.transition().duration(500)
     const classNames = {
         info: 'c-provenance__info',
         infoNode: 'c-provenance__info--node',
@@ -69,7 +73,9 @@ function ProvenanceTree(selector, _options) {
 
     function clearCanvas() {
         $el.canvas.html('')
-        buildTree()
+        setUpSvg()
+        allData = JSON.parse(JSON.stringify(data))
+        buildTree(loadData(data))
     }
 
     function getDrag() {
@@ -231,7 +237,7 @@ function ProvenanceTree(selector, _options) {
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
             .text(d => {
-                return d.source.data.type === 'Entity' ? 'WAS_GENERATED_BY' : 'USED'
+                return d.source.data.data.type === 'Entity' ? 'WAS_GENERATED_BY' : 'USED'
             })
     }
 
@@ -393,6 +399,10 @@ function ProvenanceTree(selector, _options) {
             .selectAll('g')
             .data(data.nodes)
 
+        $el.node.exit()
+            .transition(transition)
+            .remove()
+
         $el.nodeEnter = $el.node.enter()
             .append('g')
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
@@ -533,32 +543,48 @@ function ProvenanceTree(selector, _options) {
             .force('y', d3.forceY(20).strength(.2));
     }
 
-    function stratify(parentKey = 'entityAsParent') {
+    function stratify(data, parentKey) {
+        parentKey = parentKey || DataConverterNeo4J.KEY_P_ACT
         const root = d3.stratify()
             .id(function(d) { return d.id  })
             .parentId(function(d) { return d[parentKey] })
-            (data.stratify)
+            (data)
+
         return root
     }
 
-    function loadData() {
+    function loadData(data) {
         if (data.stratify) {
-            return stratify()
+            dataKey = 'stratify'
+            return stratify(data.stratify)
         } else {
-            return data.root || sampleTree
+            dataKey = data.root ? 'root' : null
+            return data.root || data
         }
     }
 
     function toggleData(ops) {
 
+        const {filter, parentKey} = ops
+        let _data = dataKey ? allData[dataKey] : allData
+        if (filter) {
+            if (filteredData[filter] === undefined) {
+                filteredData[filter] = _data.filter((item) => item.type !== filter)
+            }
+
+            if (dataKey === 'stratify') {
+                buildTree(stratify(filteredData[filter], parentKey))
+            } else {
+                buildTree(filteredData[filter])
+            }
+
+        } else {
+            buildTree(_data)
+        }
+
     }
 
-    function buildTree() {
-        const root = d3.hierarchy(loadData());
-        console.log(root)
-        data.links = root.links();
-        data.nodes = root.descendants()
-
+    function setUpSvg() {
         const isLgScreen = () => parseInt($el.canvas.style('width')) > 1024
         const getMargins = () => (isLgScreen() ? 100 : 50)
 
@@ -579,6 +605,13 @@ function ProvenanceTree(selector, _options) {
         $el.svgGroup = $el.svg
             .append('g')
             .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    }
+
+    function buildTree(_data) {
+        const root = d3.hierarchy(_data);
+
+        data.links = root.links();
+        data.nodes = root.descendants()
 
         initSimulation()
         buildLinks()
