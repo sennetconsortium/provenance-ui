@@ -21,6 +21,7 @@ function ProvenanceTree(selector, _options) {
     let allData;
     let filteredData = {}
     const transition =  d3.transition().duration(500)
+    let hasToggled = false
     const classNames = {
         info: 'c-provenance__info',
         infoNode: 'c-provenance__info--node',
@@ -75,18 +76,18 @@ function ProvenanceTree(selector, _options) {
         $el.canvas.html('')
         setUpSvg()
         allData = JSON.parse(JSON.stringify(data))
-        buildTree(loadData(data))
+
+        buildTree(loadData(data), true)
+
     }
 
     function getDrag() {
 
         function dragStarted(event, d) {
             if (!event.active) simulation.alphaTarget(0.1).restart();
-            if (canStartDrag) {
-                d.fx = d.x;
-                d.fy = d.y;
-                $(selector).addClass(classNames.hasDrag)
-            }
+            d.fx = d.x;
+            d.fy = d.y;
+            //$(selector).addClass(classNames.hasDrag)
         }
 
         function dragged(event, d) {
@@ -95,10 +96,10 @@ function ProvenanceTree(selector, _options) {
         }
 
         function dragEnded(event, d) {
-            if (!event.active) simulation.alphaTarget(0);
+           if (!event.active) simulation.alphaTarget(0);
             d.fx = null;
             d.fy = null;
-            $(selector).removeClass(classNames.hasDrag)
+            //$(selector).removeClass(classNames.hasDrag)
         }
 
         return {dragStarted, dragged, dragEnded}
@@ -178,17 +179,19 @@ function ProvenanceTree(selector, _options) {
     function buildLinks() {
 
 
-        const linkUpdate = $el.linksGroup
+        $el.link = $el.linksGroup
             .selectAll("line")
             .data(data.links)
 
-        linkUpdate.exit().remove()
+        $el.link.exit().remove()
 
-        $el.link = linkUpdate
+        $el.line = $el.link
             .enter()
             .append("line")
 
-        $el.link.merge(linkUpdate)
+        $el.link = $el.link.merge($el.line)
+
+        $el.link
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, false)
@@ -199,18 +202,19 @@ function ProvenanceTree(selector, _options) {
             .attr('marker-end','url(#arrowhead)');
 
 
-
         // Makes path go along with the link by providing position for link labels
-        const tPathUpdate = $el.labelsGroup.selectAll(`.${classNames.links.paths}`)
+        $el.edgePaths = $el.labelsGroup.selectAll(`.${classNames.links.paths}`)
             .data(data.links)
 
-        tPathUpdate.exit().remove()
+        $el.edgePaths.exit().remove()
 
-        $el.edgePaths = tPathUpdate
+        $el.edgePathsEnter = $el.edgePaths
             .enter()
             .append('path')
 
-        $el.edgePaths.merge(tPathUpdate)
+        $el.edgePaths = $el.edgePaths.merge($el.edgePathsEnter)
+
+        $el.edgePaths
             .attr('class', classNames.links.paths)
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
@@ -395,14 +399,16 @@ function ProvenanceTree(selector, _options) {
         //     d.y = 100*d.depth + 100;
         // })
 
-        let nodeUpdate = $el.nodeGroup
+        $el.node = $el.nodeGroup
             .selectAll('.node')
             .data(data.nodes)
 
-        nodeUpdate.exit()
+        $el.node.exit()
             .remove()
 
-        $el.node = nodeUpdate.enter()
+        const { dragStarted, dragged, dragEnded } = getDrag()
+
+        $el.nodeEnter = $el.node.enter()
             .append('g')
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
             .on('click', function(e, d) {
@@ -414,13 +420,16 @@ function ProvenanceTree(selector, _options) {
                 clickEndTime = new Date();
                 canStartDrag = ((clickEndTime - clickStartTime) > 2000)
             })
-            .call(drag())
+            .call(d3.drag()
+                .on("start", dragStarted)
+                .on("drag", dragged)
+                .on("end", dragEnded))
 
-        $el.nodeGlow = $el.node.append('circle')
+        $el.nodeGlow = $el.nodeEnter.append('circle')
             .attr('class', 'glow')
             .attr('r', options.node.radius * 1.3)
 
-        $el.nodeMain = $el.node
+        $el.nodeMain = $el.nodeEnter
             .append("circle")
             .attr('class', 'main')
             .attr("fill", d => typeToColor(getNodeCat(d)))
@@ -429,21 +438,13 @@ function ProvenanceTree(selector, _options) {
 
         if (options.node.append) {
             if (options.node.append === 'text') {
-                appendTextToNode($el.node)
+                appendTextToNode($el.nodeEnter)
             }
         }
 
-        nodeUpdate = $el.node.merge(nodeUpdate)
+        $el.node = $el.node.merge($el.nodeEnter)
 
-        nodeUpdate.select('.node')
-            .on('mousedown', function() { clickStartTime = new Date() })
-            .on('mouseup',function(e, d) {
-                clickEndTime = new Date();
-                canStartDrag = ((clickEndTime - clickStartTime) > 2000)
-            })
-            .call(drag('Update pattern'))
-
-        nodeUpdate.select('.glow')
+        $el.node.select('.glow')
             .style('fill', (d) => {
                 return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
             })
@@ -452,8 +453,7 @@ function ProvenanceTree(selector, _options) {
             })
             .append('title').text(d => getNodeCat(d))
 
-
-        nodeUpdate.select('.main')
+        $el.node.select('.main')
             .attr("fill", d => typeToColor(getNodeCat(d)))
             .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
             .append('title').text(d => getNodeCat(d))
@@ -552,7 +552,19 @@ function ProvenanceTree(selector, _options) {
             .force("charge", d3.forceManyBody().strength(-700))
             .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2))
             .force("x", d3.forceX())
-            .force('y', d3.forceY(20).strength(.2));
+            .force('y', d3.forceY(20).strength(.2))
+
+    }
+
+    function updateSimulation() {
+        simulation
+            .nodes(data.nodes)
+
+        simulation
+            .alpha(1)
+            .alphaTarget(0)
+            .restart()
+
     }
 
     function stratify(data, parentKey) {
@@ -576,8 +588,9 @@ function ProvenanceTree(selector, _options) {
     }
 
     function toggleData(ops) {
-
+        hasToggled = true
         const {filter, parentKey} = ops
+        simulation.stop()
         let _data = dataKey ? allData[dataKey] : allData
         if (filter) {
             if (filteredData[filter] === undefined) {
@@ -647,19 +660,9 @@ function ProvenanceTree(selector, _options) {
         appendInfoPanel()
     }
 
-    function buildTree(_data) {
-        const root = d3.hierarchy(_data);
-
-        data.links = root.links();
-        data.nodes = root.descendants()
-
-        initSimulation()
-        buildLinks()
-        buildNodes()
-
-
+    function ticked() {
         simulation.on("tick", (e) => {
-
+            console.log('Ticking', e)
             // const ky = simulation.alpha()
             // data.links.forEach(function(d, i) {
             //     d.target.y += (d.target.depth * 70 - d.target.y) * 2 * ky;
@@ -671,16 +674,34 @@ function ProvenanceTree(selector, _options) {
                 .attr("x2", d => d.target.x)
                 .attr("y2", d => d.target.y);
 
-            $el.nodeMain
+            $el.node.select('.main')
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
 
-            $el.nodeGlow
+            $el.node.select('.glow')
                 .attr("cx", d => d.x)
                 .attr("cy", d => d.y);
+
 
             $el.edgePaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y)
         });
+    }
+
+    function buildTree(_data, isInit) {
+        const root = d3.hierarchy(_data);
+
+        data.links = root.links();
+        data.nodes = root.descendants()
+
+        buildLinks()
+        buildNodes()
+        if (isInit) {
+            initSimulation()
+        } else {
+            updateSimulation()
+        }
+
+        ticked()
 
         createZoom()
         return $el.svg.node()
@@ -690,6 +711,7 @@ function ProvenanceTree(selector, _options) {
     return {
         colorMap: options.colorMap,
         toggleData: toggleData,
+        simulation
     }
 }
 

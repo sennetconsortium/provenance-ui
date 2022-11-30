@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react'
+import React, { useContext, useState, useEffect, useRef } from 'react'
 import AppContext from './context/AppContext'
 import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
@@ -8,9 +8,14 @@ import DataConverterNeo4J from "./lib/js/neo4j/DataConverterNeo4J";
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
     const [data, setData] = useState(null)
+    const initialized = useRef(false)
 
     useEffect(() => {
-        setData(contextData)
+        if (contextData !== null && !initialized.current) {
+            initialized.current = true
+            setData(contextData)
+        }
+
     })
 
     const toggleData = (hideActivity) => {

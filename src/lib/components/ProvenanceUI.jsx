@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import ProvenanceTree from '../js/ProvenanceTree'
 
+
 function ProvenanceUI({ children, data, options = {} }) {
     const selectorId = options.selectorId || 'provenanceTree'
+    const initialized = useRef(false)
 
     const addVisitedClass = () => {
         $(`#${selectorId}`).on('click', '.node', function(e) {
@@ -17,7 +19,10 @@ function ProvenanceUI({ children, data, options = {} }) {
             import (`../ProvenanceUI.css`)
         }
 
-        window.ProvenanceTreeD3 = ProvenanceTree(`#${selectorId}`, {...options, data })
+        if (!initialized.current) {
+            initialized.current = true
+            window.ProvenanceTreeD3 = ProvenanceTree(`#${selectorId}`, {...options, data })
+        }
 
         addVisitedClass()
     }, []);
