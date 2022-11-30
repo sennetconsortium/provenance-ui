@@ -109,6 +109,7 @@ class DataConverterNeo4J extends DataConverter {
             }
             if (shouldAddRoot) {
                 this.result.push(treeRoot)
+                this.result.push({...treeRoot, type: 'Activity', subType: 'Activity', entityAsParent: treeRoot.id, activityAsParent: treeRoot.id, id: treeRoot.activityId })
             }
         } catch (e) {
             console.error(e)
