@@ -1,4 +1,7 @@
 class DataConverter {
+    static KEY_P_ENTITY = 'entityAsParent';
+    static KEY_P_ACT = 'activityAsParent';
+
     constructor(data, map, ops = {}) {
         this.ops = ops
         this.data = data

@@ -2,8 +2,7 @@ import DataConverter from '../DataConverter'
 import $ from 'jquery'
 
 class DataConverterNeo4J extends DataConverter {
-    static KEY_P_ENTITY = 'entityAsParent';
-    static KEY_P_ACT = 'activityAsParent';
+
     constructor(data, map, ops = {}) {
         super(data, map, ops)
         this.keys = {

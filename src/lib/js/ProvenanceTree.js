@@ -1,6 +1,6 @@
 import $ from 'jquery'
 import * as d3 from 'd3'
-import DataConverterNeo4J from "./neo4j/DataConverterNeo4J";
+import DataConverter from "./DataConverter";
 
 /**
  * @author dbmi.pitt.edu
@@ -21,7 +21,10 @@ function ProvenanceTree(selector, _options) {
     let allData;
     let filteredData = {}
     const transition =  d3.transition().duration(500)
-    let hasToggled = false
+    let toggled = {
+        has: false,
+        original: true
+    }
     const classNames = {
         info: 'c-provenance__info',
         infoNode: 'c-provenance__info--node',
@@ -46,6 +49,10 @@ function ProvenanceTree(selector, _options) {
             append: 'text',
             radius: 15
         },
+        propertyMap: {
+            'sennet:created_by_user_displayname': 'agent'
+        },
+        edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
         highlight: [],
         iconMap: fontAwesomeIcons(),
         colors: colors(),
@@ -55,6 +62,7 @@ function ProvenanceTree(selector, _options) {
             url: '',
             exclude: []
         },
+        callbacks: {},
         hideElementId: true,
         theme: {
             colors: {
@@ -178,7 +186,6 @@ function ProvenanceTree(selector, _options) {
 
     function buildLinks() {
 
-
         $el.link = $el.linksGroup
             .selectAll("line")
             .data(data.links)
@@ -222,28 +229,36 @@ function ProvenanceTree(selector, _options) {
             .style('pointer-events', 'none');
 
         // Labels
-        const labelsUpdate = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
+        $el.edgeLabel = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
             .data(data.links)
 
-        labelsUpdate.exit().remove()
+        $el.edgeLabel.exit().remove()
 
-        $el.edgeLabels = labelsUpdate
+        $el.labelEnter = $el.edgeLabel
             .enter()
             .append('text')
-
-        $el.edgeLabels.merge(labelsUpdate)
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
             .attr('id', function (d, i) {return classNames.links.labels + i})
             .attr('font-size', 8)
             .attr('fill', '#aaa')
-            .append('textPath')
-            .attr('xlink:href', function (d, i) {return `#${classNames.links.paths}` + i})
+
+        $el.labelEnter.append('textPath')
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
+
+        $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter)
+
+        // Update labels
+        $el.edgeLabel.select('textPath')
+            .attr('xlink:href', function (d, i) {return `#${classNames.links.paths}` + i})
             .text(d => {
-                return d.source.data.data.type === 'Entity' ? 'WAS_GENERATED_BY' : 'USED'
+                if (options.callbacks.onEdgeLabel) {
+                    return runCallback('onEdgeLabel', d)
+                } else {
+                    return (d.source.data.data.type === 'Entity' && toggled.original) ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used
+                }
             })
     }
 
@@ -389,11 +404,35 @@ function ProvenanceTree(selector, _options) {
     }
 
     function buildNodes() {
-        data.nodes.forEach(function(d, i) {
-            d.y = sz.height/2 + i;
-            d.x = -3000*d.depth + 300;
-        });
 
+        const childIndex = (d, i) => {
+            const posY = (ci) => {
+                return (ci * 50 * d.depth)
+            }
+            if (d.parent) {
+                const children = d.parent.children;
+                const id = d.data.id;
+                const pId = d.parent.data.id;
+                const mod = parentYs[pId] || 0
+                let x = 0
+                for (let n of children) {
+                    if (n.data.id === id) {
+                        return {id, y: posY(x) + mod}
+                    }
+                    x++
+                }
+                return {id, y: posY(0)}
+            } else {
+                return {id: null, y: posY(0)}
+            }
+        }
+        let parentYs = {}
+        data.nodes.forEach(function(d, i) {
+            let ci = childIndex(d, i)
+            d.y = ci.y
+            parentYs[ci.id] = ci.y
+            d.x = -100*d.depth + 300;
+        });
         // data.nodes.forEach(function(d, i) {
         //     d.x = sz.width/2 + i;
         //     d.y = 100*d.depth + 100;
@@ -406,8 +445,6 @@ function ProvenanceTree(selector, _options) {
         $el.node.exit()
             .remove()
 
-        const { dragStarted, dragged, dragEnded } = getDrag()
-
         $el.nodeEnter = $el.node.enter()
             .append('g')
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
@@ -415,15 +452,13 @@ function ProvenanceTree(selector, _options) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
             })
-            .on('mousedown', function() { clickStartTime = new Date() })
-            .on('mouseup',function(e, d) {
-                clickEndTime = new Date();
-                canStartDrag = ((clickEndTime - clickStartTime) > 2000)
-            })
-            .call(d3.drag()
-                .on("start", dragStarted)
-                .on("drag", dragged)
-                .on("end", dragEnded))
+            // .on('mousedown', function(e, d) { clickStartTime = new Date() })
+            // .on('mouseup',function(e, d) {
+            //     clickEndTime = new Date();
+            //     canStartDrag = ((clickEndTime - clickStartTime) > 1500)
+            //
+            // })
+            .call(drag())
 
         $el.nodeGlow = $el.nodeEnter.append('circle')
             .attr('class', 'glow')
@@ -495,10 +530,10 @@ function ProvenanceTree(selector, _options) {
         const properties = getNodeProperties(d)
         if (properties) {
             Object.keys(properties).forEach(function(property) {
-                appendInfoElement(d,'property', isNode, property, JSON.stringify(properties[property]));
+                let mapped = options.propertyMap[property] || property
+                appendInfoElement(d,'property', isNode, mapped, JSON.stringify(properties[property]));
             });
         }
-
     }
 
     function appendInfoElement(d, cls, isNode, property, value) {
@@ -548,12 +583,12 @@ function ProvenanceTree(selector, _options) {
 
     function initSimulation() {
         simulation = d3.forceSimulation(data.nodes)
+            .alpha(0.5)
             //.force("link", d3.forceLink(data.links).id(d => d.depth).distance(20).strength(1))
-            .force("charge", d3.forceManyBody().strength(-700))
+            .force("charge", d3.forceManyBody().strength(1))
             .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2))
-            .force("x", d3.forceX())
-            .force('y', d3.forceY(20).strength(.2))
-
+            //.force("x", d3.forceX())
+            //.force('y', d3.forceY(20).strength(.2))
     }
 
     function updateSimulation() {
@@ -561,14 +596,13 @@ function ProvenanceTree(selector, _options) {
             .nodes(data.nodes)
 
         simulation
-            .alpha(1)
+            .alpha(.5)
             .alphaTarget(0)
             .restart()
-
     }
 
     function stratify(data, parentKey) {
-        parentKey = parentKey || DataConverterNeo4J.KEY_P_ACT
+        parentKey = parentKey || DataConverter.KEY_P_ACT
         const root = d3.stratify()
             .id(function(d) { return d.id  })
             .parentId(function(d) { return d[parentKey] })
@@ -587,26 +621,35 @@ function ProvenanceTree(selector, _options) {
         }
     }
 
+    function resolveDataMethod(data, dataKey, parentKey) {
+        if (dataKey === 'stratify') {
+            buildTree(stratify(data, parentKey))
+        } else {
+            buildTree(data)
+        }
+    }
     function toggleData(ops) {
-        hasToggled = true
+        toggled.has = true
         const {filter, parentKey} = ops
         simulation.stop()
         let _data = dataKey ? allData[dataKey] : allData
         if (filter) {
+            toggled.original = false
             if (filteredData[filter] === undefined) {
                 filteredData[filter] = _data.filter((item) => item.type !== filter)
             }
-
-            if (dataKey === 'stratify') {
-                buildTree(stratify(filteredData[filter], parentKey))
-            } else {
-                buildTree(filteredData[filter])
-            }
-
+            resolveDataMethod(filteredData[filter], dataKey, parentKey)
         } else {
-            buildTree(_data)
+            toggled.original = true
+            resolveDataMethod(_data, dataKey, parentKey)
         }
 
+    }
+
+    function runCallback(callback, args) {
+        if (options.callbacks[callback] && typeof options.callbacks[callback] === "function") {
+            options.callbacks[callback]({$el, data, options, args})
+        }
     }
 
     function setUpSvg() {
@@ -626,6 +669,8 @@ function ProvenanceTree(selector, _options) {
         $el.svg = $el.canvas.append('svg')
             .attr('width', sz.width + margin.left + margin.right)
             .attr('height', sz.height + margin.top + margin.bottom)
+
+        runCallback("onBeforeBuild")
 
         $el.svgGroup = $el.svg
             .append('g')
@@ -660,34 +705,69 @@ function ProvenanceTree(selector, _options) {
         appendInfoPanel()
     }
 
+    function updatePositions() {
+        // TODO: use lx and ly positions during data toggle
+        $el.link
+            .attr("x1", d => {
+                d.source.lx = d.source.x
+                return d.source.x
+            })
+            .attr("y1", d => {
+                d.source.ly = d.source.y
+                return d.source.y
+            })
+            .attr("x2", d => {
+                d.target.lx = d.target.x
+                return d.target.x
+            })
+            .attr("y2", d => {
+                d.target.ly = d.target.y
+                return d.target.y
+            });
+
+        $el.node.select('.main')
+            .attr("cx", d => {
+                d.lx = d.x
+                return  d.x
+            })
+            .attr("cy", d => {
+                d.ly = d.y
+                return d.y
+            });
+
+        $el.node.select('.glow')
+            .attr("cx", d => {
+                d.lx = d.x
+                return  d.x
+            })
+            .attr("cy", d => {
+                d.ly = d.y
+                return d.y
+            });
+
+        $el.edgePaths.attr('d', d => {
+            d.source.lx = d.source.x
+            d.source.ly = d.source.y
+            d.target.lx = d.target.x
+            d.target.ly = d.target.y
+            return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
+            //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
+        })
+    }
+
     function ticked() {
         simulation.on("tick", (e) => {
-            console.log('Ticking', e)
             // const ky = simulation.alpha()
             // data.links.forEach(function(d, i) {
-            //     d.target.y += (d.target.depth * 70 - d.target.y) * 2 * ky;
+            //     d.source.y += (d.source.depth * 70 - d.source.y) * 2 * ky;
             // })
 
-            $el.link
-                .attr("x1", d => d.source.x)
-                .attr("y1", d => d.source.y)
-                .attr("x2", d => d.target.x)
-                .attr("y2", d => d.target.y);
-
-            $el.node.select('.main')
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
-
-            $el.node.select('.glow')
-                .attr("cx", d => d.x)
-                .attr("cy", d => d.y);
-
-
-            $el.edgePaths.attr('d', d => 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y)
+            updatePositions()
         });
     }
 
     function buildTree(_data, isInit) {
+
         const root = d3.hierarchy(_data);
 
         data.links = root.links();
@@ -695,15 +775,16 @@ function ProvenanceTree(selector, _options) {
 
         buildLinks()
         buildNodes()
+
         if (isInit) {
             initSimulation()
         } else {
             updateSimulation()
         }
-
         ticked()
 
         createZoom()
+        runCallback("onAfterBuild")
         return $el.svg.node()
     }
 
