@@ -15,6 +15,10 @@
       cursor move
 
     .node
+      &:hover
+        .glow
+          opacity .5
+          stroke $col-malibu !important
       &.node--highlighted
         .glow
           -ms-filter 'progid:DXImageTransform.Microsoft.Alpha(Opacity=50)'
@@ -35,7 +39,7 @@
         filter  unquote('alpha(opacity=0)')
         opacity 0
         stroke $col-malibu
-        stroke-width 8px
+        stroke-width 5px
       .text
         fill white
         &.icon
@@ -46,6 +50,7 @@
     top 0
     font-size 16px
     padding 10px
+    color white
     a
       border 1px solid
       display inline-block
@@ -73,4 +78,3 @@
       &.info
         background-color $col-chateau
         border 1px solid $col-chateau-2
-      color white

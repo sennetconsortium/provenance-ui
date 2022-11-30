@@ -175,7 +175,7 @@ function ProvenanceTree(selector, _options) {
 
     function createZoom() {
         const zoom = d3.zoom()
-            .scaleExtent([1, 8])
+            .scaleExtent([0.2, 5])
             .on('zoom', function(event) {
                 $el.svgGroup.selectAll('.links, .nodes, .labels')
                     .attr('transform', event.transform);
