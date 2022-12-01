@@ -1,7 +1,7 @@
 import $ from 'jquery'
-//import * as d3 from 'd3'
 import DataConverter from "./DataConverter";
 
+// Do a dynamic import to avoid issues with d3 and ESModule import
 let d3
 (async () => {
     d3 = await import('d3');
@@ -9,16 +9,20 @@ let d3
 
 /**
  * @author dbmi.pitt.edu
- * @param selector
- * @param _options
+ * @param selector {string}
+ * @param _options {object}
  * @returns {{}}
  * @constructor
  */
 function ProvenanceTree(selector, _options) {
 
-
     const $el = {
         canvas: d3.select(selector),
+    }
+
+    const models = {
+        stratify: 'stratify',
+        root: 'root'
     }
 
     let $info
@@ -57,6 +61,7 @@ function ProvenanceTree(selector, _options) {
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
+        displayEdgeLabels: false,
         edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
         highlight: [],
         iconMap: fontAwesomeIcons(),
@@ -94,9 +99,7 @@ function ProvenanceTree(selector, _options) {
         $el.canvas.html('')
         setUpSvg()
         allData = JSON.parse(JSON.stringify(data))
-
         buildTree(loadData(data), true)
-
     }
 
     function getDrag() {
@@ -275,7 +278,11 @@ function ProvenanceTree(selector, _options) {
                 if (options.callbacks.onEdgeLabel) {
                     return runCallback('onEdgeLabel', d)
                 } else {
-                    return (d.source.data.type === 'Entity' && toggled.original) ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used
+                    if (options.displayEdgeLabels) {
+                        return (d.source.data.type === 'Entity' && toggled.original) ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used
+                    } else {
+                        return ''
+                    }
                 }
             })
     }
@@ -470,12 +477,6 @@ function ProvenanceTree(selector, _options) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
             })
-            // .on('mousedown', function(e, d) { clickStartTime = new Date() })
-            // .on('mouseup',function(e, d) {
-            //     clickEndTime = new Date();
-            //     canStartDrag = ((clickEndTime - clickStartTime) > 1500)
-            //
-            // })
             .call(drag())
 
         $el.nodeGlow = $el.nodeEnter.append('circle')
@@ -483,11 +484,11 @@ function ProvenanceTree(selector, _options) {
             .attr('r', options.node.radius * 1.3)
 
         $el.nodeMain = $el.nodeEnter
-            .append("circle")
+            .append('circle')
             .attr('class', 'main')
-            .attr("fill", d => typeToColor(getNodeCat(d)))
-            .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
-            .attr("r", options.node.radius)
+            .attr('fill', d => typeToColor(getNodeCat(d)))
+            .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
+            .attr('r', options.node.radius)
 
         if (options.node.append) {
             if (options.node.append === 'text') {
@@ -509,8 +510,8 @@ function ProvenanceTree(selector, _options) {
             .append('title').text(d => getNodeCat(d))
 
         $el.node.select('.main')
-            .attr("fill", d => typeToColor(getNodeCat(d)))
-            .attr("stroke", d => typeToDarkenColor(getNodeCat(d)))
+            .attr('fill', d => typeToColor(getNodeCat(d)))
+            .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
             .append('title').text(d => getNodeCat(d))
 
     }
@@ -639,6 +640,7 @@ function ProvenanceTree(selector, _options) {
             .parentId(function(d) { return d[parentKey] })
             (data)
 
+        // Do a DFS and fix the duplicate graph ids back to their original form
         let stack = [root];
         let visited = {};
         visited[root.id] = true
@@ -655,23 +657,30 @@ function ProvenanceTree(selector, _options) {
             }
         }
 
-        const desc = root.descendants()
+        const descendants = root.descendants()
         const _links = root.links()
         let seen = {}
         let nodes = []
-        for (let d of desc) {
+        let fixed = {}
+        for (let d of descendants) {
+            // Push what has not been seen
             if (!seen[d.id]) {
                 seen[d.id] = d;
                 nodes.push(d)
             } else {
-                for (let l of  _links) {
-                    if (l.source.id === d.id) {
-                        l.source = seen[d.id]
-                    }
+                // Otherwise, find them in the relationships and reference the same object
+                if (!fixed[d.id]) {
+                    for (let l of _links) {
+                        if (l.source.id === d.id) {
+                            l.source = seen[d.id]
+                        }
 
-                    if (l.target.id === d.id) {
-                        l.target = seen[d.id]
+                        if (l.target.id === d.id) {
+                            l.target = seen[d.id]
+                        }
                     }
+                    // We only want to fix once per node id for efficiency,
+                    fixed[d.id] = true;
                 }
             }
         }
@@ -680,22 +689,23 @@ function ProvenanceTree(selector, _options) {
 
     function loadData(data) {
         if (data.stratify) {
-            dataKey = 'stratify'
+            dataKey = models.stratify
             return stratify(data.stratify)
         } else {
-            dataKey = data.root ? 'root' : null
+            dataKey = data.root ? models.root : null
             const root = data.root || data
             return {root}
         }
     }
 
     function resolveDataMethod(data, dataKey, parentKey) {
-        if (dataKey === 'stratify') {
+        if (dataKey === models.stratify) {
             buildTree(stratify(data, parentKey))
         } else {
             buildTree({root: data})
         }
     }
+
     function toggleData(ops) {
         toggled.has = true
         const {filter, parentKey} = ops
@@ -711,11 +721,10 @@ function ProvenanceTree(selector, _options) {
             toggled.original = true
             resolveDataMethod(_data, dataKey, parentKey)
         }
-
     }
 
     function runCallback(callback, args) {
-        if (options.callbacks[callback] && typeof options.callbacks[callback] === "function") {
+        if (options.callbacks[callback] && typeof options.callbacks[callback] === 'function') {
             options.callbacks[callback]({$el, data, options, args})
         }
     }
@@ -829,20 +838,16 @@ function ProvenanceTree(selector, _options) {
             // data.links.forEach(function(d, i) {
             //     d.source.y += (d.source.depth * 70 - d.source.y) * 2 * ky;
             // })
-
             updatePositions()
         });
     }
 
     function buildTree(_data, isInit) {
         const { root, nodes, links } = _data
-        const h = d3.hierarchy(root);
+        const h = d3.hierarchy(root)
 
-        data.links = links //|| h.links();
-
+        data.links = links || h.links()
         data.nodes = nodes || h.descendants()
-
-
 
         buildLinks()
         buildNodes()
@@ -853,7 +858,6 @@ function ProvenanceTree(selector, _options) {
             updateSimulation()
         }
         ticked()
-
         createZoom()
         runCallback("onAfterBuild")
         return $el.svg.node()
