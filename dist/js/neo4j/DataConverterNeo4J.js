@@ -19,6 +19,10 @@ class DataConverterNeo4J extends _DataConverter.default {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     super(data, map, ops);
     this.keys = {
+      activity: this.map.keys.activity || {
+        keyName: 'activity',
+        entityName: 'Activity'
+      },
       generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
       prov: this.map.keys.prov || 'prov:type',
       type: this.map.keys.type || 'sennet:entity_type',
@@ -45,7 +49,7 @@ class DataConverterNeo4J extends _DataConverter.default {
     return parts[parts.length - 1];
   }
   isActivity(key) {
-    return key === 'activity';
+    return key === this.keys.activity.keyName;
   }
   hierarchy(rootId, hasDescendants) {
     this.dict = {};
@@ -53,7 +57,7 @@ class DataConverterNeo4J extends _DataConverter.default {
       let id;
       let shouldAddRoot = false;
       let suffix = hasDescendants ? 'Root' : '';
-      const activityId = rootId + suffix + '--Activity';
+      const activityId = rootId + suffix + '--' + this.keys.activity.entityName;
       let treeRoot = {
         className: 'is-inserted',
         type: 'Root',
@@ -88,23 +92,32 @@ class DataConverterNeo4J extends _DataConverter.default {
           const propKey = this.keys.relationships[genKey];
           let actId = id;
           let used = [null];
+
+          // Find the used dict list of the current id to backtrack to get to parent(s):
+          // [Ec] <--used-- [A] <--generated-- [Ep]
+          // Given a current entity, Ec, if it has a parent entity, Ep,
+          // it will have a 'used' activity detail, A,
+          // which will in turn point up to the parent from the 'generated' activity detail
           if (!this.isActivity(key)) {
             const usedKey = this.keys.relationships.dataProps.used;
-            used = this.dict[usedKey][id];
-            used = used ? used : [null];
+            used = this.dict[usedKey] ? this.dict[usedKey][id] : null;
+            used = used ? used : [null]; // add this so the next loop runs at least once
           }
-          let x = 0;
+
           for (let u of used) {
             actId = u ? this.getNodeIdFromValue(u[propKey]) : !this.isActivity(key) ? null : actId;
-            console.log(actId);
-            let generated = this.dict[genKey][actId];
+            let generated = this.dict[genKey] ? this.dict[genKey][actId] : null;
+
+            // No parent, current entity is the root or a descendant of the current
             if (!generated) {
               shouldAddRoot = true;
-              generated = [null];
+              generated = [null]; // we should add this to get to add the root
             }
-            x++;
+
             for (let gen of generated) {
               const entityId = gen ? this.getNodeIdFromValue(gen[this.map.keys.startNode]) : treeRoot.id;
+
+              // Do a deep copy to avoid reference mutations
               let _item = JSON.parse(JSON.stringify(item));
               _jquery.default.extend(_item, {
                 id: id,
@@ -114,8 +127,11 @@ class DataConverterNeo4J extends _DataConverter.default {
               this.setProperties(_item, _item.subType);
               if (id === rootId) {
                 if (!hasDescendants) {
+                  // Must clear this so that the d3.stratify will not result in no root issue
+                  // Roots cannot have parents.
                   _item.activityAsParent = null;
                   _item.entityAsParent = null;
+                  // use the original item object
                   treeRoot = _item;
                 }
                 if (hasDescendants) {
@@ -132,8 +148,8 @@ class DataConverterNeo4J extends _DataConverter.default {
         this.result.push(treeRoot);
         if (hasDescendants) {
           this.result.push(_objectSpread(_objectSpread({}, treeRoot), {}, {
-            type: 'Activity',
-            subType: 'Activity',
+            type: this.keys.activity.entityName,
+            subType: this.keys.activity.entityName,
             entityAsParent: treeRoot.id,
             activityAsParent: treeRoot.id,
             id: activityId

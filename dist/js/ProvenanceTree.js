@@ -17,6 +17,7 @@ var _DataConverter = _interopRequireDefault(require("./DataConverter"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+// Do a dynamic import to avoid issues with d3 and ESModule import
 let d3;
 (async () => {
   d3 = await Promise.resolve().then(() => _interopRequireWildcard(require('d3')));
@@ -24,14 +25,18 @@ let d3;
 
 /**
  * @author dbmi.pitt.edu
- * @param selector
- * @param _options
+ * @param selector {string}
+ * @param _options {object}
  * @returns {{}}
  * @constructor
  */
 function ProvenanceTree(selector, _options) {
   const $el = {
     canvas: d3.select(selector)
+  };
+  const models = {
+    stratify: 'stratify',
+    root: 'root'
   };
   let $info;
   let dataKey;
@@ -69,6 +74,7 @@ function ProvenanceTree(selector, _options) {
     propertyMap: {
       'sennet:created_by_user_displayname': 'agent'
     },
+    displayEdgeLabels: false,
     edgeLabels: {
       used: 'USED',
       wasGeneratedBy: 'WAS_GENERATED_BY'
@@ -888,7 +894,11 @@ function ProvenanceTree(selector, _options) {
       if (options.callbacks.onEdgeLabel) {
         return runCallback('onEdgeLabel', d);
       } else {
-        return d.source.data.type === 'Entity' && toggled.original ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used;
+        if (options.displayEdgeLabels) {
+          return d.source.data.type === 'Entity' && toggled.original ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used;
+        } else {
+          return '';
+        }
       }
     });
   }
@@ -1052,16 +1062,9 @@ function ProvenanceTree(selector, _options) {
     $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).on('click', function (e, d) {
       d.wasClicked = true;
       updateInfo(d.data, true);
-    })
-    // .on('mousedown', function(e, d) { clickStartTime = new Date() })
-    // .on('mouseup',function(e, d) {
-    //     clickEndTime = new Date();
-    //     canStartDrag = ((clickEndTime - clickStartTime) > 1500)
-    //
-    // })
-    .call(drag());
+    }).call(drag());
     $el.nodeGlow = $el.nodeEnter.append('circle').attr('class', 'glow').attr('r', options.node.radius * 1.3);
-    $el.nodeMain = $el.nodeEnter.append("circle").attr('class', 'main').attr("fill", d => typeToColor(getNodeCat(d))).attr("stroke", d => typeToDarkenColor(getNodeCat(d))).attr("r", options.node.radius);
+    $el.nodeMain = $el.nodeEnter.append('circle').attr('class', 'main').attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('r', options.node.radius);
     if (options.node.append) {
       if (options.node.append === 'text') {
         appendTextToNode($el.nodeEnter);
@@ -1074,7 +1077,7 @@ function ProvenanceTree(selector, _options) {
     }).style('stroke', d => {
       return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
     }).append('title').text(d => getNodeCat(d));
-    $el.node.select('.main').attr("fill", d => typeToColor(getNodeCat(d))).attr("stroke", d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
+    $el.node.select('.main').attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
@@ -1169,6 +1172,8 @@ function ProvenanceTree(selector, _options) {
     }).parentId(function (d) {
       return d[parentKey];
     })(data);
+
+    // Do a DFS and fix the duplicate graph ids back to their original form
     let stack = [root];
     let visited = {};
     visited[root.id] = true;
@@ -1184,22 +1189,29 @@ function ProvenanceTree(selector, _options) {
         }
       }
     }
-    const desc = root.descendants();
+    const descendants = root.descendants();
     const _links = root.links();
     let seen = {};
     let nodes = [];
-    for (let d of desc) {
+    let fixed = {};
+    for (let d of descendants) {
+      // Push what has not been seen
       if (!seen[d.id]) {
         seen[d.id] = d;
         nodes.push(d);
       } else {
-        for (let l of _links) {
-          if (l.source.id === d.id) {
-            l.source = seen[d.id];
+        // Otherwise, find them in the relationships and reference the same object
+        if (!fixed[d.id]) {
+          for (let l of _links) {
+            if (l.source.id === d.id) {
+              l.source = seen[d.id];
+            }
+            if (l.target.id === d.id) {
+              l.target = seen[d.id];
+            }
           }
-          if (l.target.id === d.id) {
-            l.target = seen[d.id];
-          }
+          // We only want to fix once per node id for efficiency,
+          fixed[d.id] = true;
         }
       }
     }
@@ -1211,10 +1223,10 @@ function ProvenanceTree(selector, _options) {
   }
   function loadData(data) {
     if (data.stratify) {
-      dataKey = 'stratify';
+      dataKey = models.stratify;
       return stratify(data.stratify);
     } else {
-      dataKey = data.root ? 'root' : null;
+      dataKey = data.root ? models.root : null;
       const root = data.root || data;
       return {
         root
@@ -1222,7 +1234,7 @@ function ProvenanceTree(selector, _options) {
     }
   }
   function resolveDataMethod(data, dataKey, parentKey) {
-    if (dataKey === 'stratify') {
+    if (dataKey === models.stratify) {
       buildTree(stratify(data, parentKey));
     } else {
       buildTree({
@@ -1250,7 +1262,7 @@ function ProvenanceTree(selector, _options) {
     }
   }
   function runCallback(callback, args) {
-    if (options.callbacks[callback] && typeof options.callbacks[callback] === "function") {
+    if (options.callbacks[callback] && typeof options.callbacks[callback] === 'function') {
       options.callbacks[callback]({
         $el,
         data,
@@ -1326,7 +1338,6 @@ function ProvenanceTree(selector, _options) {
       // data.links.forEach(function(d, i) {
       //     d.source.y += (d.source.depth * 70 - d.source.y) * 2 * ky;
       // })
-
       updatePositions();
     });
   }
@@ -1337,8 +1348,7 @@ function ProvenanceTree(selector, _options) {
       links
     } = _data;
     const h = d3.hierarchy(root);
-    data.links = links; //|| h.links();
-
+    data.links = links || h.links();
     data.nodes = nodes || h.descendants();
     buildLinks();
     buildNodes();
