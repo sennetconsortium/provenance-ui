@@ -28,9 +28,6 @@ function ProvenanceTree(selector, _options) {
   const $el = {
     canvas: d3.select(selector)
   };
-  let clickStartTime;
-  let clickEndTime;
-  let canStartDrag = false;
   let $info;
   let dataKey;
   let allData;
@@ -94,7 +91,11 @@ function ProvenanceTree(selector, _options) {
     _jquery.default.extend(options, _options);
     data.stratify = options.data.stratify;
     data.root = options.data.root;
-    clearCanvas();
+    if (!data.stratify.length && !data.root) {
+      console.error('No data provided...');
+    } else {
+      clearCanvas();
+    }
   }
   function clearCanvas() {
     $el.canvas.html('');
@@ -107,9 +108,7 @@ function ProvenanceTree(selector, _options) {
       if (!event.active) simulation.alphaTarget(0.1).restart();
       d.fx = d.x;
       d.fy = d.y;
-      //$(selector).addClass(classNames.hasDrag)
     }
-
     function dragged(event, d) {
       d.fx = event.x;
       d.fy = event.y;
@@ -118,9 +117,7 @@ function ProvenanceTree(selector, _options) {
       if (!event.active) simulation.alphaTarget(0);
       d.fx = null;
       d.fy = null;
-      //$(selector).removeClass(classNames.hasDrag)
     }
-
     return {
       dragStarted,
       dragged,

@@ -19,16 +19,21 @@ async function Neo4JGraphObject(serviceOps) {
         let keys = ['used', 'wasGeneratedBy']
         let hasDescendants = false
         for (let key of keys) {
-            for (let _prop in result.descendants[key]) {
-                result[key] = result[key] || {}
-                hasDescendants = true
-                // Must update key to avoid key collisions with original result.used and result.wasGeneratedBy
-                result[key][`des${_prop}`] = result.descendants[key][_prop]
+            if (result.descendants) {
+                for (let _prop in result.descendants[key]) {
+                    result[key] = result[key] || {}
+                    hasDescendants = true
+                    // Must update key to avoid key collisions with original result.used and result.wasGeneratedBy
+                    result[key][`des${_prop}`] = result.descendants[key][_prop]
+                }
             }
+
         }
-        $.extend(result.activity, result.descendants.activity)
-        $.extend(result.entity, result.descendants.entity)
-        log.debug(`${feature}: Result width appended descendants...`, result)
+        if (result.descendants) {
+            $.extend(result.activity, result.descendants.activity)
+            $.extend(result.entity, result.descendants.entity)
+            log.debug(`${feature}: Result width appended descendants...`, result)
+        }
         
         const converter = new DataConverterNeo4J(result, dataMap)
         converter.hierarchy(itemId, hasDescendants)
