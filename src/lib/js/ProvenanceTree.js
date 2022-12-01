@@ -1,6 +1,11 @@
 import $ from 'jquery'
-import * as d3 from 'd3'
+//import * as d3 from 'd3'
 import DataConverter from "./DataConverter";
+
+let d3
+(async () => {
+    d3 = await import('d3');
+})().catch(err => console.error(err));
 
 /**
  * @author dbmi.pitt.edu
@@ -10,6 +15,8 @@ import DataConverter from "./DataConverter";
  * @constructor
  */
 function ProvenanceTree(selector, _options) {
+
+
     const $el = {
         canvas: d3.select(selector),
     }

@@ -1,4 +1,5 @@
 import React from 'react'
+import * as d3 from 'd3'
 import ProvenanceUI from './components/ProvenanceUI'
 import Legend from './components/Legend'
 import Toggle from './components/Toggle'
