@@ -19,7 +19,6 @@ function App() {
     })
 
     const toggleData = (hideActivity) => {
-
         const ui = window.ProvenanceTreeD3
         ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }

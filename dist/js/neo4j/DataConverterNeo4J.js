@@ -53,12 +53,13 @@ class DataConverterNeo4J extends _DataConverter.default {
       let id;
       let shouldAddRoot = false;
       let suffix = hasDescendants ? 'Root' : '';
+      const activityId = rootId + suffix + '--Activity';
       let treeRoot = {
         className: 'is-inserted',
         type: 'Root',
         subType: 'Root',
         id: rootId + suffix,
-        activityId: rootId + suffix + '--Activity'
+        activityId: activityId
       };
 
       // Create dictionaries for constant time access
@@ -129,13 +130,15 @@ class DataConverterNeo4J extends _DataConverter.default {
       }
       if (shouldAddRoot) {
         this.result.push(treeRoot);
-        this.result.push(_objectSpread(_objectSpread({}, treeRoot), {}, {
-          type: 'Activity',
-          subType: 'Activity',
-          entityAsParent: treeRoot.id,
-          activityAsParent: treeRoot.id,
-          id: treeRoot.activityId
-        }));
+        if (hasDescendants) {
+          this.result.push(_objectSpread(_objectSpread({}, treeRoot), {}, {
+            type: 'Activity',
+            subType: 'Activity',
+            entityAsParent: treeRoot.id,
+            activityAsParent: treeRoot.id,
+            id: activityId
+          }));
+        }
       }
     } catch (e) {
       console.error(e);
