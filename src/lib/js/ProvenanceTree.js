@@ -198,7 +198,16 @@ function ProvenanceTree(selector, _options) {
 
         $el.link = $el.link.merge($el.line)
 
+        const className = (d) => {
+            const set = new Set()
+            set.add(d.source.data.className)
+            set.add(d.target.data.className)
+            return set.size ? Array.from(set).join(' ') : ''
+        }
         $el.link
+            .attr('class', d => {
+                return className(d)
+            })
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, false)
@@ -247,6 +256,7 @@ function ProvenanceTree(selector, _options) {
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
+            .attr('class', d => className(d))
 
         $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter)
 
@@ -448,7 +458,6 @@ function ProvenanceTree(selector, _options) {
         $el.nodeEnter = $el.node.enter()
             .append('g')
             .attr('id', d => `node--${getNodeId(d)}`)
-            .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
@@ -479,6 +488,8 @@ function ProvenanceTree(selector, _options) {
         }
 
         $el.node = $el.node.merge($el.nodeEnter)
+
+        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)} ${d.data.className || ''}`)
 
         $el.node.select('.glow')
             .style('fill', (d) => {
@@ -638,9 +649,8 @@ function ProvenanceTree(selector, _options) {
 
         const desc = root.descendants()
         const _links = root.links()
-        let seen = {};
+        let seen = {}
         let nodes = []
-        let links = []
         for (let d of desc) {
             if (!seen[d.id]) {
                 seen[d.id] = d;
@@ -657,8 +667,6 @@ function ProvenanceTree(selector, _options) {
                 }
             }
         }
-        console.log('Nodes here',data.nodes)
-
         return {root, nodes, links: _links }
     }
 
@@ -802,10 +810,6 @@ function ProvenanceTree(selector, _options) {
             d.source.ly = d.source.y
             d.target.lx = d.target.x
             d.target.ly = d.target.y
-            if (d.target.x == undefined) {
-                console.log('edges', d.target, d.source)
-            }
-
             return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
             //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
         })

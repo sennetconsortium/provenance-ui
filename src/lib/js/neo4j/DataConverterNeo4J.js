@@ -41,6 +41,7 @@ class DataConverterNeo4J extends DataConverter {
             let shouldAddRoot = false
             let suffix = hasDescendants ? 'Root' : ''
             let treeRoot = {
+                className: 'is-inserted',
                 type: 'Root',
                 subType: 'Root',
                 id: rootId + suffix,
