@@ -21,14 +21,15 @@ function ProvenanceUI({ children, data, options = {} }) {
 
         if (!initialized.current) {
             initialized.current = true
-            window.ProvenanceTreeD3 = ProvenanceTree(`#${selectorId}`, {...options, data })
+            window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {}
+            window.ProvenanceTreeD3[selectorId] = ProvenanceTree(`#${selectorId}`, {...options, data })
         }
 
         addVisitedClass()
     }, []);
 
     return (
-        <div className='c-provenance c-provenance--Tree js-provenance' id={selectorId} style={{minHeight: options.minHeight || 500}}>
+        <div className='c-provenance c-provenance--Tree js-provenance' id={selectorId} style={{minHeight: options.minHeight || 300}}>
             {children}
         </div>
     );

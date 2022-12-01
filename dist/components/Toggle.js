@@ -12,6 +12,7 @@ function Toggle(_ref) {
   let {
     context,
     data,
+    selectorId = 'provenanceTree',
     ariaLabel = 'Toggle',
     text = '',
     className = ''
@@ -21,7 +22,7 @@ function Toggle(_ref) {
     const className = 'hide-activities';
     $el.toggleClass(className);
     if (context !== null) {
-      context($el.hasClass(className));
+      context($el.hasClass(className), selectorId);
     }
   };
   return /*#__PURE__*/_react.default.createElement("label", {

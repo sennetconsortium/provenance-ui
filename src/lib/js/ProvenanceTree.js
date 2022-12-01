@@ -20,6 +20,8 @@ function ProvenanceTree(selector, _options) {
         canvas: d3.select(selector),
     }
 
+    const canvasId = selector.slice(1)
+
     const models = {
         stratify: 'stratify',
         root: 'root'
@@ -61,7 +63,7 @@ function ProvenanceTree(selector, _options) {
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
-        displayEdgeLabels: false,
+        displayEdgeLabels: true,
         edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
         highlight: [],
         iconMap: fontAwesomeIcons(),
@@ -198,14 +200,14 @@ function ProvenanceTree(selector, _options) {
     function buildLinks() {
 
         $el.link = $el.linksGroup
-            .selectAll("line")
+            .selectAll('line')
             .data(data.links)
 
         $el.link.exit().remove()
 
         $el.line = $el.link
             .enter()
-            .append("line")
+            .append('line')
 
         $el.link = $el.link.merge($el.line)
 
@@ -245,7 +247,7 @@ function ProvenanceTree(selector, _options) {
             .attr('class', classNames.links.paths)
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
-            .attr('id', function (d, i) {return classNames.links.paths + i})
+            .attr('id', (d, i) => classNames.links.paths + i + canvasId)
             .style('pointer-events', 'none');
 
         // Labels
@@ -259,7 +261,7 @@ function ProvenanceTree(selector, _options) {
             .append('text')
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
-            .attr('id', function (d, i) {return classNames.links.labels + i})
+            .attr('id', (d, i) => classNames.links.labels + i + canvasId)
             .attr('font-size', 8)
             .attr('fill', '#aaa')
 
@@ -267,13 +269,13 @@ function ProvenanceTree(selector, _options) {
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
             .attr("startOffset", "50%")
-            .attr('class', d => className(d))
+            .attr('class', d => 'textPath ' + className(d))
 
         $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter)
 
         // Update labels
-        $el.edgeLabel.select('textPath')
-            .attr('xlink:href', function (d, i) {return `#${classNames.links.paths}` + i})
+        $el.edgeLabel.select('.textPath')
+            .attr('xlink:href', (d, i) => `#${classNames.links.paths}` + i + canvasId)
             .text(d => {
                 if (options.callbacks.onEdgeLabel) {
                     return runCallback('onEdgeLabel', d)

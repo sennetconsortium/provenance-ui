@@ -35,7 +35,8 @@ function ProvenanceUI(_ref) {
     }
     if (!initialized.current) {
       initialized.current = true;
-      window.ProvenanceTreeD3 = (0, _ProvenanceTree.default)("#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
+      window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {};
+      window.ProvenanceTreeD3[selectorId] = (0, _ProvenanceTree.default)("#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
         data
       }));
     }
@@ -45,7 +46,7 @@ function ProvenanceUI(_ref) {
     className: "c-provenance c-provenance--Tree js-provenance",
     id: selectorId,
     style: {
-      minHeight: options.minHeight || 500
+      minHeight: options.minHeight || 300
     }
   }, children);
 }

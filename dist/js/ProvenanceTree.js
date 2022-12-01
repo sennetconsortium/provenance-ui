@@ -34,6 +34,7 @@ function ProvenanceTree(selector, _options) {
   const $el = {
     canvas: d3.select(selector)
   };
+  const canvasId = selector.slice(1);
   const models = {
     stratify: 'stratify',
     root: 'root'
@@ -74,7 +75,7 @@ function ProvenanceTree(selector, _options) {
     propertyMap: {
       'sennet:created_by_user_displayname': 'agent'
     },
-    displayEdgeLabels: false,
+    displayEdgeLabels: true,
     edgeLabels: {
       used: 'USED',
       wasGeneratedBy: 'WAS_GENERATED_BY'
@@ -848,9 +849,9 @@ function ProvenanceTree(selector, _options) {
     $el.svg.call(zoom);
   }
   function buildLinks() {
-    $el.link = $el.linksGroup.selectAll("line").data(data.links);
+    $el.link = $el.linksGroup.selectAll('line').data(data.links);
     $el.link.exit().remove();
-    $el.line = $el.link.enter().append("line");
+    $el.line = $el.link.enter().append('line');
     $el.link = $el.link.merge($el.line);
     const className = d => {
       const set = new Set();
@@ -874,23 +875,17 @@ function ProvenanceTree(selector, _options) {
     $el.edgePaths.exit().remove();
     $el.edgePathsEnter = $el.edgePaths.enter().append('path');
     $el.edgePaths = $el.edgePaths.merge($el.edgePathsEnter);
-    $el.edgePaths.attr('class', classNames.links.paths).attr('fill-opacity', 0).attr('stroke-opacity', 0).attr('id', function (d, i) {
-      return classNames.links.paths + i;
-    }).style('pointer-events', 'none');
+    $el.edgePaths.attr('class', classNames.links.paths).attr('fill-opacity', 0).attr('stroke-opacity', 0).attr('id', (d, i) => classNames.links.paths + i + canvasId).style('pointer-events', 'none');
 
     // Labels
     $el.edgeLabel = $el.labelsGroup.selectAll(".".concat(classNames.links.labels)).data(data.links);
     $el.edgeLabel.exit().remove();
-    $el.labelEnter = $el.edgeLabel.enter().append('text').style('pointer-events', 'none').attr('class', classNames.links.labels).attr('id', function (d, i) {
-      return classNames.links.labels + i;
-    }).attr('font-size', 8).attr('fill', '#aaa');
-    $el.labelEnter.append('textPath').style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', d => className(d));
+    $el.labelEnter = $el.edgeLabel.enter().append('text').style('pointer-events', 'none').attr('class', classNames.links.labels).attr('id', (d, i) => classNames.links.labels + i + canvasId).attr('font-size', 8).attr('fill', '#aaa');
+    $el.labelEnter.append('textPath').style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', d => 'textPath ' + className(d));
     $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter);
 
     // Update labels
-    $el.edgeLabel.select('textPath').attr('xlink:href', function (d, i) {
-      return "#".concat(classNames.links.paths) + i;
-    }).text(d => {
+    $el.edgeLabel.select('.textPath').attr('xlink:href', (d, i) => "#".concat(classNames.links.paths) + i + canvasId).text(d => {
       if (options.callbacks.onEdgeLabel) {
         return runCallback('onEdgeLabel', d);
       } else {

@@ -2,14 +2,14 @@ import React from 'react'
 import log from 'loglevel'
 import $ from 'jquery'
 
-function Toggle({ context, data, ariaLabel = 'Toggle', text='', className = ''}) {
+function Toggle({ context, data, selectorId = 'provenanceTree', ariaLabel = 'Toggle', text='', className = ''}) {
 
     const toggleData = (e) => {
         const $el = $(e.currentTarget)
         const className = 'hide-activities'
         $el.toggleClass(className)
         if (context !== null) {
-            context($el.hasClass(className))
+            context($el.hasClass(className), selectorId)
         }
     }
 

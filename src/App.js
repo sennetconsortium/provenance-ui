@@ -18,17 +18,18 @@ function App() {
 
     })
 
-    const toggleData = (hideActivity) => {
-        const ui = window.ProvenanceTreeD3
+    const toggleData = (hideActivity, selectorId) => {
+        const ui = window.ProvenanceTreeD3[selectorId]
         ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }
 
     return (
         <div className={`c-App`}>
-            {/*{  <ProvenanceUI data={sample} /> }*/}
+            { !loading && data && <Toggle data={data} context={ toggleData } selectorId='graph--other' /> }
+            { !loading && data && <ProvenanceUI data={data} options={ {...options, selectorId: 'graph--other'} } /> }
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
             { options.colorMap && <Legend colorMap={options.colorMap} /> }
-            { !loading && data && <Toggle data={data} context={ toggleData } /> }
+
         </div>
     )
 }
