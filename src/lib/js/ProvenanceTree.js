@@ -257,7 +257,7 @@ function ProvenanceTree(selector, _options) {
                 if (options.callbacks.onEdgeLabel) {
                     return runCallback('onEdgeLabel', d)
                 } else {
-                    return (d.source.data.data.type === 'Entity' && toggled.original) ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used
+                    return (d.source.data.type === 'Entity' && toggled.original) ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used
                 }
             })
     }
@@ -447,6 +447,7 @@ function ProvenanceTree(selector, _options) {
 
         $el.nodeEnter = $el.node.enter()
             .append('g')
+            .attr('id', d => `node--${getNodeId(d)}`)
             .attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)}`)
             .on('click', function(e, d) {
                 d.wasClicked = true
@@ -603,12 +604,62 @@ function ProvenanceTree(selector, _options) {
 
     function stratify(data, parentKey) {
         parentKey = parentKey || DataConverter.KEY_P_ACT
+        let has = {}
+        let x = 0;
         const root = d3.stratify()
-            .id(function(d) { return d.id  })
+            .id(function(d) {
+                x++
+                if (has[d.id]) {
+                    return d.id + '~' + x
+                } else {
+                    has[d.id] = true
+                    return d.id
+                }
+
+            })
             .parentId(function(d) { return d[parentKey] })
             (data)
 
-        return root
+        let stack = [root];
+        let visited = {};
+        visited[root.id] = true
+        while (stack.length) {
+            let n = stack.pop()
+            n.id = n.id.split('~')[0]
+            if (n.children && n.children.length){
+                for (let c of n.children) {
+                    if (!visited[c.id]) {
+                        visited[c.id] = true
+                        stack.push(c)
+                    }
+                }
+            }
+        }
+
+        const desc = root.descendants()
+        const _links = root.links()
+        let seen = {};
+        let nodes = []
+        let links = []
+        for (let d of desc) {
+            if (!seen[d.id]) {
+                seen[d.id] = d;
+                nodes.push(d)
+            } else {
+                for (let l of  _links) {
+                    if (l.source.id === d.id) {
+                        l.source = seen[d.id]
+                    }
+
+                    if (l.target.id === d.id) {
+                        l.target = seen[d.id]
+                    }
+                }
+            }
+        }
+        console.log('Nodes here',data.nodes)
+
+        return {root, nodes, links: _links }
     }
 
     function loadData(data) {
@@ -617,7 +668,8 @@ function ProvenanceTree(selector, _options) {
             return stratify(data.stratify)
         } else {
             dataKey = data.root ? 'root' : null
-            return data.root || data
+            const root = data.root || data
+            return {root}
         }
     }
 
@@ -625,7 +677,7 @@ function ProvenanceTree(selector, _options) {
         if (dataKey === 'stratify') {
             buildTree(stratify(data, parentKey))
         } else {
-            buildTree(data)
+            buildTree({root: data})
         }
     }
     function toggleData(ops) {
@@ -750,6 +802,10 @@ function ProvenanceTree(selector, _options) {
             d.source.ly = d.source.y
             d.target.lx = d.target.x
             d.target.ly = d.target.y
+            if (d.target.x == undefined) {
+                console.log('edges', d.target, d.source)
+            }
+
             return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
             //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
         })
@@ -767,11 +823,14 @@ function ProvenanceTree(selector, _options) {
     }
 
     function buildTree(_data, isInit) {
+        const { root, nodes, links } = _data
+        const h = d3.hierarchy(root);
 
-        const root = d3.hierarchy(_data);
+        data.links = links //|| h.links();
 
-        data.links = root.links();
-        data.nodes = root.descendants()
+        data.nodes = nodes || h.descendants()
+
+
 
         buildLinks()
         buildNodes()

@@ -33,6 +33,7 @@ class DataConverterNeo4J extends DataConverter {
     isActivity(key) {
         return key === 'activity'
     }
+
     hierarchy(rootId, hasDescendants) {
         this.dict = {}
         try {
@@ -54,7 +55,10 @@ class DataConverterNeo4J extends DataConverter {
                     this.dict[key] = {}
                     for (let _prop in data) {
                         id = this.getNodeIdFromValue(data[_prop][idKey])
-                        this.dict[key][id] = data[_prop]
+                        if (!this.dict[key][id]) {
+                            this.dict[key][id] = []
+                        }
+                        this.dict[key][id].push(data[_prop])
                     }
                 }
             }
@@ -72,37 +76,49 @@ class DataConverterNeo4J extends DataConverter {
                     const propKey = this.keys.relationships[genKey]
 
                     let actId = id;
+                    let used = [null];
                     if (!this.isActivity(key)) {
                         const usedKey = this.keys.relationships.dataProps.used
-                        let used = this.dict[usedKey][id]
-                        actId = used ? this.getNodeIdFromValue(used[propKey]) : null
+                        used = this.dict[usedKey][id]
+                        used = used ? used : [null]
                     }
-
-                    let gen = this.dict[genKey][actId]
-                    if (!gen) {
-                        shouldAddRoot = true;
-                    }
-                    const entityId = gen ? this.getNodeIdFromValue(
-                        gen[this.map.keys.startNode]
-                    ) : treeRoot.id
-                    $.extend(item, {
-                        id: id,
-                        activityAsParent: !this.isActivity(key) ? (gen ? actId : treeRoot.activityId) : entityId,
-                        entityAsParent: entityId
-                    })
-                    this.setProperties(item, item.subType)
-
-                    if (id === rootId) {
-                        if (!hasDescendants) {
-                            item.activityAsParent = null
-                            item.entityAsParent = null
-                            treeRoot = item
+                    let x = 0
+                    for(let u of used) {
+                        actId = u ? this.getNodeIdFromValue(u[propKey]) : (!this.isActivity(key) ? null : actId)
+                        console.log(actId)
+                        let generated = this.dict[genKey][actId]
+                        if (!generated) {
+                            shouldAddRoot = true;
+                            generated = [null]
                         }
-                        if (hasDescendants) {
-                            this.result.push(item)
+                        x++
+                        for (let gen of generated) {
+                            const entityId = gen ? this.getNodeIdFromValue(
+                                gen[this.map.keys.startNode]
+                            ) : treeRoot.id
+
+                            let _item = JSON.parse(JSON.stringify(item))
+                            $.extend(_item, {
+                                id: id,
+                                activityAsParent: !this.isActivity(key) ? (gen ? actId : treeRoot.activityId) : entityId,
+                                entityAsParent: entityId
+                            })
+                            this.setProperties(_item, _item.subType)
+
+                            if (id === rootId) {
+                                if (!hasDescendants) {
+                                    _item.activityAsParent = null
+                                    _item.entityAsParent = null
+                                    treeRoot = _item
+                                }
+                                if (hasDescendants) {
+                                    this.result.push(_item)
+                                }
+                            } else {
+                                this.result.push(_item)
+                            }
                         }
-                    } else {
-                        this.result.push(item)
+
                     }
 
                 }
