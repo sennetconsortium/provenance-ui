@@ -3,12 +3,6 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-Object.defineProperty(exports, "DataConverterGeneric", {
-  enumerable: true,
-  get: function get() {
-    return _DataConverterGeneric.default;
-  }
-});
 Object.defineProperty(exports, "DataConverterNeo4J", {
   enumerable: true,
   get: function get() {
@@ -33,10 +27,10 @@ Object.defineProperty(exports, "Legend", {
     return _Legend.default;
   }
 });
-Object.defineProperty(exports, "NeoGraphGeneric", {
+Object.defineProperty(exports, "ProvenanceTree", {
   enumerable: true,
   get: function get() {
-    return _NeoGraphGeneric.default;
+    return _ProvenanceTree.default;
   }
 });
 Object.defineProperty(exports, "ProvenanceUI", {
@@ -45,12 +39,18 @@ Object.defineProperty(exports, "ProvenanceUI", {
     return _ProvenanceUI.default;
   }
 });
+Object.defineProperty(exports, "Toggle", {
+  enumerable: true,
+  get: function get() {
+    return _Toggle.default;
+  }
+});
 var _react = _interopRequireDefault(require("react"));
 var _ProvenanceUI = _interopRequireDefault(require("./components/ProvenanceUI"));
 var _Legend = _interopRequireDefault(require("./components/Legend"));
+var _Toggle = _interopRequireDefault(require("./components/Toggle"));
 var _GraphGeneric = _interopRequireDefault(require("./js/generic/GraphGeneric"));
 var _DataGraphGeneric = _interopRequireDefault(require("./js/generic/DataGraphGeneric"));
-var _NeoGraphGeneric = _interopRequireDefault(require("./js/generic/NeoGraphGeneric"));
-var _DataConverterGeneric = _interopRequireDefault(require("./js/generic/DataConverterGeneric"));
 var _DataConverterNeo4J = _interopRequireDefault(require("./js/neo4j/DataConverterNeo4J"));
+var _ProvenanceTree = _interopRequireDefault(require("./js/ProvenanceTree"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }

@@ -5,39 +5,26 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
-require("core-js/modules/es.object.assign.js");
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 class DataConverter {
   constructor(data, map) {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     this.ops = ops;
     this.data = data;
     this.map = map;
-    this.relationships = [];
-    this.nodes = [];
     this.error = null;
-    this.actvityTypeName = this.map.actvityTypeName || 'Activity';
   }
-  isActivity(item) {
-    return item.isActivity || (this.keys && this.keys.prov ? item[this.keys.prov] === this.actvityTypeName : false);
-  }
-
-  /**
-   * Returns a parent entity type from provided list object
-   * @param id
-   * @returns {*|string}
-   */
-  getParentEntityTypeFromId(id) {
-    const rootKeys = Object.assign({}, ...Object.entries(this.map.root).map(_ref => {
-      let [a, b] = _ref;
-      return {
-        [b]: a
-      };
-    }));
-    try {
-      const type = this.list[id] ? this.list[id][rootKeys.labels] : '';
-      return type;
-    } catch (e) {
-      console.error(e);
+  setProperties(item, type) {
+    item.properties = item.properties || {};
+    for (let gProp of this.map.props) {
+      item.properties[gProp] = item[gProp];
+    }
+    if (type && typeof this.map.typeProps[type] === 'object') {
+      for (let tProp of this.map.typeProps[type]) {
+        if (item[tProp] !== undefined) {
+          item.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp]);
+        }
+      }
     }
   }
 
@@ -55,62 +42,6 @@ class DataConverter {
       }
     }
     return result;
-  }
-  formatNode(item) {
-    let data = {};
-    let type;
-
-    // Capture properties wanted for
-    for (let prop in item) {
-      let value = item[this.map.root[prop]] !== undefined ? item[this.map.root[prop]] : item[prop];
-      if (this.map.root[prop]) {
-        if (this.map.root[prop] === 'labels' || this.map.root[prop] === 'category' && this.isActivity(item)) {
-          data.labels = item.labels || [value];
-          type = value;
-        } else if (prop === this.map.actor.dataProp && this.isActivity(item)) {
-          data.properties = {
-            [this.map.actor.visualProp]: item[this.map.actor.dataProp]
-          };
-          data.text = this.evaluateCallbackOnValue(prop, value);
-        } else if (this.map.root[prop] === 'text') {
-          data.text = this.isActivity(item) ? this.evaluateCallbackOnValue(prop, value) : this.ops.setTextForNoneActivity ? item[this.getPropFromMap('labels')] : '';
-        } else {
-          data[this.map.root[prop]] = this.evaluateCallbackOnValue(prop, value);
-        }
-      }
-    }
-    data.properties = data.properties || {};
-    for (let gProp of this.map.props) {
-      data.properties[gProp] = item[gProp];
-    }
-    if (type && typeof this.map.typeProps[type] === 'object') {
-      for (let tProp of this.map.typeProps[type]) {
-        if (item[tProp] !== undefined) {
-          data.properties[tProp] = this.evaluateCallbackOnValue(tProp, item[tProp]);
-        }
-      }
-    }
-    data.parentType = item.parentId ? this.getParentEntityTypeFromId(item.parentId) : this.getParentEntityType(item);
-    this.nodes.push(data);
-  }
-  getParentEntityType(item) {
-    return '';
-  }
-
-  /**
-   * Returns a particular node as a highlight
-   * @param prop {string}
-   * @param index {int}
-   * @returns {{property: string, class: string, value: string}}
-   */
-  getNodeAsHighlight(prop) {
-    let index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
-    const node = this.nodes[index];
-    return {
-      'class': node.labels[0],
-      property: prop,
-      value: node.properties[prop]
-    };
   }
 
   /**
@@ -172,42 +103,8 @@ class DataConverter {
   evaluateCallbackOnValue(prop, value) {
     return this.map.callbacks[prop] ? this.valueCallback(this.map.callbacks[prop], value) : value;
   }
-
-  /**
-   * Returns all node
-   * @returns {[]}
-   */
-  getNodes() {
-    return this.nodes;
-  }
-
-  /**
-   * Return all relationships
-   * @returns {[]}
-   */
-  getRelationships() {
-    return this.relationships;
-  }
-
-  /**
-   * Return neo4jFormatted data
-   * @param data
-   * @returns {{results: [{data: [{graph: {relationships: *, nodes: *}}], columns: []}], errors: *[]}}
-   */
-  getNeo4jFormat(data) {
-    return {
-      results: [{
-        columns: data.columns,
-        data: [{
-          graph: {
-            nodes: data.nodes,
-            relationships: data.relationships
-          }
-        }]
-      }],
-      errors: []
-    };
-  }
 }
+_defineProperty(DataConverter, "KEY_P_ENTITY", 'entityAsParent');
+_defineProperty(DataConverter, "KEY_P_ACT", 'activityAsParent');
 var _default = DataConverter;
 exports.default = _default;
