@@ -62,7 +62,7 @@ class GraphGeneric {
     const id = node[this.keys.id];
     this.visited[id] = true;
     this.stack.push(id);
-    this.appendList(id, node);
+    this.list[id] = node;
   }
 
   /**
@@ -89,8 +89,8 @@ class GraphGeneric {
     }
   }
   getItem(obj) {
-    if (typeof obj === 'array') {
-      return obj.length ? obj[0] : null;
+    if (typeof obj === 'object') {
+      return obj.length ? obj[0] : obj;
     } else {
       return obj;
     }

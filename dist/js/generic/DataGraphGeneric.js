@@ -34,7 +34,6 @@ class DataGraphGeneric extends _GraphGeneric.default {
     this.continueDfs();
     return this;
   }
-
   /**
    * Continues the dfs algorithm with promise
    * @param ops

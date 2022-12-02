@@ -4,7 +4,6 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/es.promise.js");
 require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.parse-int.js");
@@ -15,13 +14,11 @@ require("core-js/modules/esnext.string.replace-all.js");
 var _jquery = _interopRequireDefault(require("jquery"));
 var _DataConverter = _interopRequireDefault(require("./DataConverter"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-// Do a dynamic import to avoid issues with d3 and ESModule import
-let d3;
-(async () => {
-  d3 = await Promise.resolve().then(() => _interopRequireWildcard(require('d3')));
-})().catch(err => console.error(err));
+// // Do a dynamic import to avoid issues with d3 and ESModule import
+// let d3
+// (async () => {
+//     d3 = await import('d3');
+// })().catch(err => console.error(err));
 
 /**
  * @author dbmi.pitt.edu
@@ -30,7 +27,7 @@ let d3;
  * @returns {{}}
  * @constructor
  */
-function ProvenanceTree(selector, _options) {
+function ProvenanceTree(d3, selector, _options) {
   const $el = {
     canvas: d3.select(selector)
   };
@@ -53,10 +50,17 @@ function ProvenanceTree(selector, _options) {
     infoNode: 'c-provenance__info--node',
     infoRelation: 'c-provenance__info--relationship',
     links: {
+      hidden: 'edgeLabels--hidden',
       labels: 'edgeLabels',
       paths: 'edgePaths'
     },
-    hasDrag: 'has-drag'
+    hasDrag: 'has-drag',
+    nodes: {
+      glow: 'glow',
+      main: 'main',
+      text: 'text',
+      image: 'image'
+    }
   };
   const sz = {};
   let simulation;
@@ -68,10 +72,12 @@ function ProvenanceTree(selector, _options) {
       "Sample": "#ebb5c8",
       "Source": "#ffc255"
     },
+    imageMap: {},
     node: {
       append: 'text',
       radius: 15
     },
+    images: {},
     propertyMap: {
       'sennet:created_by_user_displayname': 'agent'
     },
@@ -101,9 +107,10 @@ function ProvenanceTree(selector, _options) {
   };
   function init() {
     _jquery.default.extend(options, _options);
+    initImageMap();
     data.stratify = options.data.stratify;
     data.root = options.data.root;
-    if (!data.stratify.length && !data.root) {
+    if (!data.root && data.stratify && !data.stratify.length) {
       console.error('No data provided...');
     } else {
       clearCanvas();
@@ -860,7 +867,7 @@ function ProvenanceTree(selector, _options) {
       return set.size ? Array.from(set).join(' ') : '';
     };
     $el.link.attr('class', d => {
-      return className(d);
+      return 'link ' + className(d);
     }).on('click', function (e, d) {
       d.wasClicked = true;
       updateInfo(d.data, false);
@@ -939,7 +946,7 @@ function ProvenanceTree(selector, _options) {
   }
   function appendTextToNode(node) {
     return node.append('text').attr('class', function (d) {
-      return 'text' + getTextToAppendToNode(d).className;
+      return "".concat(classNames.nodes.text, " ") + getTextToAppendToNode(d).className;
     }).attr('fill', '#ffffff').attr('font-size', function (d) {
       return icon(d) ? options.node.radius + 'px' : '8px';
     }).attr('pointer-events', 'none').attr('text-anchor', 'middle').attr('y', function (d) {
@@ -947,6 +954,19 @@ function ProvenanceTree(selector, _options) {
     }).html(function (d) {
       return getTextToAppendToNode(d).text;
     });
+  }
+  function initImageMap() {
+    let key, keys, selector;
+    for (key in options.images) {
+      if (options.images.hasOwnProperty(key)) {
+        keys = key.split('|');
+        if (!options.imageMap[keys[0]]) {
+          options.imageMap[keys[0]] = [key];
+        } else {
+          options.imageMap[keys[0]].push(key);
+        }
+      }
+    }
   }
   function image(d) {
     let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
@@ -973,7 +993,8 @@ function ProvenanceTree(selector, _options) {
               //console.error()
               break;
           }
-          if (subType === label && (!property || d.data.properties[property] !== undefined) && (!value || d.data.properties[property] === value)) {
+          const properties = getNodeProperties(d);
+          if (subType === label && (!property || properties[property] !== undefined) && (!value || properties[property] === value)) {
             if (labelPropertyValue.length > imgLevel) {
               img = options.images[imagesForLabel[i]];
               imgLevel = labelPropertyValue.length;
@@ -985,17 +1006,7 @@ function ProvenanceTree(selector, _options) {
     return img;
   }
   function appendImageToNode(node) {
-    return node.append('image').attr('height', function (d) {
-      return icon(d) ? '24px' : '30px';
-    }).attr('x', function (d) {
-      return icon(d) ? '5px' : '-15px';
-    }).attr('xlink:href', function (d) {
-      return image(d);
-    }).attr('y', function (d) {
-      return icon(d) ? '5px' : '-16px';
-    }).attr('width', function (d) {
-      return icon(d) ? '24px' : '30px';
-    });
+    return node.append('image').attr('class', 'image').attr('height', d => icon(d) ? '24px' : '30px').attr('x', d => icon(d) ? '5px' : '-15px').attr('xlink:href', d => image(d)).attr('y', d => icon(d) ? '5px' : '-16px').attr('width', d => icon(d) ? '24px' : '30px');
   }
   function getHighlightClass(d) {
     let isNode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -1058,21 +1069,22 @@ function ProvenanceTree(selector, _options) {
       d.wasClicked = true;
       updateInfo(d.data, true);
     }).call(drag());
-    $el.nodeGlow = $el.nodeEnter.append('circle').attr('class', 'glow').attr('r', options.node.radius * 1.3);
-    $el.nodeMain = $el.nodeEnter.append('circle').attr('class', 'main').attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('r', options.node.radius);
+    $el.nodeGlow = $el.nodeEnter.append('circle').attr('class', classNames.nodes.glow).attr('r', options.node.radius * 1.3);
+    $el.nodeMain = $el.nodeEnter.append('circle').attr('class', classNames.nodes.main).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('r', options.node.radius);
     if (options.node.append) {
       if (options.node.append === 'text') {
         appendTextToNode($el.nodeEnter);
       }
+      appendImageToNode($el.nodeEnter);
     }
     $el.node = $el.node.merge($el.nodeEnter);
     $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHighlightClass(d), " ").concat(d.data.className || ''));
-    $el.node.select('.glow').style('fill', d => {
+    $el.node.select(".".concat(classNames.nodes.glow)).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
     }).style('stroke', d => {
       return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
     }).append('title').text(d => getNodeCat(d));
-    $el.node.select('.main').attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
+    $el.node.select(".".concat(classNames.nodes.main)).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
@@ -1237,6 +1249,9 @@ function ProvenanceTree(selector, _options) {
       });
     }
   }
+  function toggleEdgeLabels(ops) {
+    (0, _jquery.default)(selector).toggleClass(classNames.links.hidden);
+  }
   function toggleData(ops) {
     toggled.has = true;
     const {
@@ -1303,17 +1318,31 @@ function ProvenanceTree(selector, _options) {
       d.target.ly = d.target.y;
       return d.target.y;
     });
-    $el.node.select('.main').attr("cx", d => {
+    $el.node.select(".".concat(classNames.nodes.main)).attr("cx", d => {
       d.lx = d.x;
       return d.x;
     }).attr("cy", d => {
       d.ly = d.y;
       return d.y;
     });
-    $el.node.select('.glow').attr("cx", d => {
+    $el.node.select(".".concat(classNames.nodes.glow)).attr("cx", d => {
       d.lx = d.x;
       return d.x;
     }).attr("cy", d => {
+      d.ly = d.y;
+      return d.y;
+    });
+    $el.node.select(".".concat(classNames.nodes.text)).attr("x", d => {
+      d.lx = d.x;
+      return d.x;
+    }).attr("y", d => {
+      d.ly = d.y;
+      return d.y;
+    });
+    $el.node.select(".".concat(classNames.nodes.image)).attr("x", d => {
+      d.lx = d.x;
+      return d.x;
+    }).attr("y", d => {
       d.ly = d.y;
       return d.y;
     });
@@ -1361,7 +1390,8 @@ function ProvenanceTree(selector, _options) {
   return {
     colorMap: options.colorMap,
     toggleData: toggleData,
-    simulation
+    simulation,
+    toggleEdgeLabels
   };
 }
 var _default = ProvenanceTree;

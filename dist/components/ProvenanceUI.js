@@ -10,6 +10,7 @@ var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _jquery = _interopRequireDefault(require("jquery"));
 var _ProvenanceTree = _interopRequireDefault(require("../js/ProvenanceTree"));
+var _useD = _interopRequireDefault(require("../hooks/useD3"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
@@ -22,6 +23,11 @@ function ProvenanceUI(_ref) {
     data,
     options = {}
   } = _ref;
+  const {
+    d3,
+    error,
+    loading
+  } = (0, _useD.default)();
   const selectorId = options.selectorId || 'provenanceTree';
   const initialized = (0, _react.useRef)(false);
   const addVisitedClass = () => {
@@ -33,15 +39,15 @@ function ProvenanceUI(_ref) {
     if (!options.noStyles) {
       Promise.resolve("../ProvenanceUI.css").then(s => _interopRequireWildcard(require(s)));
     }
-    if (!initialized.current) {
-      initialized.current = true;
-      window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {};
-      window.ProvenanceTreeD3[selectorId] = (0, _ProvenanceTree.default)("#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
-        data
-      }));
-    }
     addVisitedClass();
-  }, []);
+  });
+  if ((options.dontCheckInitialized || !initialized.current) && !loading && !error) {
+    initialized.current = true;
+    window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {};
+    window.ProvenanceTreeD3[selectorId] = (0, _ProvenanceTree.default)(d3, "#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
+      data
+    }));
+  }
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "c-provenance c-provenance--Tree js-provenance",
     id: selectorId,
