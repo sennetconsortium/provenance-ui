@@ -38,7 +38,7 @@ class DataConverterNeo4J extends DataConverter {
         return key === this.keys.activity.keyName
     }
 
-    hierarchy(rootId, hasDescendants) {
+    buildAdjacencyList(rootId, hasDescendants) {
         this.dict = {}
         try {
             let id
@@ -75,7 +75,7 @@ class DataConverterNeo4J extends DataConverter {
                     let item = data[_prop]
                     item.type = item[this.keys.prov]
                     item.subType = item[this.keys.type] || item.type
-                    id = item[this.getPropFromMap()]
+                    id = item[this.map.root.id]
 
                     const genKey =
                         this.keys.relationships.dataProps.generatedBy

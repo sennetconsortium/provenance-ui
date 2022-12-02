@@ -36,7 +36,7 @@ async function Neo4JGraphObject(serviceOps) {
         }
         
         const converter = new DataConverterNeo4J(result, dataMap)
-        converter.hierarchy(itemId, hasDescendants)
+        converter.buildAdjacencyList(itemId, hasDescendants)
         log.debug('Converter details...', converter)
         setContextData({stratify: converter.result})
         let ops = getOptions()

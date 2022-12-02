@@ -1,8 +1,8 @@
 const dataMap = {
     root: {
-        entity_type: 'labels',
-        uuid: 'id',
-        created_by_user_displayname: 'text',
+        id: 'uuid',
+        subType: 'entity_type',
+        text: 'created_by_user_displayname'
     },
     highlight: {
         labels: 'entity_type',

@@ -10,7 +10,7 @@ const dataMap = {
         edge: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' }
     },
     root: {
-        'sennet:uuid': 'id',
+        'id': 'sennet:uuid'
     },
     props: ['sennet:uuid', 'sennet:sennet_id'],
     typeProps: {

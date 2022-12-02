@@ -25,21 +25,6 @@ class DataConverter {
     }
 
     /**
-     * Returns a property name from the map.root
-     * @param key {string}
-     * @returns {string}
-     */
-    getPropFromMap(key = 'id') {
-        let result = '_id'
-        for (let prop in this.map.root) {
-            if (this.map.root[prop] === key ) {
-                return prop
-            }
-        }
-        return result
-    }
-
-    /**
      * Runs a callback on a given value
      * @param cb {function}
      * @param val {string}
