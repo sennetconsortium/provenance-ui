@@ -84,7 +84,7 @@ class GraphGeneric {
     }
 
     getItem(obj) {
-        if (typeof obj === 'array') {
+        if (typeof obj === 'object') {
             return obj.length ? obj[0] : null
         } else {
             return obj

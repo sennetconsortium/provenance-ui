@@ -19,11 +19,9 @@ function ProvenanceUI({ children, data, options = {} }) {
         if (!options.noStyles) {
             import (`../ProvenanceUI.css`)
         }
-
-
-
+        
         addVisitedClass()
-    }, []);
+    });
 
     if (!initialized.current && !loading && !error) {
         initialized.current = true

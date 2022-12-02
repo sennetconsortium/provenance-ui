@@ -1,5 +1,4 @@
 import React from 'react'
-import log from 'loglevel'
 import $ from 'jquery'
 
 function Toggle({ context, selectorId = 'provenanceTree', ariaLabel = 'Toggle', text='', className = ''}) {

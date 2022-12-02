@@ -55,7 +55,7 @@ export const AppProvider = ({ children }) => {
 
         const handleFeature = async (fn) => {
             setLoading(true)
-            const result = await fn({
+            await fn({
                 token,
                 url,
                 itemId,

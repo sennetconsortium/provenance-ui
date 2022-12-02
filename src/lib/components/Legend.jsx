@@ -3,14 +3,13 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 
 const Legend = ({ colorMap, filterNodes }) => {
-    const [colors, setColors] = useState(colorMap)
-    const [filterable, setFilterable] = useState(filterNodes)
+    const [colors] = useState(colorMap)
+    const [filterable] = useState(filterNodes)
     const loaded = useRef(false)
-    const $previous = useRef(null)
 
     useEffect(() => {
         if (filterable && !loaded.current) setEvents()
-    }, [])
+    })
 
     const setEvents = () => {
         loaded.current = true
@@ -26,25 +25,23 @@ const Legend = ({ colorMap, filterNodes }) => {
         }
 
         const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
-            const $el = e ? $(e.currentTarget) : $previous.current
-            if (className === stickClass) {
-                $previous.current = e ? $el : null
-            }
+            const $el = $(e.currentTarget)
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
-            $(selectors.provenance)[fn](className)
+            if (!($(`.node`).hasClass('has-hover') && fn === classFns.remove)) {
+                $(selectors.provenance)[fn](className)
+            }
         }
 
-        // $(selectors.legendItem).on('click', (e) => {
-        //     e.stopPropagation()
-        //     e.preventDefault()
-        //
-        //     const fn = $(e.currentTarget).hasClass(stickClass) ? classFns.remove : classFns.add
-        //     let r = (fn === classFns.add) ? toggleClass(e) : toggleClass(e, classFns.remove)
-        //     //if ($previous.current && $(e.currentTarget) !== $previous.current) toggleClass(null, classFns.remove, stickClass)
-        //     toggleClass(e, fn, stickClass)
-        // })
+        $(selectors.legendItem).on('click', (e) => {
+            e.stopPropagation()
+            e.preventDefault()
+
+            const fn = $(e.currentTarget).hasClass(stickClass) ? classFns.remove : classFns.add
+            toggleClass(e, fn)
+            toggleClass(e, fn, stickClass)
+        })
 
         $(selectors.legendItem).on('mouseover', (e) => {
             if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
