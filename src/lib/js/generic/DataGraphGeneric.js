@@ -23,29 +23,6 @@ class DataGraphGeneric extends GraphGeneric {
         this.continueDfs()
         return this
     }
-
-    stratify() {
-        let stack = [this.root];
-        let visited = {};
-        visited[this.root.id] = true
-        while (stack.length) {
-            let n = stack.pop()
-            n = this.list[n[this.keys.id]] || n
-            n.id = n[this.keys.id]
-            n.entityAsParent = visited[n.id]
-            n.type = n[this.map.root.type] || 'Entity'
-            n.subType = n[this.map.root.subType] || n.type
-            this.setProperties(n, n.subType)
-            if (n.children && n.children.length){
-                for (let c of n.children) {
-                    if (!visited[c.id]) {
-                        visited[c.id] = n.id
-                        stack.push(c)
-                    }
-                }
-            }
-        }
-    }
     /**
      * Continues the dfs algorithm with promise
      * @param ops

@@ -23,7 +23,7 @@ function ProvenanceUI({ children, data, options = {} }) {
         addVisitedClass()
     });
 
-    if (!initialized.current && !loading && !error) {
+    if ((options.dontCheckInitialized || !initialized.current) && !loading && !error) {
         initialized.current = true
         window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {}
         window.ProvenanceTreeD3[selectorId] = ProvenanceTree(d3,`#${selectorId}`, {...options, data })
