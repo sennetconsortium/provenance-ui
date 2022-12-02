@@ -3,10 +3,33 @@
 .c-toggle
   pos-rel()
   display inline-block
-  width 28px
+
   height $toggleH
   border 0 
   background-color transparent
+
+  &--eye
+    .c-toggle
+      &__slider
+        width 18px
+
+      &__text
+        margin-left 25px
+
+    input
+      &:checked
+        & + .c-toggle__slider
+          &:before
+            transform none !important
+  &__icon
+    color $col-malibu
+    &.has-toggled
+      color $col-grey
+      &:before
+        content '\f070'
+
+  &__text
+    margin-left 30px
 
   input
     opacity 0
@@ -16,6 +39,7 @@
   &__slider
     pos-abs()
     cursor pointer
+    width 28px
     top 0
     left 0
     right 0

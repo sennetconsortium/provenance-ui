@@ -11,6 +11,7 @@ function App() {
     const [data, setData] = useState(null)
     const initialized = useRef(false)
 
+
     useEffect(() => {
         if (contextData !== null && !initialized.current) {
             initialized.current = true
@@ -23,12 +24,23 @@ function App() {
         ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }
 
+    const actionMap = {
+        Activity: {
+            callback: toggleData,
+            selectorId: 'provenanceTree',
+            className: 'c-toggle--eye',
+            ariaLabel: 'Hide Activity'
+        }
+    }
+
     return (
         <div className={`c-App`}>
-            {  <Toggle context={ toggleData } selectorId='graph--other' /> }
-            {  <ProvenanceUI data={{root: sampleTree}} options={{...options, selectorId: 'graph--other'}} /> }
-            {/*{ !loading && data && <ProvenanceUI data={data} options={ options } /> }*/}
-            { options.colorMap && <Legend colorMap={options.colorMap} /> }
+
+            {/*{  <ProvenanceUI data={{root: sampleTree}} options={{...options, selectorId: 'graph--other'}} /> }*/}
+            { !loading && data && <ProvenanceUI data={data} options={ options } /> }
+            { options.colorMap && <Legend colorMap={options.colorMap} actionMap={actionMap}>
+
+            </Legend> }
 
         </div>
     )

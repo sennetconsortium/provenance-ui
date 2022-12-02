@@ -39,6 +39,7 @@ function ProvenanceTree(d3, selector, _options) {
         infoNode: 'c-provenance__info--node',
         infoRelation: 'c-provenance__info--relationship',
         links: {
+            hidden: 'edgeLabels--hidden',
             labels: 'edgeLabels',
             paths: 'edgePaths'
         },
@@ -724,6 +725,10 @@ function ProvenanceTree(d3, selector, _options) {
         }
     }
 
+    function toggleEdgeLabels(ops) {
+        $(selector).toggleClass(classNames.links.hidden)
+    }
+
     function toggleData(ops) {
         toggled.has = true
         const {filter, parentKey} = ops
@@ -905,7 +910,8 @@ function ProvenanceTree(d3, selector, _options) {
     return {
         colorMap: options.colorMap,
         toggleData: toggleData,
-        simulation
+        simulation,
+        toggleEdgeLabels
     }
 }
 

@@ -5,8 +5,9 @@
     &:hover
       cursor pointer
     .c-legend__label
-      &:hover
-        color $col-malibu
+      &__text
+        &:hover
+          color $col-malibu
   &.has-hover
     .c-legend__color
       opacity .5
@@ -20,7 +21,9 @@
         &__color
           opacity 1
         &__label
-          color $col-malibu
+          &__text
+            &:hover
+              color $col-malibu
   &__color
     width 20px
     height 20px
@@ -29,6 +32,6 @@
     pos-rel()
     line-height 10px
     span
-      pos-abs()
-      margin-top -16px
+      pos-rel()
+      top -5px
       margin-left 5px

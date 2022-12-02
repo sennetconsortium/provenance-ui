@@ -8,7 +8,7 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url }
-    const itemId = 'ff22ba6b25042e6b25be3fc0b7af461b'
+    const itemId = '6f23a02d5a3058561f420c07519fa6c7'
     //const itemId = 'd0012eff666fb2531d97f379d03de635' // linear
     //const itemId = '7784dc1fe53baed4369692732a29a74d' // large
     //const itemId = 'cc71575241d56f13189e84333f366bd0' // descendants

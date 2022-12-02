@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
+import Toggle from "./Toggle";
 
-const Legend = ({ colorMap, filterNodes }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const loaded = useRef(false)
@@ -16,6 +17,7 @@ const Legend = ({ colorMap, filterNodes }) => {
         const stickClass = 'stickFilters'
         const selectors = {
             legendItem: '.js-legend__item',
+            legendTrigger: '.js-legend--trigger',
             provenance: '.js-provenance'
         }
 
@@ -24,8 +26,11 @@ const Legend = ({ colorMap, filterNodes }) => {
             remove: 'removeClass'
         }
 
+        const getItem = (e) => {
+            return $(e.currentTarget).parents(selectors.legendItem)
+        }
         const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
-            const $el = $(e.currentTarget)
+            const $el = getItem(e)
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
@@ -34,16 +39,16 @@ const Legend = ({ colorMap, filterNodes }) => {
             }
         }
 
-        $(selectors.legendItem).on('click', (e) => {
+        $(selectors.legendTrigger).on('click', (e) => {
             e.stopPropagation()
             e.preventDefault()
 
-            const fn = $(e.currentTarget).hasClass(stickClass) ? classFns.remove : classFns.add
+            const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
             toggleClass(e, fn)
             toggleClass(e, fn, stickClass)
         })
 
-        $(selectors.legendItem).on('mouseover', (e) => {
+        $(selectors.legendTrigger).on('mouseover', (e) => {
             if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
         }).on('mouseleave', (e) => {
             if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass')
@@ -55,11 +60,14 @@ const Legend = ({ colorMap, filterNodes }) => {
         for (let type in colors) {
             result.push(
                 <li className='c-legend__item js-legend__item' key={`legend--${type}`} data-node={type}>
-                    <span className={`c-legend__color c-legend__color--${type}`} style={{backgroundColor: colors[type]}}></span>
+                    <span className={`c-legend__color js-legend--trigger c-legend__color--${type}`} style={{backgroundColor: colors[type]}}></span>
                     <span className='c-legend__label'>
-                        <span>
+                        <span className='c-legend__label__text js-legend--trigger'>
                             {type}
                         </span>
+                        { actionMap[type] &&
+                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId} className={`c-legend__action ${actionMap[type].className}`} ariaLabel={actionMap[type].ariaLabel} />
+                        }
                     </span>
                 </li>
             )
@@ -69,17 +77,23 @@ const Legend = ({ colorMap, filterNodes }) => {
 
     return (
         <div className={`c-legend ${filterable ? 'c-legend--filterable' : ''}`}>
-            {buildLegend()}
+            <ul>
+                {buildLegend()}
+                {children}
+            </ul>
         </div>
     )
 }
 
 Legend.defaultProps = {
-    filterNodes: true
+    filterNodes: true,
+    actionMap: {}
 }
 
 Legend.propTypes = {
     colorMap: PropTypes.object.isRequired,
+    actionMap: PropTypes.object,
+    children: PropTypes.object,
     filterNodes: PropTypes.bool
 }
 
