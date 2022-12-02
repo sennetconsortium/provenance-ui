@@ -22,8 +22,15 @@
           opacity 1
         &__label
           &__text
-            &:hover
-              color $col-malibu
+            color $col-malibu
+
+    &--Edge
+      .c-legend__color
+        pos-rel()
+        top -8px
+        height 2px
+        border-radius inherit
+
   &__color
     width 20px
     height 20px
@@ -35,3 +42,4 @@
       pos-rel()
       top -5px
       margin-left 5px
+

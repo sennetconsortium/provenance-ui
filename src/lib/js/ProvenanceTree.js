@@ -226,7 +226,7 @@ function ProvenanceTree(d3, selector, _options) {
         }
         $el.link
             .attr('class', d => {
-                return className(d)
+                return 'link '+className(d)
             })
             .on('click', function(e, d) {
                 d.wasClicked = true

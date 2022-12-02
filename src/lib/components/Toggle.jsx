@@ -25,7 +25,7 @@ function Toggle({ context, icon = true, selectorId = 'provenanceTree', ariaLabel
                 </>
             }
             {icon && <>
-                <span className={`c-toggle__icon fa fa-eye`} aria-label={ariaLabel} onClick={toggleData}></span>
+                <span className={`c-toggle__icon fa fa-eye`} aria-label={ariaLabel} onClick={toggleData} title={ariaLabel}></span>
             </> }
 
         </label>

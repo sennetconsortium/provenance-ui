@@ -24,12 +24,23 @@ function App() {
         ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }
 
+    const toggleEdgeLabels = (hideActivity, selectorId) => {
+        const ui = window.ProvenanceTreeD3[selectorId]
+        ui.toggleEdgeLabels()
+    }
+
     const actionMap = {
         Activity: {
             callback: toggleData,
             selectorId: 'provenanceTree',
             className: 'c-toggle--eye',
-            ariaLabel: 'Hide Activity'
+            ariaLabel: 'Toggle Activity Nodes'
+        },
+        Edge: {
+            callback: toggleEdgeLabels,
+            selectorId: 'provenanceTree',
+            className: 'c-toggle--eye',
+            ariaLabel: 'Toggle Edge Labels'
         }
     }
 
@@ -38,7 +49,7 @@ function App() {
 
             {/*{  <ProvenanceUI data={{root: sampleTree}} options={{...options, selectorId: 'graph--other'}} /> }*/}
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            { options.colorMap && <Legend colorMap={options.colorMap} actionMap={actionMap}>
+            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap}>
 
             </Legend> }
 

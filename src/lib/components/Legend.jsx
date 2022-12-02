@@ -59,7 +59,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
         let result = [];
         for (let type in colors) {
             result.push(
-                <li className='c-legend__item js-legend__item' key={`legend--${type}`} data-node={type}>
+                <li className={`c-legend__item c-legend__item--${type} js-legend__item`} key={`legend--${type}`} data-node={type}>
                     <span className={`c-legend__color js-legend--trigger c-legend__color--${type}`} style={{backgroundColor: colors[type]}}></span>
                     <span className='c-legend__label'>
                         <span className='c-legend__label__text js-legend--trigger'>
