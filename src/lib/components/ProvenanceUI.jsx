@@ -2,9 +2,10 @@ import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import ProvenanceTree from '../js/ProvenanceTree'
-
+import useD3 from '../hooks/useD3'
 
 function ProvenanceUI({ children, data, options = {} }) {
+    const { d3, error, loading } = useD3()
     const selectorId = options.selectorId || 'provenanceTree'
     const initialized = useRef(false)
 
@@ -19,14 +20,16 @@ function ProvenanceUI({ children, data, options = {} }) {
             import (`../ProvenanceUI.css`)
         }
 
-        if (!initialized.current) {
-            initialized.current = true
-            window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {}
-            window.ProvenanceTreeD3[selectorId] = ProvenanceTree(`#${selectorId}`, {...options, data })
-        }
+
 
         addVisitedClass()
     }, []);
+
+    if (!initialized.current && !loading && !error) {
+        initialized.current = true
+        window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {}
+        window.ProvenanceTreeD3[selectorId] = ProvenanceTree(d3,`#${selectorId}`, {...options, data })
+    }
 
     return (
         <div className='c-provenance c-provenance--Tree js-provenance' id={selectorId} style={{minHeight: options.minHeight || 300}}>

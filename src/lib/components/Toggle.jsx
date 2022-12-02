@@ -2,7 +2,7 @@ import React from 'react'
 import log from 'loglevel'
 import $ from 'jquery'
 
-function Toggle({ context, data, selectorId = 'provenanceTree', ariaLabel = 'Toggle', text='', className = ''}) {
+function Toggle({ context, selectorId = 'provenanceTree', ariaLabel = 'Toggle', text='', className = ''}) {
 
     const toggleData = (e) => {
         const $el = $(e.currentTarget)

@@ -4,6 +4,7 @@ import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
 import Toggle from './lib/components/Toggle'
 import DataConverterNeo4J from "./lib/js/neo4j/DataConverterNeo4J";
+import sampleTree from "./data/sample.tree";
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -15,7 +16,6 @@ function App() {
             initialized.current = true
             setData(contextData)
         }
-
     })
 
     const toggleData = (hideActivity, selectorId) => {
@@ -25,9 +25,9 @@ function App() {
 
     return (
         <div className={`c-App`}>
-            { !loading && data && <Toggle data={data} context={ toggleData } selectorId='graph--other' /> }
-            { !loading && data && <ProvenanceUI data={data} options={ {...options, selectorId: 'graph--other'} } /> }
-            { !loading && data && <ProvenanceUI data={data} options={ options } /> }
+            {  <Toggle context={ toggleData } selectorId='graph--other' /> }
+            {  <ProvenanceUI data={{root: sampleTree}} options={{...options, selectorId: 'graph--other'}} /> }
+            {/*{ !loading && data && <ProvenanceUI data={data} options={ options } /> }*/}
             { options.colorMap && <Legend colorMap={options.colorMap} /> }
 
         </div>
