@@ -3,10 +3,11 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import ProvenanceTree from '../js/ProvenanceTree'
 import useD3 from '../hooks/useD3'
+import { SELECTOR_ID } from '../js/constants'
 
 function ProvenanceUI({ children, data, options = {} }) {
     const { d3, error, loading } = useD3()
-    const selectorId = options.selectorId || 'provenanceTree'
+    const selectorId = options.selectorId || SELECTOR_ID
     const initialized = useRef(false)
 
     const addVisitedClass = () => {

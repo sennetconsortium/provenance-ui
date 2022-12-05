@@ -71,18 +71,10 @@ class GraphGeneric {
     continueDfs(ops = {}) {}
 
     /**
-     * Determines if a node has already been visited
-     * @param id {string}
-     * @param node {object}
+     * Returns an item from object or object array
+     * @param obj
+     * @returns {*}
      */
-    checkVisited(id, node) {
-        if (!this.visited[id]) {
-            this.appendList(id, node)
-            this.visited[id] = true
-            this.stack.push(id)
-        }
-    }
-
     getItem(obj) {
         if (typeof obj === 'object') {
             return obj.length ? obj[0] : obj
@@ -96,6 +88,7 @@ class GraphGeneric {
             this.list[id] = this.getItem(obj)
         }
     }
+
     /**
      * Returns result
      * @returns {[]}

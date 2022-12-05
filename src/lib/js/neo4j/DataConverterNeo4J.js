@@ -1,6 +1,11 @@
 import DataConverter from '../DataConverter'
 import $ from 'jquery'
 
+/**
+ * This converts a data object in Neo4J format to an adjacency list that will be later
+ * used in d3.stratify to create the hierarchy model.
+ * @author dbmi.pitt.edu
+ */
 class DataConverterNeo4J extends DataConverter {
 
     constructor(data, map, ops = {}) {
@@ -29,15 +34,31 @@ class DataConverterNeo4J extends DataConverter {
         this.list = {}
     }
 
+    /**
+     * Retrieves an id from a string value with delimiters
+     * @param value
+     * @returns {*}
+     */
     getNodeIdFromValue(value) {
         let parts = value.split(this.map.delimiters.node || '/')
         return parts[parts.length - 1]
     }
 
+    /**
+     * Determines if given key is of activity
+     * @param key
+     * @returns {boolean}
+     */
     isActivity(key) {
         return key === this.keys.activity.keyName
     }
 
+    /**
+     * Creates an adjacency list object
+     * @param rootId {string}
+     * @param hasDescendants {boolean}
+     * @returns {DataConverterNeo4J}
+     */
     buildAdjacencyList(rootId, hasDescendants) {
         this.dict = {}
         try {

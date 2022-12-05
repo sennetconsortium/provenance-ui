@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import Toggle from "./Toggle";
+import Toggle from './Toggle'
+import { SELECTOR_ID } from '../js/constants'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const loaded = useRef(false)
@@ -14,7 +15,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
 
     const setEvents = () => {
         loaded.current = true
-        const stickClass = 'stickFilters'
+        const stickClass = 'has-activeFilters'
         const selectors = {
             legendItem: '.js-legend__item',
             legendTrigger: '.js-legend--trigger',
@@ -66,7 +67,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
                             {type}
                         </span>
                         { actionMap[type] &&
-                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId} className={`c-legend__action ${actionMap[type].className}`} ariaLabel={actionMap[type].ariaLabel} />
+                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId || selectorId} className={`c-legend__action ${actionMap[type].className}`} ariaLabel={actionMap[type].ariaLabel} />
                         }
                     </span>
                 </li>
@@ -87,14 +88,16 @@ const Legend = ({ children, colorMap, filterNodes, actionMap }) => {
 
 Legend.defaultProps = {
     filterNodes: true,
-    actionMap: {}
+    actionMap: {},
+    selectorId: SELECTOR_ID
 }
 
 Legend.propTypes = {
     colorMap: PropTypes.object.isRequired,
     actionMap: PropTypes.object,
     children: PropTypes.object,
-    filterNodes: PropTypes.bool
+    filterNodes: PropTypes.bool,
+    selectorId: PropTypes.string
 }
 
 export default Legend

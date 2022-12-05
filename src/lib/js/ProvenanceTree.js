@@ -1,20 +1,16 @@
 import $ from 'jquery'
-import DataConverter from "./DataConverter";
-
-// // Do a dynamic import to avoid issues with d3 and ESModule import
-// let d3
-// (async () => {
-//     d3 = await import('d3');
-// })().catch(err => console.error(err));
+import DataConverter from './DataConverter'
 
 /**
  * @author dbmi.pitt.edu
- * @param selector {string}
- * @param _options {object}
+ * @param d3 {object} The d3 library
+ * @param selector {string} The selector of the canvas
+ * @param _options {object} Set of options to pass
  * @returns {{}}
  * @constructor
  */
 function ProvenanceTree(d3, selector, _options) {
+
     const $el = {
         canvas: d3.select(selector),
     }

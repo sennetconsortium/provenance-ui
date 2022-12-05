@@ -2,6 +2,12 @@ class DataConverter {
     static KEY_P_ENTITY = 'entityAsParent';
     static KEY_P_ACT = 'activityAsParent';
 
+    /**
+     *
+     * @param data {object}
+     * @param map {object}
+     * @param ops {object}
+     */
     constructor(data, map, ops = {}) {
         this.ops = ops
         this.data = data
@@ -9,6 +15,11 @@ class DataConverter {
         this.error = null
     }
 
+    /**
+     * Set properties that will be displayed in info panel.
+     * @param item {object}
+     * @param type {string}
+     */
     setProperties(item, type) {
         item.properties = item.properties || {}
         for (let gProp of this.map.props) {
