@@ -272,7 +272,6 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('font-size', 8)
             .attr('fill', '#aaa')
 
-
         $el.labelEnter.append('textPath')
             .style("text-anchor", "middle")
             .style("pointer-events", "none")
@@ -283,6 +282,7 @@ function ProvenanceTree(d3, selector, _options) {
 
         // Update labels
         $el.edgeLabel.select('.textPath')
+            .attr('class', d => 'textPath ' + className(d))
             .attr('xlink:href', (d, i) => `#${classNames.links.paths}` + i + canvasId)
             .text(d => {
                 if (options.callbacks.onEdgeLabel) {

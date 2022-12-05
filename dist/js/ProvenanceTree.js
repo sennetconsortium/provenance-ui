@@ -890,7 +890,7 @@ function ProvenanceTree(d3, selector, _options) {
     $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter);
 
     // Update labels
-    $el.edgeLabel.select('.textPath').attr('xlink:href', (d, i) => "#".concat(classNames.links.paths) + i + canvasId).text(d => {
+    $el.edgeLabel.select('.textPath').attr('class', d => 'textPath ' + className(d)).attr('xlink:href', (d, i) => "#".concat(classNames.links.paths) + i + canvasId).text(d => {
       if (options.callbacks.onEdgeLabel) {
         return runCallback('onEdgeLabel', d);
       } else {
