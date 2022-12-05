@@ -768,7 +768,7 @@ function ProvenanceTree(d3, selector, _options) {
 
     function runCallback(callback, args) {
         if (options.callbacks[callback] && typeof options.callbacks[callback] === 'function') {
-            options.callbacks[callback]({$el, data, options, args})
+            return options.callbacks[callback]({$el, data, options, args})
         } else {
             return false
         }
