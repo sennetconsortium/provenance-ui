@@ -639,7 +639,7 @@ function ProvenanceTree(d3, selector, _options) {
             .alpha(0.5)
             //.force("link", d3.forceLink(data.links).id(d => d.depth).distance(20).strength(1))
             .force('charge', d3.forceManyBody().strength(1))
-            .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2))
+            .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth/1.58, sz.height / 2))
             //.force("x", d3.forceX())
             //.force('y', d3.forceY(20).strength(.2))
     }
@@ -906,8 +906,6 @@ function ProvenanceTree(d3, selector, _options) {
         runCallback("onAfterBuild")
         return $el.svg.node()
     }
-
-
 
     init()
     return {
