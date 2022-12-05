@@ -3,6 +3,7 @@ import AppContext from './context/AppContext'
 import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
 import DataConverterNeo4J from './lib/js/neo4j/DataConverterNeo4J'
+import {SELECTOR_ID} from "./lib/js/constants";
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -30,13 +31,11 @@ function App() {
     const actionMap = {
         Activity: {
             callback: toggleData,
-            selectorId: 'provenanceTree',
             className: 'c-toggle--eye',
             ariaLabel: 'Toggle Activity Nodes'
         },
         Edge: {
             callback: toggleEdgeLabels,
-            selectorId: 'provenanceTree',
             className: 'c-toggle--eye',
             ariaLabel: 'Toggle Edge Labels'
         }
@@ -45,11 +44,11 @@ function App() {
     return (
         <div className={`c-App`}>
 
-            {/*{  <ProvenanceUI data={{root: sampleTree}} options={{...options, selectorId: 'graph--other'}} /> }*/}
+            { !loading && data && <ProvenanceUI data={data} options={{...options, selectorId: 'graph--other'}} /> }
+            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap} selectorId='graph--other' />}
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap}>
+            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap} selectorId={SELECTOR_ID} />}
 
-            </Legend> }
 
         </div>
     )

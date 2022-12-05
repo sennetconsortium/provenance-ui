@@ -13,8 +13,7 @@ export const CLASS_NAMES = {
 export const SELECTORS = {
     legend: {
         legendItem: '.js-legend__item',
-        legendTrigger: '.js-legend--trigger',
-        provenance: '.js-provenance'
+        legendTrigger: '.js-legend--trigger'
     }
 }
 

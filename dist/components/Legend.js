@@ -44,15 +44,15 @@ const Legend = _ref => {
       const $el = getItem(e);
       const node = $el.data('node');
       $el[fn](className).parent()[fn](className);
-      (0, _jquery.default)(".node--".concat(node))[fn](className);
+      (0, _jquery.default)("#".concat(selectorId, " .node--").concat(node))[fn](className);
       if ((0, _constants.isEdge)($el)) {
         (0, _jquery.default)("#".concat(selectorId)).find('.links, #arrowhead')[fn](className);
       }
-      if (!((0, _jquery.default)(".node").hasClass(_constants.CLASS_NAMES.hover) && fn === classFns.remove)) {
-        (0, _jquery.default)(selectors.provenance)[fn](className);
+      if (!((0, _jquery.default)("#".concat(selectorId, " .node")).hasClass(_constants.CLASS_NAMES.hover) && fn === classFns.remove)) {
+        (0, _jquery.default)("#".concat(selectorId))[fn](className);
       }
     };
-    (0, _jquery.default)(selectors.legendTrigger).on('click', (e, data) => {
+    (0, _jquery.default)(".c-legend--".concat(selectorId, "  ").concat(selectors.legendTrigger)).on('click', (e, data) => {
       e.stopPropagation();
       e.preventDefault();
       if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled) || data.force) {
@@ -71,12 +71,12 @@ const Legend = _ref => {
         }
       }
     });
-    (0, _jquery.default)(selectors.legendTrigger).on('mouseover', e => {
+    (0, _jquery.default)(".c-legend--".concat(selectorId, "  ").concat(selectors.legendTrigger)).on('mouseover', e => {
       if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled)) {
-        if (!(0, _jquery.default)(selectors.provenance).hasClass(stickClass)) toggleClass(e);
+        if (!(0, _jquery.default)("#".concat(selectorId)).hasClass(stickClass)) toggleClass(e);
       }
     }).on('mouseleave', e => {
-      if (!(0, _jquery.default)(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass');
+      if (!(0, _jquery.default)("#".concat(selectorId)).hasClass(stickClass)) toggleClass(e, 'removeClass');
     });
   };
   const buildLegend = () => {
@@ -105,7 +105,7 @@ const Legend = _ref => {
     return result;
   };
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "c-legend ".concat(filterable ? 'c-legend--filterable' : '')
+    className: "c-legend c-legend--".concat(selectorId, " ").concat(filterable ? 'c-legend--filterable' : '')
   }, /*#__PURE__*/_react.default.createElement("ul", null, buildLegend(), children));
 };
 Legend.defaultProps = {

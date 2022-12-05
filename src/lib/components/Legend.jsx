@@ -31,17 +31,17 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
             const $el = getItem(e)
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
-            $(`.node--${node}`)[fn](className)
+            $(`#${selectorId} .node--${node}`)[fn](className)
 
             if (isEdge($el)) {
                 $(`#${selectorId}`).find('.links, #arrowhead')[fn](className)
             }
-            if (!($(`.node`).hasClass(CLASS_NAMES.hover) && fn === classFns.remove)) {
-                $(selectors.provenance)[fn](className)
+            if (!($(`#${selectorId} .node`).hasClass(CLASS_NAMES.hover) && fn === classFns.remove)) {
+                $(`#${selectorId}`)[fn](className)
             }
         }
 
-        $(selectors.legendTrigger).on('click', (e, data) => {
+        $(`.c-legend--${selectorId}  ${selectors.legendTrigger}`).on('click', (e, data) => {
             e.stopPropagation()
             e.preventDefault()
 
@@ -64,12 +64,12 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
 
         })
 
-        $(selectors.legendTrigger).on('mouseover', (e) => {
+        $(`.c-legend--${selectorId}  ${selectors.legendTrigger}`).on('mouseover', (e) => {
             if (!getItem(e).hasClass(CLASS_NAMES.disabled)) {
-                if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
+                if (!$(`#${selectorId}`).hasClass(stickClass)) toggleClass(e)
             }
         }).on('mouseleave', (e) => {
-            if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass')
+            if (!$(`#${selectorId}`).hasClass(stickClass)) toggleClass(e, 'removeClass')
         })
     }
 
@@ -94,7 +94,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     }
 
     return (
-        <div className={`c-legend ${filterable ? 'c-legend--filterable' : ''}`}>
+        <div className={`c-legend c-legend--${selectorId} ${filterable ? 'c-legend--filterable' : ''}`}>
             <ul>
                 {buildLegend()}
                 {children}

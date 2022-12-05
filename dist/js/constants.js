@@ -19,8 +19,7 @@ exports.CLASS_NAMES = CLASS_NAMES;
 const SELECTORS = {
   legend: {
     legendItem: '.js-legend__item',
-    legendTrigger: '.js-legend--trigger',
-    provenance: '.js-provenance'
+    legendTrigger: '.js-legend--trigger'
   }
 };
 exports.SELECTORS = SELECTORS;
