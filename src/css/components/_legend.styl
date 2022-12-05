@@ -8,6 +8,14 @@
       &__text
         &:hover
           color $col-malibu
+  &__item
+    &.is-disabled
+      .c-legend__label
+        &__text
+          color $col-grey !important
+          cursor default
+          text-decoration line-through
+
   &.has-hover
     .c-legend__color
       opacity .5

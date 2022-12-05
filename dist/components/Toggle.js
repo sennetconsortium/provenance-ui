@@ -23,7 +23,7 @@ function Toggle(_ref) {
     const className = 'has-toggled';
     $el.toggleClass(className);
     if (context !== null) {
-      context($el.hasClass(className), selectorId);
+      context(e, $el.hasClass(className), selectorId);
     }
   };
   return /*#__PURE__*/_react.default.createElement("label", {

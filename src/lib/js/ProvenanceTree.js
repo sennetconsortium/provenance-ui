@@ -67,6 +67,7 @@ function ProvenanceTree(d3, selector, _options) {
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
+        keepPositionsOnDataToggle: false,
         displayEdgeLabels: true,
         edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
         highlight: [],
@@ -470,7 +471,7 @@ function ProvenanceTree(d3, selector, _options) {
         let parentYs = {}
         data.nodes.forEach(function(d, i) {
             const pos = positionData[d.id]
-            if (pos) {
+            if (options.keepPositionsOnDataToggle && pos && !toggled.original) {
                 d.y = pos.y
                 d.x = pos.x
             } else {

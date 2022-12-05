@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Toggle from './Toggle'
-import { SELECTOR_ID } from '../js/constants'
+import {CLASS_NAMES, SELECTOR_ID} from '../js/constants'
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const [colors] = useState(colorMap)
@@ -30,6 +30,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
         const getItem = (e) => {
             return $(e.currentTarget).parents(selectors.legendItem)
         }
+
         const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
             const $el = getItem(e)
             const node = $el.data('node')
@@ -44,13 +45,18 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
             e.stopPropagation()
             e.preventDefault()
 
-            const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
-            toggleClass(e, fn)
-            toggleClass(e, fn, stickClass)
+            if (!getItem(e).hasClass(CLASS_NAMES.disabled)) {
+                const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
+                toggleClass(e, fn)
+                toggleClass(e, fn, stickClass)
+            }
+
         })
 
         $(selectors.legendTrigger).on('mouseover', (e) => {
-            if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
+            if (!getItem(e).hasClass(CLASS_NAMES.disabled)) {
+                if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e)
+            }
         }).on('mouseleave', (e) => {
             if (!$(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass')
         })

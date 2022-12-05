@@ -2,7 +2,9 @@ import React, { useContext, useState, useEffect, useRef } from 'react'
 import AppContext from './context/AppContext'
 import ProvenanceUI from './lib/components/ProvenanceUI'
 import Legend from './lib/components/Legend'
-import DataConverterNeo4J from "./lib/js/neo4j/DataConverterNeo4J";
+import DataConverterNeo4J from './lib/js/neo4j/DataConverterNeo4J'
+import $ from 'jquery'
+import {CLASS_NAMES} from "./lib/js/constants";
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -16,12 +18,13 @@ function App() {
         }
     }, [setData, contextData])
 
-    const toggleData = (hideActivity, selectorId) => {
+    const toggleData = (e, hideActivity, selectorId) => {
         const ui = window.ProvenanceTreeD3[selectorId]
+        $(e.currentTarget).parents('.js-legend__item').toggleClass(CLASS_NAMES.disabled)
         ui.toggleData({filter: hideActivity ? 'Activity' : '', parentKey: hideActivity ? DataConverterNeo4J.KEY_P_ENTITY : DataConverterNeo4J.KEY_P_ACT})
     }
 
-    const toggleEdgeLabels = (hideActivity, selectorId) => {
+    const toggleEdgeLabels = (e, hideActivity, selectorId) => {
         const ui = window.ProvenanceTreeD3[selectorId]
         ui.toggleEdgeLabels()
     }

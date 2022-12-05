@@ -56,12 +56,16 @@ const Legend = _ref => {
     (0, _jquery.default)(selectors.legendTrigger).on('click', e => {
       e.stopPropagation();
       e.preventDefault();
-      const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add;
-      toggleClass(e, fn);
-      toggleClass(e, fn, stickClass);
+      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled)) {
+        const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add;
+        toggleClass(e, fn);
+        toggleClass(e, fn, stickClass);
+      }
     });
     (0, _jquery.default)(selectors.legendTrigger).on('mouseover', e => {
-      if (!(0, _jquery.default)(selectors.provenance).hasClass(stickClass)) toggleClass(e);
+      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled)) {
+        if (!(0, _jquery.default)(selectors.provenance).hasClass(stickClass)) toggleClass(e);
+      }
     }).on('mouseleave', e => {
       if (!(0, _jquery.default)(selectors.provenance).hasClass(stickClass)) toggleClass(e, 'removeClass');
     });
