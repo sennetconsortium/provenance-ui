@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Toggle from './Toggle'
-import {CLASS_NAMES, SELECTOR_ID, SELECTORS} from '../js/constants'
+import {CLASS_NAMES, COMPS, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const [colors] = useState(colorMap)
@@ -32,7 +32,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
-            if (node === 'Edge') {
+            if (isEdge($el)) {
                 $(`#${selectorId}`).find('.links, #arrowhead')[fn](className)
             }
             if (!($(`.node`).hasClass(CLASS_NAMES.hover) && fn === classFns.remove)) {

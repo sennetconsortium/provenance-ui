@@ -1,7 +1,7 @@
 import React from 'react'
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import {CLASS_NAMES, SELECTOR_ID, SELECTORS} from '../js/constants'
+import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
 function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
 
@@ -10,10 +10,12 @@ function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
         const toggled = CLASS_NAMES.toggled
         $el.toggleClass(toggled)
         const $p = $el.parents(SELECTORS.legend.legendItem)
-
-        const $trigger = $p.find(SELECTORS.legend.legendTrigger)
-        if ($p.data('node') !== 'Edge' && $p.hasClass(CLASS_NAMES.hover)) {
+        if (!isEdge($p)) {
             $p.toggleClass(CLASS_NAMES.disabled)
+        }
+        const $trigger = $p.find(SELECTORS.legend.legendTrigger)
+        if (!isEdge($p) && $p.hasClass(CLASS_NAMES.hover)) {
+
             $trigger.eq(0).trigger('click', {force: true})
         }
         if (context !== null) {

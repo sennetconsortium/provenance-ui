@@ -45,7 +45,7 @@ const Legend = _ref => {
       const node = $el.data('node');
       $el[fn](className).parent()[fn](className);
       (0, _jquery.default)(".node--".concat(node))[fn](className);
-      if (node === 'Edge') {
+      if ((0, _constants.isEdge)($el)) {
         (0, _jquery.default)("#".concat(selectorId)).find('.links, #arrowhead')[fn](className);
       }
       if (!((0, _jquery.default)(".node").hasClass(_constants.CLASS_NAMES.hover) && fn === classFns.remove)) {

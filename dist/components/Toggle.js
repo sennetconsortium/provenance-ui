@@ -23,9 +23,11 @@ function Toggle(_ref) {
     const toggled = _constants.CLASS_NAMES.toggled;
     $el.toggleClass(toggled);
     const $p = $el.parents(_constants.SELECTORS.legend.legendItem);
-    const $trigger = $p.find(_constants.SELECTORS.legend.legendTrigger);
-    if ($p.data('node') !== 'Edge' && $p.hasClass(_constants.CLASS_NAMES.hover)) {
+    if (!(0, _constants.isEdge)($p)) {
       $p.toggleClass(_constants.CLASS_NAMES.disabled);
+    }
+    const $trigger = $p.find(_constants.SELECTORS.legend.legendTrigger);
+    if (!(0, _constants.isEdge)($p) && $p.hasClass(_constants.CLASS_NAMES.hover)) {
       $trigger.eq(0).trigger('click', {
         force: true
       });

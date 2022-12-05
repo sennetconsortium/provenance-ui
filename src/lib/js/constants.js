@@ -1,5 +1,9 @@
 export const SELECTOR_ID = 'provenanceTree'
 
+export const isEdge = ($el) => {
+    return $el.data('node') === 'Edge'
+}
+
 export const CLASS_NAMES = {
     disabled: 'is-disabled',
     hover: 'has-hover',
