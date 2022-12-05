@@ -1311,9 +1311,9 @@ function ProvenanceTree(d3, selector, _options) {
     };
     sz.width = (0, _jquery.default)(selector).width() - margin.left - margin.right;
     sz.height = (0, _jquery.default)(selector).height() - margin.top - margin.bottom;
-    $el.svg = $el.canvas.append('svg').attr('width', sz.width + margin.left + margin.right).attr('height', sz.height + margin.top + margin.bottom);
+    $el.svg = $el.canvas.append('svg').attr('width', sz.width).attr('height', sz.height);
     runCallback("onBeforeBuild");
-    $el.svgGroup = $el.svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+    $el.svgGroup = $el.svg.append('g').attr('transform', 'translate(' + margin.left * 2 + ',' + margin.top * 2 + ')');
     $el.svg.append('defs').append('marker').attr("id", 'arrowhead').attr('viewBox', '-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
     .attr('refX', 30) // X coordinate for the reference point of the marker. If circle is bigger, this needs to be bigger.
     .attr('refY', 0).attr('orient', 'auto').attr('markerWidth', 8).attr('markerHeight', 8).attr('xoverflow', 'visible').append('svg:path').attr('d', 'M 0,-5 L 10 ,0 L 0,5').attr('fill', '#999').style('stroke', 'none');

@@ -789,14 +789,14 @@ function ProvenanceTree(d3, selector, _options) {
         sz.height = $(selector).height() - margin.top - margin.bottom
 
         $el.svg = $el.canvas.append('svg')
-            .attr('width', sz.width + margin.left + margin.right)
-            .attr('height', sz.height + margin.top + margin.bottom)
+            .attr('width', sz.width)
+            .attr('height', sz.height)
 
         runCallback("onBeforeBuild")
 
         $el.svgGroup = $el.svg
             .append('g')
-            .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+            .attr('transform', 'translate(' + (margin.left * 2) + ',' + (margin.top * 2) + ')')
 
         $el.svg.append('defs').append('marker')
             .attr("id",'arrowhead')
