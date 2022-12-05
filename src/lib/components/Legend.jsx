@@ -50,13 +50,16 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
                 toggleClass(e, fn)
                 toggleClass(e, fn, stickClass)
 
-                const node = getItem(e).data('node')
-                if (fn === classFns.remove) {
-                    delete window.ProvenanceTreeD3[selectorId].legendFilters[node]
-                } else {
-                    window.ProvenanceTreeD3[selectorId].legendFilters[node] = true
+                try {
+                    const node = getItem(e).data('node')
+                    if (fn === classFns.remove) {
+                        delete window.ProvenanceTreeD3[selectorId].legendFilters[node]
+                    } else {
+                        window.ProvenanceTreeD3[selectorId].legendFilters[node] = true
+                    }
+                } catch (e) {
+                    console.error(e)
                 }
-
             }
 
         })
