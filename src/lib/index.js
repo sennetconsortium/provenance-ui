@@ -8,6 +8,7 @@ import DataConverterNeo4J from './js/neo4j/DataConverterNeo4J'
 import DataConverterGeneric from './js/generic/DataConverterGeneric'
 import ProvenanceTree from './js/ProvenanceTree'
 import * as PUI from './js/constants'
+import useD3 from './hooks/useD3'
 
 
-export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataConverterGeneric, DataGraphGeneric, GraphGeneric, ProvenanceTree, PUI }
+export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataConverterGeneric, DataGraphGeneric, GraphGeneric, ProvenanceTree, PUI, useD3 }
