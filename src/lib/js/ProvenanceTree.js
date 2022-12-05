@@ -251,7 +251,8 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('fill-opacity', 0)
             .attr('stroke-opacity', 0)
             .attr('id', (d, i) => classNames.links.paths + i + canvasId)
-            .style('pointer-events', 'none');
+            .style('pointer-events', 'none')
+
 
         // Labels
         $el.edgeLabel = $el.labelsGroup.selectAll(`.${classNames.links.labels}`)
@@ -267,6 +268,7 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('id', (d, i) => classNames.links.labels + i + canvasId)
             .attr('font-size', 8)
             .attr('fill', '#aaa')
+
 
         $el.labelEnter.append('textPath')
             .style("text-anchor", "middle")
@@ -621,7 +623,7 @@ function ProvenanceTree(d3, selector, _options) {
         simulation = d3.forceSimulation(data.nodes)
             .alpha(0.5)
             //.force("link", d3.forceLink(data.links).id(d => d.depth).distance(20).strength(1))
-            .force("charge", d3.forceManyBody().strength(1))
+            .force('charge', d3.forceManyBody().strength(1))
             .force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2))
             //.force("x", d3.forceX())
             //.force('y', d3.forceY(20).strength(.2))

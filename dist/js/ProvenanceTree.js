@@ -14,16 +14,11 @@ require("core-js/modules/esnext.string.replace-all.js");
 var _jquery = _interopRequireDefault(require("jquery"));
 var _DataConverter = _interopRequireDefault(require("./DataConverter"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-// // Do a dynamic import to avoid issues with d3 and ESModule import
-// let d3
-// (async () => {
-//     d3 = await import('d3');
-// })().catch(err => console.error(err));
-
 /**
  * @author dbmi.pitt.edu
- * @param selector {string}
- * @param _options {object}
+ * @param d3 {object} The d3 library
+ * @param selector {string} The selector of the canvas
+ * @param _options {object} Set of options to pass
  * @returns {{}}
  * @constructor
  */
@@ -1155,7 +1150,7 @@ function ProvenanceTree(d3, selector, _options) {
   function initSimulation() {
     simulation = d3.forceSimulation(data.nodes).alpha(0.5)
     //.force("link", d3.forceLink(data.links).id(d => d.depth).distance(20).strength(1))
-    .force("charge", d3.forceManyBody().strength(1)).force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2));
+    .force('charge', d3.forceManyBody().strength(1)).force('center', d3.forceCenter($el.svgGroup.node().parentElement.clientWidth / 2, $el.svgGroup.node().parentElement.clientHeight / 2));
     //.force("x", d3.forceX())
     //.force('y', d3.forceY(20).strength(.2))
   }

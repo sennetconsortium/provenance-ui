@@ -14,6 +14,11 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+/**
+ * This converts a data object in Neo4J format to an adjacency list that will be later
+ * used in d3.stratify to create the hierarchy model.
+ * @author dbmi.pitt.edu
+ */
 class DataConverterNeo4J extends _DataConverter.default {
   constructor(data, map) {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -44,13 +49,32 @@ class DataConverterNeo4J extends _DataConverter.default {
     this.result = [];
     this.list = {};
   }
+
+  /**
+   * Retrieves an id from a string value with delimiters
+   * @param value
+   * @returns {*}
+   */
   getNodeIdFromValue(value) {
     let parts = value.split(this.map.delimiters.node || '/');
     return parts[parts.length - 1];
   }
+
+  /**
+   * Determines if given key is of activity
+   * @param key
+   * @returns {boolean}
+   */
   isActivity(key) {
     return key === this.keys.activity.keyName;
   }
+
+  /**
+   * Creates an adjacency list object
+   * @param rootId {string}
+   * @param hasDescendants {boolean}
+   * @returns {DataConverterNeo4J}
+   */
   buildAdjacencyList(rootId, hasDescendants) {
     this.dict = {};
     try {

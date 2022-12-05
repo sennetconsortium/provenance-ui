@@ -43,7 +43,7 @@ Toggle.defaultProps = {
 }
 
 Toggle.propTypes = {
-    context: PropTypes.object,
+    context: PropTypes.func,
     icon: PropTypes.bool,
     selectorId: PropTypes.string,
     ariaLabel: PropTypes.string,

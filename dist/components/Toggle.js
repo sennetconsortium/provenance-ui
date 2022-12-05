@@ -6,15 +6,17 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 var _react = _interopRequireDefault(require("react"));
 var _jquery = _interopRequireDefault(require("jquery"));
+var _propTypes = _interopRequireDefault(require("prop-types"));
+var _constants = require("../js/constants");
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function Toggle(_ref) {
   let {
     context,
-    icon = true,
-    selectorId = 'provenanceTree',
-    ariaLabel = 'Toggle',
-    text = '',
-    className = ''
+    icon,
+    selectorId,
+    ariaLabel,
+    text,
+    className
   } = _ref;
   const toggleData = e => {
     const $el = (0, _jquery.default)(e.currentTarget);
@@ -43,5 +45,20 @@ function Toggle(_ref) {
     title: ariaLabel
   })));
 }
+Toggle.defaultProps = {
+  icon: true,
+  selectorId: _constants.SELECTOR_ID,
+  ariaLabel: 'Toggle',
+  text: '',
+  className: ''
+};
+Toggle.propTypes = {
+  context: _propTypes.default.func,
+  icon: _propTypes.default.bool,
+  selectorId: _propTypes.default.string,
+  ariaLabel: _propTypes.default.string,
+  text: _propTypes.default.string,
+  className: _propTypes.default.string
+};
 var _default = Toggle;
 exports.default = _default;

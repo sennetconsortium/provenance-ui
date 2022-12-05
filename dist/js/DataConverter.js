@@ -7,6 +7,12 @@ exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 class DataConverter {
+  /**
+   *
+   * @param data {object}
+   * @param map {object}
+   * @param ops {object}
+   */
   constructor(data, map) {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     this.ops = ops;
@@ -14,6 +20,12 @@ class DataConverter {
     this.map = map;
     this.error = null;
   }
+
+  /**
+   * Set properties that will be displayed in info panel.
+   * @param item {object}
+   * @param type {string}
+   */
   setProperties(item, type) {
     item.properties = item.properties || {};
     for (let gProp of this.map.props) {
