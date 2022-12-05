@@ -32,6 +32,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
+
             if (isEdge($el)) {
                 $(`#${selectorId}`).find('.links, #arrowhead')[fn](className)
             }
@@ -48,6 +49,14 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
                 const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
                 toggleClass(e, fn)
                 toggleClass(e, fn, stickClass)
+
+                const node = getItem(e).data('node')
+                if (fn === classFns.remove) {
+                    delete window.ProvenanceTreeD3[selectorId].legendFilters[node]
+                } else {
+                    window.ProvenanceTreeD3[selectorId].legendFilters[node] = true
+                }
+
             }
 
         })

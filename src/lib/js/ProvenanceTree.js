@@ -26,6 +26,7 @@ function ProvenanceTree(d3, selector, _options) {
     let allData;
     let positionData = {}
     let filteredData = {}
+    let legendFilters = {}
     const transition =  d3.transition().duration(500)
     let toggled = {
         has: false,
@@ -524,7 +525,12 @@ function ProvenanceTree(d3, selector, _options) {
 
         $el.node = $el.node.merge($el.nodeEnter)
 
-        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked ? 'is-visited' : ''}`)
+        const getHoverClass = (d) => {
+            const cat = getNodeCat(d)
+            return (legendFilters[cat]) ? 'has-hover ' : ''
+        }
+
+        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked ? 'is-visited' : ''}`)
 
         $el.node.select(`.${classNames.nodes.glow}`)
             .style('fill', (d) => {
@@ -901,12 +907,15 @@ function ProvenanceTree(d3, selector, _options) {
         return $el.svg.node()
     }
 
+
+
     init()
     return {
         colorMap: options.colorMap,
         toggleData: toggleData,
         simulation,
-        toggleEdgeLabels
+        toggleEdgeLabels,
+        legendFilters
     }
 }
 

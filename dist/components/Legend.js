@@ -59,6 +59,12 @@ const Legend = _ref => {
         const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add;
         toggleClass(e, fn);
         toggleClass(e, fn, stickClass);
+        const node = getItem(e).data('node');
+        if (fn === classFns.remove) {
+          delete window.ProvenanceTreeD3[selectorId].legendFilters[node];
+        } else {
+          window.ProvenanceTreeD3[selectorId].legendFilters[node] = true;
+        }
       }
     });
     (0, _jquery.default)(selectors.legendTrigger).on('mouseover', e => {

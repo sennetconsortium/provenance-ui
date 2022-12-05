@@ -36,6 +36,7 @@ function ProvenanceTree(d3, selector, _options) {
   let allData;
   let positionData = {};
   let filteredData = {};
+  let legendFilters = {};
   const transition = d3.transition().duration(500);
   let toggled = {
     has: false,
@@ -1081,7 +1082,11 @@ function ProvenanceTree(d3, selector, _options) {
       appendImageToNode($el.nodeEnter);
     }
     $el.node = $el.node.merge($el.nodeEnter);
-    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked ? 'is-visited' : ''));
+    const getHoverClass = d => {
+      const cat = getNodeCat(d);
+      return legendFilters[cat] ? 'has-hover ' : '';
+    };
+    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked ? 'is-visited' : ''));
     $el.node.select(".".concat(classNames.nodes.glow)).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
     }).style('stroke', d => {
@@ -1381,7 +1386,8 @@ function ProvenanceTree(d3, selector, _options) {
     colorMap: options.colorMap,
     toggleData: toggleData,
     simulation,
-    toggleEdgeLabels
+    toggleEdgeLabels,
+    legendFilters
   };
 }
 var _default = ProvenanceTree;
