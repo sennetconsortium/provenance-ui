@@ -24,6 +24,7 @@ function ProvenanceTree(d3, selector, _options) {
     let $info
     let dataKey;
     let allData;
+    let positionData = {}
     let filteredData = {}
     const transition =  d3.transition().duration(500)
     let toggled = {
@@ -468,10 +469,17 @@ function ProvenanceTree(d3, selector, _options) {
         }
         let parentYs = {}
         data.nodes.forEach(function(d, i) {
-            let ci = childIndex(d, i)
-            d.y = ci.y
-            parentYs[ci.id] = ci.y
-            d.x = -100*d.depth + 300;
+            const pos = positionData[d.id]
+            if (pos) {
+                d.y = pos.y
+                d.x = pos.x
+            } else {
+                let ci = childIndex(d, i)
+                d.y = ci.y
+                parentYs[ci.id] = ci.y
+                d.x = -100*d.depth + 300;
+            }
+
         });
         // data.nodes.forEach(function(d, i) {
         //     d.x = sz.width/2 + i;
@@ -515,7 +523,7 @@ function ProvenanceTree(d3, selector, _options) {
 
         $el.node = $el.node.merge($el.nodeEnter)
 
-        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)} ${d.data.className || ''}`)
+        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked ? 'is-visited' : ''}`)
 
         $el.node.select(`.${classNames.nodes.glow}`)
             .style('fill', (d) => {
@@ -803,71 +811,59 @@ function ProvenanceTree(d3, selector, _options) {
         appendInfoPanel()
     }
 
+
     function updatePositions() {
-        // TODO: use lx and ly positions during data toggle
         $el.link
             .attr("x1", d => {
-                d.source.lx = d.source.x
                 return d.source.x
             })
             .attr("y1", d => {
-                d.source.ly = d.source.y
                 return d.source.y
             })
             .attr("x2", d => {
-                d.target.lx = d.target.x
                 return d.target.x
             })
             .attr("y2", d => {
-                d.target.ly = d.target.y
                 return d.target.y
             });
 
         $el.node.select(`.${classNames.nodes.main}`)
             .attr("cx", d => {
-                d.lx = d.x
+                positionData[d.id] = positionData[d.id] || {}
+                positionData[d.id].x = d.x
                 return  d.x
             })
             .attr("cy", d => {
-                d.ly = d.y
+                positionData[d.id] = positionData[d.id] || {}
+                positionData[d.id].y = d.y
                 return d.y
             });
 
         $el.node.select(`.${classNames.nodes.glow}`)
             .attr("cx", d => {
-                d.lx = d.x
                 return  d.x
             })
             .attr("cy", d => {
-                d.ly = d.y
                 return d.y
             });
 
         $el.node.select(`.${classNames.nodes.text}`)
             .attr("x", d => {
-                d.lx = d.x
                 return  d.x
             })
             .attr("y", d => {
-                d.ly = d.y
                 return d.y
             });
 
         $el.node.select(`.${classNames.nodes.image}`)
             .attr("x", d => {
-                d.lx = d.x
                 return  d.x
             })
             .attr("y", d => {
-                d.ly = d.y
                 return d.y
             });
 
         $el.edgePaths.attr('d', d => {
-            d.source.lx = d.source.x
-            d.source.ly = d.source.y
-            d.target.lx = d.target.x
-            d.target.ly = d.target.y
             return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
             //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
         })
