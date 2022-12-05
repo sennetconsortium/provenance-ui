@@ -5,7 +5,9 @@ import Toggle from './components/Toggle'
 import GraphGeneric from './js/generic/GraphGeneric'
 import DataGraphGeneric from './js/generic/DataGraphGeneric'
 import DataConverterNeo4J from './js/neo4j/DataConverterNeo4J'
+import DataConverterGeneric from './js/generic/DataConverterGeneric'
 import ProvenanceTree from './js/ProvenanceTree'
+import * as PUI from './js/constants'
 
 
-export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataGraphGeneric, GraphGeneric, ProvenanceTree }
+export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataConverterGeneric, DataGraphGeneric, GraphGeneric, ProvenanceTree, PUI }
