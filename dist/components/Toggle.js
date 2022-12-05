@@ -20,10 +20,18 @@ function Toggle(_ref) {
   } = _ref;
   const toggleData = e => {
     const $el = (0, _jquery.default)(e.currentTarget);
-    const className = 'has-toggled';
-    $el.toggleClass(className);
+    const toggled = _constants.CLASS_NAMES.toggled;
+    $el.toggleClass(toggled);
+    const $p = $el.parents(_constants.SELECTORS.legend.legendItem);
+    const $trigger = $p.find(_constants.SELECTORS.legend.legendTrigger);
+    if ($p.data('node') !== 'Edge' && $p.hasClass(_constants.CLASS_NAMES.hover)) {
+      $p.toggleClass(_constants.CLASS_NAMES.disabled);
+      $trigger.eq(0).trigger('click', {
+        force: true
+      });
+    }
     if (context !== null) {
-      context(e, $el.hasClass(className), selectorId);
+      context(e, $el.hasClass(toggled), selectorId);
     }
   };
   return /*#__PURE__*/_react.default.createElement("label", {

@@ -1,16 +1,23 @@
 import React from 'react'
 import $ from 'jquery'
 import PropTypes from 'prop-types'
-import { SELECTOR_ID } from '../js/constants'
+import {CLASS_NAMES, SELECTOR_ID, SELECTORS} from '../js/constants'
 
 function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
 
     const toggleData = (e) => {
         const $el = $(e.currentTarget)
-        const className = 'has-toggled'
-        $el.toggleClass(className)
+        const toggled = CLASS_NAMES.toggled
+        $el.toggleClass(toggled)
+        const $p = $el.parents(SELECTORS.legend.legendItem)
+
+        const $trigger = $p.find(SELECTORS.legend.legendTrigger)
+        if ($p.data('node') !== 'Edge' && $p.hasClass(CLASS_NAMES.hover)) {
+            $p.toggleClass(CLASS_NAMES.disabled)
+            $trigger.eq(0).trigger('click', {force: true})
+        }
         if (context !== null) {
-            context(e, $el.hasClass(className), selectorId)
+            context(e, $el.hasClass(toggled), selectorId)
         }
     }
 

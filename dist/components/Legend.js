@@ -30,11 +30,7 @@ const Legend = _ref => {
   const setEvents = () => {
     loaded.current = true;
     const stickClass = 'has-activeFilters';
-    const selectors = {
-      legendItem: '.js-legend__item',
-      legendTrigger: '.js-legend--trigger',
-      provenance: '.js-provenance'
-    };
+    const selectors = _constants.SELECTORS.legend;
     const classFns = {
       add: 'addClass',
       remove: 'removeClass'
@@ -44,19 +40,22 @@ const Legend = _ref => {
     };
     const toggleClass = function toggleClass(e) {
       let fn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'addClass';
-      let className = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'has-hover';
+      let className = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _constants.CLASS_NAMES.hover;
       const $el = getItem(e);
       const node = $el.data('node');
       $el[fn](className).parent()[fn](className);
       (0, _jquery.default)(".node--".concat(node))[fn](className);
-      if (!((0, _jquery.default)(".node").hasClass('has-hover') && fn === classFns.remove)) {
+      if (node === 'Edge') {
+        (0, _jquery.default)("#".concat(selectorId)).find('.links, #arrowhead')[fn](className);
+      }
+      if (!((0, _jquery.default)(".node").hasClass(_constants.CLASS_NAMES.hover) && fn === classFns.remove)) {
         (0, _jquery.default)(selectors.provenance)[fn](className);
       }
     };
-    (0, _jquery.default)(selectors.legendTrigger).on('click', e => {
+    (0, _jquery.default)(selectors.legendTrigger).on('click', (e, data) => {
       e.stopPropagation();
       e.preventDefault();
-      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled)) {
+      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled) || data.force) {
         const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add;
         toggleClass(e, fn);
         toggleClass(e, fn, stickClass);

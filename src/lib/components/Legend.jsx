@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Toggle from './Toggle'
-import {CLASS_NAMES, SELECTOR_ID} from '../js/constants'
+import {CLASS_NAMES, SELECTOR_ID, SELECTORS} from '../js/constants'
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const [colors] = useState(colorMap)
@@ -16,11 +16,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const setEvents = () => {
         loaded.current = true
         const stickClass = 'has-activeFilters'
-        const selectors = {
-            legendItem: '.js-legend__item',
-            legendTrigger: '.js-legend--trigger',
-            provenance: '.js-provenance'
-        }
+        const selectors = SELECTORS.legend
 
         const classFns = {
             add: 'addClass',
@@ -31,21 +27,24 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
             return $(e.currentTarget).parents(selectors.legendItem)
         }
 
-        const toggleClass = (e, fn = 'addClass', className = 'has-hover') => {
+        const toggleClass = (e, fn = 'addClass', className = CLASS_NAMES.hover) => {
             const $el = getItem(e)
             const node = $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`.node--${node}`)[fn](className)
-            if (!($(`.node`).hasClass('has-hover') && fn === classFns.remove)) {
+            if (node === 'Edge') {
+                $(`#${selectorId}`).find('.links, #arrowhead')[fn](className)
+            }
+            if (!($(`.node`).hasClass(CLASS_NAMES.hover) && fn === classFns.remove)) {
                 $(selectors.provenance)[fn](className)
             }
         }
 
-        $(selectors.legendTrigger).on('click', (e) => {
+        $(selectors.legendTrigger).on('click', (e, data) => {
             e.stopPropagation()
             e.preventDefault()
 
-            if (!getItem(e).hasClass(CLASS_NAMES.disabled)) {
+            if (!getItem(e).hasClass(CLASS_NAMES.disabled) || data.force) {
                 const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
                 toggleClass(e, fn)
                 toggleClass(e, fn, stickClass)
