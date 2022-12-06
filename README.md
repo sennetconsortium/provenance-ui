@@ -53,7 +53,7 @@ The data map is required to convert your data into a format required by the modu
 const dataMap = {
         // Map Specific properties from raw data to required properties of the ProvenanceUI API
         root: {
-            uuid: 'id'
+            id: 'uuid'
         },
         // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
         props: ['uuid', 'sennet_id'],
@@ -80,7 +80,9 @@ const dataMap = {
         generated: {...}
     }
     const converter = new DataConverterNeo4J(result, dataMap)
-    converter.hierarchy(itemId, hasDescendants)
+    const hasDescendants = false
+    const itemId = '1'
+    converter.buildAdjacencyList(itemId, hasDescendants)
     const data = {stratify: converter.result}
 ```
 

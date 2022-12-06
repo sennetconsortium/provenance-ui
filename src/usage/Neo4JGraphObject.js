@@ -46,7 +46,6 @@ async function Neo4JGraphObject(serviceOps) {
         ops = { ...ops, highlight: [{id: itemId}], colorMap}
         setOptions(ops)
         setLoading(false)
-
     }
 
     if (token.length && url.length && itemId.length) {
