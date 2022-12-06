@@ -44,8 +44,10 @@ function ProvenanceTree(d3, selector, _options) {
   };
   const classNames = {
     info: 'c-provenance__info',
+    infoMain: 'c-provenance__info__main',
     infoNode: 'c-provenance__info--node',
     infoRelation: 'c-provenance__info--relationship',
+    infoCloseBtn: 'js-btn--close',
     links: {
       hidden: 'edgeLabels--hidden',
       labels: 'edgeLabels',
@@ -1084,6 +1086,7 @@ function ProvenanceTree(d3, selector, _options) {
     $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).on('click', function (e, d) {
       d.wasClicked = true;
       updateInfo(d.data, true);
+      (0, _jquery.default)("".concat(selector, " .").concat(classNames.infoCloseBtn)).fadeIn();
     }).call(drag());
     $el.nodeGlow = $el.nodeEnter.append('circle').attr('class', classNames.nodes.glow).attr('r', options.node.radius * 1.3);
     $el.nodeMain = $el.nodeEnter.append('circle').attr('class', classNames.nodes.main).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('r', options.node.radius);
@@ -1108,7 +1111,17 @@ function ProvenanceTree(d3, selector, _options) {
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
-    $info = (0, _jquery.default)(selector).find(".".concat(classNames.info));
+    const onCloseButton = () => {
+      const c = runCallback('onCloseButton');
+      return c ? c : 'ⓧ';
+    };
+    $el.info.append('span').attr('class', classNames.info + '--close ' + classNames.infoCloseBtn).attr('style', 'display: none;').attr('title', 'Close Info Panel').text(onCloseButton());
+    (0, _jquery.default)(selector).on('click', ".".concat(classNames.infoCloseBtn), e => {
+      clearInfo();
+      (0, _jquery.default)(e.currentTarget).hide();
+    });
+    $el.info = $el.info.append('div').attr('class', classNames.infoMain);
+    $info = (0, _jquery.default)(selector).find(".".concat(classNames.infoMain));
   }
   function isValidURL(string) {
     const res = string.match(/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g);

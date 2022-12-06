@@ -1,5 +1,5 @@
 .c-provenance
-
+  pos-rel()
   font-family $font-family
   &.has-hover
     .node:not(.has-hover)
@@ -59,12 +59,22 @@
         &.icon
           font-family FontAwesome
 
+
   &__info
     pos-abs()
     top 0
     font-size 16px
     padding 10px
-    color white
+    width 100%
+    &__main
+      width 98%
+    &--close
+      cursor pointer
+      pos-abs()
+      p6()
+      right 30px
+      &:hover
+        color $col-malibu
     a
       border 1px solid
       display inline-block

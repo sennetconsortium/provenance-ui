@@ -34,8 +34,10 @@ function ProvenanceTree(d3, selector, _options) {
     }
     const classNames = {
         info: 'c-provenance__info',
+        infoMain: 'c-provenance__info__main',
         infoNode: 'c-provenance__info--node',
         infoRelation: 'c-provenance__info--relationship',
+        infoCloseBtn: 'js-btn--close',
         links: {
             hidden: 'edgeLabels--hidden',
             labels: 'edgeLabels',
@@ -505,6 +507,7 @@ function ProvenanceTree(d3, selector, _options) {
             .on('click', function(e, d) {
                 d.wasClicked = true
                 updateInfo(d.data, true)
+                $(`${selector} .${classNames.infoCloseBtn}`).fadeIn()
             })
             .call(drag())
 
@@ -555,7 +558,26 @@ function ProvenanceTree(d3, selector, _options) {
     function appendInfoPanel() {
          $el.info = $el.canvas.append('div')
             .attr('class', classNames.info);
-        $info = $(selector).find(`.${classNames.info}`)
+
+         const onCloseButton = () => {
+             const c = runCallback('onCloseButton')
+             return c ? c : 'ⓧ'
+         }
+
+         $el.info.append('span')
+             .attr('class', classNames.info + '--close ' + classNames.infoCloseBtn)
+             .attr('style', 'display: none;')
+             .attr('title', 'Close Info Panel')
+             .text(onCloseButton())
+
+        $(selector).on('click', `.${classNames.infoCloseBtn}`, (e) => {
+            clearInfo()
+            $(e.currentTarget).hide()
+        })
+
+        $el.info = $el.info.append('div')
+            .attr('class', classNames.infoMain);
+         $info = $(selector).find(`.${classNames.infoMain}`)
     }
 
     function isValidURL(string) {
