@@ -448,7 +448,7 @@ function ProvenanceTree(d3, selector, _options) {
 
     function buildNodes() {
 
-        const childIndex = (d, i) => {
+        const childInfo = (d, i) => {
             const posY = (ci) => {
                 return (ci * 50 * d.depth)
             }
@@ -456,32 +456,36 @@ function ProvenanceTree(d3, selector, _options) {
                 const children = d.parent.children;
                 const id = d.data.id;
                 const pId = d.parent.data.id;
-                const mod = parentYs[pId] || 0
+                const pInfo = parentInfo[pId]
+                const mod = pInfo ? pInfo.y : 0
+                const pDepth = pInfo ? (Math.min(pInfo.dx, pInfo.d) + 1) : d.depth
                 let x = 0
                 for (let n of children) {
                     if (n.data.id === id) {
-                        return {id, y: posY(x) + mod}
+                        return {id, y: posY(x) + mod, d: pDepth}
                     }
                     x++
                 }
-                return {id, y: posY(0)}
+                // No children or (child not found / data corrupted)
+                return {id, y: posY(0), d: pDepth}
             } else {
-                return {id: null, y: posY(0)}
+                // Root element
+                return {id: null, y: posY(0), d: d.depth}
             }
         }
-        let parentYs = {}
+        const parentInfo = {}
         data.nodes.forEach(function(d, i) {
             const pos = positionData[d.id]
             if (options.keepPositionsOnDataToggle && pos && !toggled.original) {
                 d.y = pos.y
                 d.x = pos.x
             } else {
-                let ci = childIndex(d, i)
+                let ci = childInfo(d, i)
                 d.y = ci.y
-                parentYs[ci.id] = ci.y
-                d.x = -100*d.depth + 300;
+                const depth = ci.d
+                d.x = -100 * depth + 300;
+                parentInfo[ci.id] = {y: ci.y, d: d.depth, dx: depth}
             }
-
         });
         // data.nodes.forEach(function(d, i) {
         //     d.x = sz.width/2 + i;
