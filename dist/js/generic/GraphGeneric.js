@@ -38,7 +38,9 @@ class GraphGeneric {
     try {
       let headers = ops.headers || new Headers();
       headers.append('Content-Type', 'application/json');
-      headers.append('Authorization', 'Bearer ' + this.token);
+      if (this.token) {
+        headers.append('Authorization', 'Bearer ' + this.token);
+      }
       let response = await fetch(ops.url || this.url, {
         method: ops.method || 'GET',
         headers: headers

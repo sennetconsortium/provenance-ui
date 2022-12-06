@@ -24,8 +24,8 @@ async function Neo4JGraphObject(serviceOps) {
                     result[key][`des${_prop}`] = result.descendants[key][_prop]
                 }
             }
-
         }
+
         if (result.descendants) {
             $.extend(result.activity, result.descendants.activity)
             $.extend(result.entity, result.descendants.entity)
