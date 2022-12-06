@@ -801,6 +801,7 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function setUpSvg() {
+
         const isLgScreen = () => parseInt($el.canvas.style('width')) > 1024
         const getMargins = () => (isLgScreen() ? 100 : 50)
 
@@ -811,8 +812,14 @@ function ProvenanceTree(d3, selector, _options) {
             left: getMargins()
         }
 
+        const sizes = runCallback('onSvgSizing', {isLgScreen, getMargins, sz, margin})
         sz.width = $(selector).width() - margin.left
         sz.height = $(selector).height() - margin.top
+
+        if (sizes) {
+            sz.width = sizes.width || sz.width
+            sz.height = sizes.height || sz.height
+        }
 
         $el.svg = $el.canvas.append('svg')
             .attr('width', sz.width)

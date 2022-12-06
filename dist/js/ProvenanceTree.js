@@ -1334,8 +1334,18 @@ function ProvenanceTree(d3, selector, _options) {
       bottom: 90,
       left: getMargins()
     };
+    const sizes = runCallback('onSvgSizing', {
+      isLgScreen,
+      getMargins,
+      sz,
+      margin
+    });
     sz.width = (0, _jquery.default)(selector).width() - margin.left;
     sz.height = (0, _jquery.default)(selector).height() - margin.top;
+    if (sizes) {
+      sz.width = sizes.width || sz.width;
+      sz.height = sizes.height || sz.height;
+    }
     $el.svg = $el.canvas.append('svg').attr('width', sz.width).attr('height', sz.height);
     runCallback("onBeforeBuild");
     $el.svgGroup = $el.svg.append('g');
