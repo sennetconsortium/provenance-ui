@@ -37,6 +37,7 @@ function ProvenanceTree(d3, selector, _options) {
   let positionData = {};
   let filteredData = {};
   let legendFilters = {};
+  let treeWidth = 1;
   const transition = d3.transition().duration(500);
   let toggled = {
     has: false,
@@ -112,7 +113,7 @@ function ProvenanceTree(d3, selector, _options) {
     data.stratify = options.data.stratify;
     data.root = options.data.root;
     if (!data.root && data.stratify && !data.stratify.length) {
-      console.error('No data provided...');
+      log('No data provided', _options, 'error');
     } else {
       clearCanvas();
     }
@@ -122,6 +123,14 @@ function ProvenanceTree(d3, selector, _options) {
     setUpSvg();
     allData = JSON.parse(JSON.stringify(data));
     buildTree(loadData(data), true);
+  }
+  function log(title, obj) {
+    let fn = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'log';
+    let color = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : '#da8f55';
+    if (window.location.host.indexOf('localhost') !== -1) {
+      console.log("%c Provenance-UI: ".concat(title), "background: #222; color: ".concat(color));
+      console[fn](obj);
+    }
   }
   function getDrag() {
     function dragStarted(event, d) {
@@ -1029,6 +1038,7 @@ function ProvenanceTree(d3, selector, _options) {
       const posY = ci => {
         return ci * 20 * d.depth;
       };
+      treeWidth = Math.max(treeWidth, d.children ? d.children.length : 0);
       if (d.parent) {
         const children = d.parent.children;
         const id = d.data.id;
@@ -1037,6 +1047,7 @@ function ProvenanceTree(d3, selector, _options) {
         const mod = pInfo ? pInfo.y : 0;
         const pDepth = pInfo ? Math.min(pInfo.dx, pInfo.d) + 1 : getDepth(d);
         let x = 0;
+        treeWidth = Math.max(treeWidth, children ? children.length : 0);
         for (let n of children) {
           if (n.data.id === id) {
             return {
@@ -1439,7 +1450,7 @@ function ProvenanceTree(d3, selector, _options) {
     }
     ticked();
     createZoom();
-    runCallback("onAfterBuild");
+    runCallback("onAfterBuild", _data);
     return $el.svg.node();
   }
   init();
@@ -1448,7 +1459,9 @@ function ProvenanceTree(d3, selector, _options) {
     toggleData: toggleData,
     simulation,
     toggleEdgeLabels,
-    legendFilters
+    legendFilters,
+    treeWidth,
+    buildTree
   };
 }
 var _default = ProvenanceTree;
