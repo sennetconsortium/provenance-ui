@@ -1035,8 +1035,9 @@ function ProvenanceTree(d3, selector, _options) {
       return d.depth;
     };
     const childInfo = (d, i) => {
-      const posY = ci => {
-        return ci * 20 * d.depth;
+      const posY = (ci, mod) => {
+        const k = mod ? 12 : 20;
+        return ci * k * d.depth;
       };
       treeWidth = Math.max(treeWidth, d.children ? d.children.length : 0);
       if (d.parent) {
@@ -1044,7 +1045,7 @@ function ProvenanceTree(d3, selector, _options) {
         const id = d.data.id;
         const pId = d.parent.data.id;
         const pInfo = parentInfo[pId];
-        const mod = pInfo ? pInfo.y : 0;
+        const mod = pInfo ? pInfo.y : 0; // Use the parent's y position or 0
         const pDepth = pInfo ? Math.min(pInfo.dx, pInfo.d) + 1 : getDepth(d);
         let x = 0;
         treeWidth = Math.max(treeWidth, children ? children.length : 0);
@@ -1052,7 +1053,7 @@ function ProvenanceTree(d3, selector, _options) {
           if (n.data.id === id) {
             return {
               id,
-              y: posY(x) + mod,
+              y: posY(x, mod) + mod,
               d: pDepth
             };
           }
