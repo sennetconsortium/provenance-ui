@@ -119,7 +119,7 @@ class DataConverterNeo4J extends _DataConverter.default {
           item.id = id;
           const usedKey = this.keys.relationships.dataProps.used;
           if (this.isActivity(key)) {
-            const used = this.dict[usedKey] ? this.dict[usedKey][id] : [null]; // create a [null] for Activity of Source that may point to inserted Root
+            const used = this.dict[usedKey] ? this.dict[usedKey][id] || [null] : [null]; // create a [null] for Activity of Source that may point to inserted Root
             for (let eId of used) {
               let _item = JSON.parse(JSON.stringify(item));
               _item.entityAsParent = eId || treeRoot.id; // (redundant as on toggle the Activities will not be in the dataset anyway
@@ -133,7 +133,7 @@ class DataConverterNeo4J extends _DataConverter.default {
             for (let actId of this.dict[genKey][id]) {
               let _item = JSON.parse(JSON.stringify(item));
               _item.activityAsParent = actId;
-              const used = this.dict[usedKey] ? this.dict[usedKey][actId] : [null]; // create a [null] for Source that may point to inserted Root
+              const used = this.dict[usedKey] ? this.dict[usedKey][actId] || [null] : [null]; // create a [null] for Source that may point to inserted Root
               for (let eId of used) {
                 let _item2 = JSON.parse(JSON.stringify(_item));
                 _item2.entityAsParent = eId || treeRoot.id;
