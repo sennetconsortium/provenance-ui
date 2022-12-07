@@ -7,9 +7,10 @@ import dataMap from '../data/neo4j/map.sample'
 async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
-    const graphOps = { url }
+    const graphOps = { token, url }
     //const itemId = 'ed98c78f9abab37be52fcba09e0c4793'
-    const itemId = '72aab3268f36551302fbd86800a06d3d'
+    //const itemId = '72aab3268f36551302fbd86800a06d3d'
+    const itemId = '7ab09dd912a7d0bc468095e6986c22a7'
     //const itemId = '72aab3268f36551302fbd86800a06d3d'
 
     const handleResult = async (result) => {
