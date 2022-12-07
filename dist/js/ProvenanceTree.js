@@ -80,6 +80,7 @@ function ProvenanceTree(d3, selector, _options) {
     propertyMap: {
       'sennet:created_by_user_displayname': 'agent'
     },
+    flipRelationships: true,
     keepPositionsOnDataToggle: false,
     displayEdgeLabels: true,
     edgeLabels: {
@@ -1021,9 +1022,12 @@ function ProvenanceTree(d3, selector, _options) {
     return '';
   }
   function buildNodes() {
+    const getDepth = d => {
+      return d.depth;
+    };
     const childInfo = (d, i) => {
       const posY = ci => {
-        return ci * 50 * d.depth;
+        return ci * 20 * d.depth;
       };
       if (d.parent) {
         const children = d.parent.children;
@@ -1031,7 +1035,7 @@ function ProvenanceTree(d3, selector, _options) {
         const pId = d.parent.data.id;
         const pInfo = parentInfo[pId];
         const mod = pInfo ? pInfo.y : 0;
-        const pDepth = pInfo ? Math.min(pInfo.dx, pInfo.d) + 1 : d.depth;
+        const pDepth = pInfo ? Math.min(pInfo.dx, pInfo.d) + 1 : getDepth(d);
         let x = 0;
         for (let n of children) {
           if (n.data.id === id) {
@@ -1054,7 +1058,7 @@ function ProvenanceTree(d3, selector, _options) {
         return {
           id: null,
           y: posY(0),
-          d: d.depth
+          d: getDepth(d)
         };
       }
     };
@@ -1068,10 +1072,10 @@ function ProvenanceTree(d3, selector, _options) {
         let ci = childInfo(d, i);
         d.y = ci.y;
         const depth = ci.d;
-        d.x = -100 * depth + 300;
+        d.x = 100 * depth + 300;
         parentInfo[ci.id] = {
           y: ci.y,
-          d: d.depth,
+          d: getDepth(d),
           dx: depth
         };
       }
@@ -1408,6 +1412,14 @@ function ProvenanceTree(d3, selector, _options) {
       updatePositions();
     });
   }
+  function flipRelationships(links) {
+    for (let l of links) {
+      let temp = l.target;
+      l.target = l.source;
+      l.source = temp;
+    }
+    return links;
+  }
   function buildTree(_data, isInit) {
     const {
       root,
@@ -1415,7 +1427,8 @@ function ProvenanceTree(d3, selector, _options) {
       links
     } = _data;
     const h = d3.hierarchy(root);
-    data.links = links || h.links();
+    const _links = links || h.links();
+    data.links = options.flipRelationships ? flipRelationships(_links) : _links;
     data.nodes = nodes || h.descendants();
     buildLinks();
     buildNodes();

@@ -7,9 +7,10 @@ import dataMap from '../data/neo4j/map.sample'
 async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
-    const graphOps = { token, url }
+    const graphOps = { url }
     //const itemId = 'ed98c78f9abab37be52fcba09e0c4793'
     const itemId = '72aab3268f36551302fbd86800a06d3d'
+    //const itemId = '72aab3268f36551302fbd86800a06d3d'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -48,7 +49,7 @@ async function Neo4JGraphObject(serviceOps) {
         setLoading(false)
     }
 
-    if (token.length && url.length && itemId.length) {
+    if (url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
         return graph.service({ callback: handleResult, url: url.replace('{id}', itemId) })
     }

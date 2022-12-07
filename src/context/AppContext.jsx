@@ -45,7 +45,7 @@ export const AppProvider = ({ children }) => {
 
             return {
                 simulation: { charge: -100 },
-                minHeight: 200,
+                minHeight: 300,
                 idNavigate: {
                     props: ['sennet:uuid', 'sennet:protocol_url'],
                     url: 'http://localhost:3000/{classType}?uuid={id}',

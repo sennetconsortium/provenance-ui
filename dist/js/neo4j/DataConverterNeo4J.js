@@ -9,11 +9,7 @@ require("core-js/modules/es.regexp.exec.js");
 require("core-js/modules/es.string.split.js");
 require("core-js/modules/es.json.stringify.js");
 var _DataConverter = _interopRequireDefault(require("../DataConverter"));
-var _jquery = _interopRequireDefault(require("jquery"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 /**
  * This converts a data object in Neo4J format to an adjacency list that will be later
  * used in d3.stratify to create the hierarchy model.
@@ -37,8 +33,14 @@ class DataConverterNeo4J extends _DataConverter.default {
         // Generally:
         // USED starts at activity, ends at entity
         // GENERATED starts at entity, ends at activity
-        used: 'prov:entity',
-        wasGeneratedBy: 'prov:activity',
+        used: {
+          id: 'prov:activity',
+          val: 'prov:entity'
+        },
+        wasGeneratedBy: {
+          id: 'prov:entity',
+          val: 'prov:activity'
+        },
         // The values of each prop should match above
         dataProps: {
           used: 'used',
@@ -72,114 +74,77 @@ class DataConverterNeo4J extends _DataConverter.default {
   /**
    * Creates an adjacency list object
    * @param rootId {string}
-   * @param hasDescendants {boolean}
    * @returns {DataConverterNeo4J}
    */
-  buildAdjacencyList(rootId, hasDescendants) {
+  buildAdjacencyList(rootId) {
     this.dict = {};
+    let id;
     try {
-      let id;
-      let shouldAddRoot = false;
-      let suffix = hasDescendants ? 'Root' : '';
+      const suffix = 'Root';
       const activityId = rootId + suffix + '--' + this.keys.activity.entityName;
       let treeRoot = {
         className: 'is-inserted',
         type: 'Root',
         subType: 'Root',
         id: rootId + suffix,
-        activityId: activityId
+        activityId: activityId,
+        entityAsParent: null,
+        activityAsParent: null
       };
 
       // Create dictionaries for constant time access
       for (let key in this.keys.relationships) {
         let data = this.data[key];
         if (data) {
-          let idKey = this.keys.relationships[key];
+          let dataKeys = this.keys.relationships[key];
           this.dict[key] = {};
           for (let _prop in data) {
-            id = this.getNodeIdFromValue(data[_prop][idKey]);
+            id = this.getNodeIdFromValue(data[_prop][dataKeys.id]);
             if (!this.dict[key][id]) {
               this.dict[key][id] = [];
             }
-            this.dict[key][id].push(data[_prop]);
+            let val = this.getNodeIdFromValue(data[_prop][dataKeys.val]);
+            this.dict[key][id].push(val);
           }
         }
       }
       for (let key of this.keys.nodes) {
+        let item;
         let data = this.data[key];
         for (let _prop in data) {
-          let item = data[_prop];
+          item = data[_prop];
           item.type = item[this.keys.prov];
           item.subType = item[this.keys.type] || item.type;
           id = item[this.map.root.id];
-          const genKey = this.keys.relationships.dataProps.generatedBy;
-          const propKey = this.keys.relationships[genKey];
-          let actId = id;
-          let used = [null];
-
-          // Find the used dict list of the current id to backtrack to get to parent(s):
-          // [Ec] <--used-- [A] <--generated-- [Ep]
-          // Given a current entity, Ec, if it has a parent entity, Ep,
-          // it will have a 'used' activity detail, A,
-          // which will in turn point up to the parent from the 'generated' activity detail
-          if (!this.isActivity(key)) {
-            const usedKey = this.keys.relationships.dataProps.used;
-            used = this.dict[usedKey] ? this.dict[usedKey][id] : null;
-            used = used ? used : [null]; // add this so the next loop runs at least once
-          }
-
-          for (let u of used) {
-            actId = u ? this.getNodeIdFromValue(u[propKey]) : !this.isActivity(key) ? null : actId;
-            let generated = this.dict[genKey] ? this.dict[genKey][actId] : null;
-
-            // No parent, current entity is the root or a descendant of the current
-            if (!generated) {
-              shouldAddRoot = true;
-              generated = [null]; // we should add this to get to add the root
-            }
-
-            for (let gen of generated) {
-              const entityId = gen ? this.getNodeIdFromValue(gen[this.map.keys.startNode]) : treeRoot.id;
-
-              // Do a deep copy to avoid reference mutations
+          item.id = id;
+          const usedKey = this.keys.relationships.dataProps.used;
+          if (this.isActivity(key)) {
+            const used = this.dict[usedKey][id] || [null]; // create a [null] for Activity of Source that may point to inserted Root
+            for (let eId of used) {
               let _item = JSON.parse(JSON.stringify(item));
-              _jquery.default.extend(_item, {
-                id: id,
-                activityAsParent: !this.isActivity(key) ? gen ? actId : treeRoot.activityId : entityId,
-                entityAsParent: entityId
-              });
+              _item.entityAsParent = eId || treeRoot.id; // (redundant as on toggle the Activities will not be in the dataset anyway
+              _item.activityAsParent = eId || treeRoot.id; // Activities point to entity Id as parent
               this.setProperties(_item, _item.subType);
-              if (id === rootId) {
-                if (!hasDescendants) {
-                  // Must clear this so that the d3.stratify will not result in no root issue
-                  // Roots cannot have parents.
-                  _item.activityAsParent = null;
-                  _item.entityAsParent = null;
-                  // use the original item object
-                  treeRoot = _item;
-                }
-                if (hasDescendants) {
-                  this.result.push(_item);
-                }
-              } else {
-                this.result.push(_item);
+              this.result.push(_item);
+            }
+          } else {
+            // Entity
+            const genKey = this.keys.relationships.dataProps.generatedBy;
+            for (let actId of this.dict[genKey][id]) {
+              let _item = JSON.parse(JSON.stringify(item));
+              _item.activityAsParent = actId;
+              const used = this.dict[usedKey][actId] || [null]; // create a [null] for Source that may point to inserted Root
+              for (let eId of used) {
+                let _item2 = JSON.parse(JSON.stringify(_item));
+                _item2.entityAsParent = eId || treeRoot.id;
+                this.setProperties(_item2, _item2.subType);
+                this.result.push(_item2);
               }
             }
           }
         }
       }
-      if (shouldAddRoot) {
-        this.result.push(treeRoot);
-        if (hasDescendants) {
-          this.result.push(_objectSpread(_objectSpread({}, treeRoot), {}, {
-            type: this.keys.activity.entityName,
-            subType: this.keys.activity.entityName,
-            entityAsParent: treeRoot.id,
-            activityAsParent: treeRoot.id,
-            id: activityId
-          }));
-        }
-      }
+      this.result.push(treeRoot);
     } catch (e) {
       console.error(e);
     }
