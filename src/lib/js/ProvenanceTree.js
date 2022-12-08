@@ -28,7 +28,6 @@ function ProvenanceTree(d3, selector, _options) {
     let filteredData = {}
     let legendFilters = {}
     let treeWidth = 1
-    const transition =  d3.transition().duration(500)
     let toggled = {
         has: false,
         original: true
@@ -57,10 +56,10 @@ function ProvenanceTree(d3, selector, _options) {
     const data = {}
     const options = {
         colorMap: {
-            "Dataset": "#8ecb93",
-            "Activity": "#f16766",
-            "Sample": "#ebb5c8",
-            "Source": "#ffc255"
+            Dataset: "#8ecb93",
+            Activity: "#f16766",
+            Sample: "#ebb5c8",
+            Source: "#ffc255"
         },
         imageMap: {},
         node: {
@@ -79,6 +78,7 @@ function ProvenanceTree(d3, selector, _options) {
         iconMap: fontAwesomeIcons(),
         colors: colors(),
         totalTypes: 0,
+        reverseEdgeLabels: true,
         idNavigate: {
             props: [],
             url: '',
@@ -148,9 +148,9 @@ function ProvenanceTree(d3, selector, _options) {
         const { dragStarted, dragged, dragEnded } = getDrag()
 
         return d3.drag()
-            .on("start", dragStarted)
-            .on("drag", dragged)
-            .on("end", dragEnded);
+            .on('start', dragStarted)
+            .on('drag', dragged)
+            .on('end', dragEnded);
     }
 
     function color() {
@@ -284,9 +284,9 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('fill', '#aaa')
 
         $el.labelEnter.append('textPath')
-            .style("text-anchor", "middle")
-            .style("pointer-events", "none")
-            .attr("startOffset", "50%")
+            .style('text-anchor', 'middle')
+            .style('pointer-events', 'none')
+            .attr('startOffset', '50%')
             .attr('class', d => 'textPath ' + className(d))
 
         $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter)
@@ -374,7 +374,7 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function initImageMap() {
-        let key, keys, selector;
+        let key, keys;
 
         for (key in options.images) {
             if (options.images.hasOwnProperty(key)) {
@@ -839,7 +839,7 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('width', sz.width)
             .attr('height', sz.height)
 
-        runCallback("onBeforeBuild")
+        runCallback('onBeforeBuild')
 
         $el.svgGroup = $el.svg
             .append('g')
@@ -877,18 +877,10 @@ function ProvenanceTree(d3, selector, _options) {
 
     function updatePositions() {
         $el.link
-            .attr("x1", d => {
-                return d.source.x
-            })
-            .attr("y1", d => {
-                return d.source.y
-            })
-            .attr("x2", d => {
-                return d.target.x
-            })
-            .attr("y2", d => {
-                return d.target.y
-            });
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
         $el.node.select(`.${classNames.nodes.main}`)
             .attr("cx", d => {
@@ -903,32 +895,23 @@ function ProvenanceTree(d3, selector, _options) {
             });
 
         $el.node.select(`.${classNames.nodes.glow}`)
-            .attr("cx", d => {
-                return  d.x
-            })
-            .attr("cy", d => {
-                return d.y
-            });
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y);
 
         $el.node.select(`.${classNames.nodes.text}`)
-            .attr("x", d => {
-                return  d.x
-            })
-            .attr("y", d => {
-                return d.y
-            });
+            .attr("x", d => d.x)
+            .attr("y", d => d.y);
 
         $el.node.select(`.${classNames.nodes.image}`)
-            .attr("x", d => {
-                return  d.x
-            })
-            .attr("y", d => {
-                return d.y
-            });
+            .attr("x", d => d.x)
+            .attr("y", d => d.y);
 
         $el.edgePaths.attr('d', d => {
-            return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
-            //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
+            if (options.reverseEdgeLabels) {
+                return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
+            } else {
+                return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
+            }
         })
     }
 
@@ -969,7 +952,7 @@ function ProvenanceTree(d3, selector, _options) {
         }
         ticked()
         createZoom()
-        runCallback("onAfterBuild", _data)
+        runCallback('onAfterBuild', _data)
         return $el.svg.node()
     }
 

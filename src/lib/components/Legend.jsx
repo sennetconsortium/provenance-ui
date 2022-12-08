@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Toggle from './Toggle'
-import {CLASS_NAMES, COMPS, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
+import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     const [colors] = useState(colorMap)

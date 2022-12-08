@@ -38,7 +38,6 @@ function ProvenanceTree(d3, selector, _options) {
   let filteredData = {};
   let legendFilters = {};
   let treeWidth = 1;
-  const transition = d3.transition().duration(500);
   let toggled = {
     has: false,
     original: true
@@ -67,10 +66,10 @@ function ProvenanceTree(d3, selector, _options) {
   const data = {};
   const options = {
     colorMap: {
-      "Dataset": "#8ecb93",
-      "Activity": "#f16766",
-      "Sample": "#ebb5c8",
-      "Source": "#ffc255"
+      Dataset: "#8ecb93",
+      Activity: "#f16766",
+      Sample: "#ebb5c8",
+      Source: "#ffc255"
     },
     imageMap: {},
     node: {
@@ -92,6 +91,7 @@ function ProvenanceTree(d3, selector, _options) {
     iconMap: fontAwesomeIcons(),
     colors: colors(),
     totalTypes: 0,
+    reverseEdgeLabels: true,
     idNavigate: {
       props: [],
       url: '',
@@ -159,7 +159,7 @@ function ProvenanceTree(d3, selector, _options) {
       dragged,
       dragEnded
     } = getDrag();
-    return d3.drag().on("start", dragStarted).on("drag", dragged).on("end", dragEnded);
+    return d3.drag().on('start', dragStarted).on('drag', dragged).on('end', dragEnded);
   }
   function color() {
     return options.colors[options.colors.length * Math.random() << 0];
@@ -898,7 +898,7 @@ function ProvenanceTree(d3, selector, _options) {
     $el.edgeLabel = $el.labelsGroup.selectAll(".".concat(classNames.links.labels)).data(data.links);
     $el.edgeLabel.exit().remove();
     $el.labelEnter = $el.edgeLabel.enter().append('text').style('pointer-events', 'none').attr('class', classNames.links.labels).attr('id', (d, i) => classNames.links.labels + i + canvasId).attr('font-size', 8).attr('fill', '#aaa');
-    $el.labelEnter.append('textPath').style("text-anchor", "middle").style("pointer-events", "none").attr("startOffset", "50%").attr('class', d => 'textPath ' + className(d));
+    $el.labelEnter.append('textPath').style('text-anchor', 'middle').style('pointer-events', 'none').attr('startOffset', '50%').attr('class', d => 'textPath ' + className(d));
     $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter);
 
     // Update labels
@@ -966,7 +966,7 @@ function ProvenanceTree(d3, selector, _options) {
     });
   }
   function initImageMap() {
-    let key, keys, selector;
+    let key, keys;
     for (key in options.images) {
       if (options.images.hasOwnProperty(key)) {
         keys = key.split('|');
@@ -1363,7 +1363,7 @@ function ProvenanceTree(d3, selector, _options) {
       sz.height = sizes.height || sz.height;
     }
     $el.svg = $el.canvas.append('svg').attr('width', sz.width).attr('height', sz.height);
-    runCallback("onBeforeBuild");
+    runCallback('onBeforeBuild');
     $el.svgGroup = $el.svg.append('g');
     //.attr('transform', 'translate(' + (margin.left * 2) + ',' + (margin.top * 2) + ')')
 
@@ -1376,15 +1376,7 @@ function ProvenanceTree(d3, selector, _options) {
     appendInfoPanel();
   }
   function updatePositions() {
-    $el.link.attr("x1", d => {
-      return d.source.x;
-    }).attr("y1", d => {
-      return d.source.y;
-    }).attr("x2", d => {
-      return d.target.x;
-    }).attr("y2", d => {
-      return d.target.y;
-    });
+    $el.link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
     $el.node.select(".".concat(classNames.nodes.main)).attr("cx", d => {
       positionData[d.id] = positionData[d.id] || {};
       positionData[d.id].x = d.x;
@@ -1394,27 +1386,17 @@ function ProvenanceTree(d3, selector, _options) {
       positionData[d.id].y = d.y;
       return d.y;
     });
-    $el.node.select(".".concat(classNames.nodes.glow)).attr("cx", d => {
-      return d.x;
-    }).attr("cy", d => {
-      return d.y;
-    });
-    $el.node.select(".".concat(classNames.nodes.text)).attr("x", d => {
-      return d.x;
-    }).attr("y", d => {
-      return d.y;
-    });
-    $el.node.select(".".concat(classNames.nodes.image)).attr("x", d => {
-      return d.x;
-    }).attr("y", d => {
-      return d.y;
-    });
+    $el.node.select(".".concat(classNames.nodes.glow)).attr("cx", d => d.x).attr("cy", d => d.y);
+    $el.node.select(".".concat(classNames.nodes.text)).attr("x", d => d.x).attr("y", d => d.y);
+    $el.node.select(".".concat(classNames.nodes.image)).attr("x", d => d.x).attr("y", d => d.y);
     $el.edgePaths.attr('d', d => {
-      return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y;
-      //return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
+      if (options.reverseEdgeLabels) {
+        return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y;
+      } else {
+        return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
+      }
     });
   }
-
   function ticked() {
     simulation.on("tick", e => {
       // const ky = simulation.alpha()
@@ -1451,7 +1433,7 @@ function ProvenanceTree(d3, selector, _options) {
     }
     ticked();
     createZoom();
-    runCallback("onAfterBuild", _data);
+    runCallback('onAfterBuild', _data);
     return $el.svg.node();
   }
   init();

@@ -6,8 +6,6 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = void 0;
 require("core-js/modules/es.promise.js");
 require("core-js/modules/web.dom-collections.iterator.js");
-require("core-js/modules/es.regexp.exec.js");
-require("core-js/modules/es.string.replace.js");
 var _GraphGeneric = _interopRequireDefault(require("./GraphGeneric"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 /**
@@ -54,10 +52,8 @@ class DataGraphGeneric extends _GraphGeneric.default {
         neighbors = node[this.keys.neighbors];
       }
       if (!neighbors.length && !this.serviced[current] && current !== undefined) {
-        this.promisesToAwait.push(this.service({
-          url: this.url.replace('{id}', current),
-          id: current
-        }));
+        const serviceOps = this.ops.getServiceOptions(current, this.url);
+        this.promisesToAwait.push(this.service(serviceOps));
       } else {
         if (neighbors.length) {
           if (this.storeResult) this.result.push(node);

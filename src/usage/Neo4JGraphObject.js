@@ -17,12 +17,10 @@ async function Neo4JGraphObject(serviceOps) {
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
         let keys = ['used', 'wasGeneratedBy']
-        let hasDescendants = false
         for (let key of keys) {
             if (result.descendants) {
                 for (let _prop in result.descendants[key]) {
                     result[key] = result[key] || {}
-                    hasDescendants = true
                     // Must update key to avoid key collisions with original result.used and result.wasGeneratedBy
                     result[key][`des${_prop}`] = result.descendants[key][_prop]
                 }

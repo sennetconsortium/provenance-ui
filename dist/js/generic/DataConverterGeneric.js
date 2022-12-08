@@ -32,7 +32,7 @@ class DataConverterGeneric extends _DataConverter.default {
       if (n._children && n._children.length) {
         for (let c of n._children) {
           const cId = c[this.map.root.id];
-          n.children.push(this.list[cId]);
+          n.children.push(this.list[cId] || c);
           if (!visited[cId]) {
             visited[cId] = n;
             stack.push(c);

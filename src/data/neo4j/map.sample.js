@@ -6,9 +6,6 @@ const dataMap = {
         startNode: 'prov:entity',
         endNode: 'prov:activity'
     },
-    labels: {
-        edge: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' }
-    },
     root: {
         'id': 'sennet:uuid'
     },

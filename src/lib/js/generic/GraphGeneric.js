@@ -35,7 +35,8 @@ class GraphGeneric {
 
             let response = await fetch(ops.url || this.url, {
                 method: ops.method || 'GET',
-                headers: headers
+                headers: headers,
+                body: ops.body || null
             })
             const result = await response.json()
 
@@ -43,10 +44,9 @@ class GraphGeneric {
                 ops.callback(result, ops)
             } else {
                 this.stack.push(ops.id)
-                this.list[ops.id] = this.getItem(result)
+                this.list[ops.id] = this.ops.onAfterServiceResolveResult ? this.ops.onAfterServiceResolveResult(result) : this.getItem(result)
                 this.serviced[ops.id] = true
                 this.continueDfs()
-
             }
         } catch (e) {
             console.error(e)

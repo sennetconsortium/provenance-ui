@@ -9,7 +9,23 @@ async function  GenericObject(serviceOps) {
     const { token, url, itemId, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = { token, url, keys: {neighbors: 'direct_ancestors'} }
     let data = null
+
+    const getServiceOptions = (id, url) => {
+        const body =  JSON.stringify({"query":{"bool":{"must":{"match":{"uuid":id}}}}})
+        return {url: url.replace('{id}', id), id, body: body, method: 'POST'}
+    }
+
+    const onAfterServiceResolveResult = (result) => {
+        const r = result.hits.hits[0]
+        if (r) {
+            return r._source
+        } else {
+            return result
+        }
+    }
+
     const handleResult = async (result) => {
+        result = onAfterServiceResolveResult(result)
         log.debug(`${feature}: Result from fetch`, result)
 
         const getNeighbors = (node) => {
@@ -29,7 +45,7 @@ async function  GenericObject(serviceOps) {
 
             log.debug(`${feature}: DataGraph`, dataGraph.list)
 
-            const converter = new DataConverterGeneric(dataGraph.root, dataMap, {list: dataGraph.list, getNeighbors})
+            const converter = new DataConverterGeneric(dataGraph.root, dataMap, {list: dataGraph.list, getNeighbors, getServiceOptions})
             converter.stratify()
             data = {root: converter.list[itemId]}
 
@@ -37,12 +53,17 @@ async function  GenericObject(serviceOps) {
 
             let ops = getOptions()
             const colorMap = {
-                "Dataset": "#8ecb93",
-                "Activity": "#f16766",
+                "Dataset": "#8e98cb",
                 "Sample": "#ebb5c8",
                 "Source": "#ffc255"
             }
-            ops = { ...ops, dontCheckInitialized: true, highlight: [{id: itemId}], colorMap}
+            const onEdgeLabel = (d) => {
+                return 'USED'
+            }
+            const callbacks = {
+                onEdgeLabel
+            }
+            ops = { ...ops, flipRelationships: false, reverseEdgeLabels: false, callbacks, dontCheckInitialized: true, highlight: [{id: itemId}], colorMap}
 
             setOptions(ops)
             setContextData(data)
@@ -50,13 +71,15 @@ async function  GenericObject(serviceOps) {
         }
 
         // Traverse the data and fetch all neighbors for each node.
-        const dataGraph = new DataGraphGeneric({...graphOps, getNeighbors, onDataAcquired })
+        const dataGraph = new DataGraphGeneric({...graphOps, getNeighbors, onDataAcquired, onAfterServiceResolveResult, getServiceOptions })
         await dataGraph.dfsWithPromise(getRootNode())
     }
 
     if (token.length && url.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
-        graph.service({ callback: handleResult, url: url.replace('{id}', itemId) })
+        const serviceOps = getServiceOptions(itemId, url)
+        serviceOps.callback = handleResult
+        await graph.service(serviceOps)
     }
 
 }
