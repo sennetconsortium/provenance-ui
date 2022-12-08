@@ -82,7 +82,7 @@ const dataMap = {
     const converter = new DataConverterNeo4J(result, dataMap)
     const hasDescendants = false
     const itemId = '1'
-    converter.buildAdjacencyList(itemId, hasDescendants)
+    converter.buildAdjacencyList(itemId)
     const data = {stratify: converter.result}
 ```
 
