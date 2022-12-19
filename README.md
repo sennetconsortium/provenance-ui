@@ -144,7 +144,7 @@ Running the data through the `DataConverterNeo4J` converter returns an adjacency
 
 ##### Hierarchy Model
 Any hierarchy model passed as `{root: data}` as `data` option must be in the format:
-```json 
+```
 {
     id: 'someId'
     children: [
