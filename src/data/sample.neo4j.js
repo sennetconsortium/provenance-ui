@@ -5,21 +5,13 @@ const sampleNeo4j = {
             "prov:endTime": "2022-12-12T14:05:58",
             "prov:type": "Activity",
             "sennet:created_by_user_email": "jandedoe@some.edu",
-            "sennet:ended_at_time": {
-                "$": 1670853958123,
-                "type": "xsd:int"
-            },
             "sennet:sennet_id": "SNT677.VKKW.223",
             "sennet:protocol_url": "https://dx.doi.org/10.1704/protocols.io.dkasfkkaadf",
             "sennet:created_by_user_displayname": "Jane Doe",
             "sennet:creation_action": "Create Source Activity",
             "sennet:created_timestamp": "2022-12-12T14:05:58",
             "sennet:created_by_user_sub": "cd17bfa7-24fd-49ca-82ec-2d456ba53730",
-            "sennet:uuid": "f212e477ad01650992c85beab425b913",
-            "sennet:started_at_time": {
-                "$": 1670853958123,
-                "type": "xsd:int"
-            }
+            "sennet:uuid": "f212e477ad01650992c85beab425b913"
         }
     },
     "entity": {
