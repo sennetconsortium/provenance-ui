@@ -20,7 +20,7 @@ Watch and build CSS files:
 
 ## Usage In Project:
 Add the project to your `dependencies` property in `package.json`
-```
+```json
 "dependencies": {
     "provenance-ui": "github:sennetconsortium/provenance-ui#main"
 }
@@ -29,7 +29,7 @@ Add the project to your `dependencies` property in `package.json`
 
 ### Data Format
 The data provided to the React component, `ProvenanceUI` should be in the following format or can be converted, see instructions in next section.
-```
+```js
 const sample = {
     root: {
         {
@@ -49,7 +49,7 @@ export default sample
 ### Converting Your Data:
 #### Step 1. Setup Your Data Map
 The data map is required to convert your data into a format required by the module.
-```
+```js
 const dataMap = {
         // Map Specific properties from raw data to required properties of the ProvenanceUI API
         root: {
@@ -71,7 +71,7 @@ const dataMap = {
 ```
 
 #### Step 2. Preparing Your Data For Conversion (See usage/Neo4JGraphObject)
-```
+```jsx
     import { GraphGeneric, DataConverterNeo4J } from 'provenance-ui/dist/index'
     const result = {
         activity: {...},
@@ -87,7 +87,7 @@ const dataMap = {
 ```
 
 #### Step 3. Using ProvenanceUI component 
-```
+```jsx
 import { ProvenanceUI } from 'provenance-ui/dist/index'
 
 const options = {
@@ -172,3 +172,19 @@ Any hierarchy model passed as `{root: data}` as `data` option must be in the for
 | **onBeforeBuild**    | The callback to run before building of the visual                                  | *any*     | The return value is not used.                 |
 | **onAfterBuild**     | The callback to run after the building of the visual                               | *any*     | The return value is not used.                 |
 
+### Legend 
+| Parameter        | Type          | Description                                                                                                                                                                                                                  |
+|------------------|---------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **selectorId**   | *string*      | Should correspond with the `selectorId` of the ProvenanceTree. See above.                                                                                                                                                    |
+| **colorMap**     | *object*      | Should correspond with the `colorMap` of the ProvenanceTree. See above.                                                                                                                                                      | 
+| **filterNodes**  | *boolean*     | Whether the lengend items filter the nodes or not: `true`, `false`. Default: `true`.                                                                                                                                         |
+| **actionMap**    | *object*      | Maps a legend `subType` to an action. Example: `{ Activity: { callback: (e, hasToggled, selectorId)=>{}, className: 'some-className', ariaLabel: 'Toggle Activity Nodes' },}`  Creates `Toggle` components as legend action. |
+
+### Toggle
+| Parameter      | Type       | Description                                                                          |
+|----------------|------------|--------------------------------------------------------------------------------------|
+| **selectorId** | *string*   | Should correspond with the `selectorId` of the ProvenanceTree. See above.            |
+| **className**  | *string*   | A classname to apply the component for custom styling.                               |
+| **icon**       | *boolean*  | Whether to use an icon as toggle element or not: `true`, `false`. Default: `true`.   |
+| **text**       | *string*   | The label to apply to the Toggle component. Available when `icon` is `false`         |
+| **ariaLabel**  | *string*   | Web accessibility aria label                                                         |
