@@ -63,7 +63,7 @@ async function  GenericObject(serviceOps) {
             const callbacks = {
                 onEdgeLabel
             }
-            ops = { ...ops, flipRelationships: false, reverseEdgeLabels: false, callbacks, dontCheckInitialized: true, highlight: [{id: itemId}], colorMap}
+            ops = { ...ops, reverseRelationships: false, reverseEdgeLabels: false, callbacks, dontCheckInitialized: true, highlight: [{id: itemId}], colorMap}
 
             setOptions(ops)
             setContextData(data)

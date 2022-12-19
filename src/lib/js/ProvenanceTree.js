@@ -62,20 +62,21 @@ function ProvenanceTree(d3, selector, _options) {
             Source: "#ffc255"
         },
         imageMap: {},
+        imagesMap: {},
         node: {
             append: 'text',
             radius: 15
         },
-        images: {},
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
-        flipRelationships: true,
+        reverseRelationships: true,
         keepPositionsOnDataToggle: false,
         displayEdgeLabels: true,
         edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
         highlight: [],
-        iconMap: fontAwesomeIcons(),
+        iconMap: {},
+        faIconMap: fontAwesomeIcons(),
         colors: colors(),
         totalTypes: 0,
         reverseEdgeLabels: true,
@@ -341,13 +342,13 @@ function ProvenanceTree(d3, selector, _options) {
         let code;
         const subType = getNodeCat(d)
 
-        if (options.iconMap && options.node.append === 'icon') {
-            if (options.icons[subType] && options.iconMap[options.icons[subType]]) {
-                code = options.iconMap[options.icons[subType]];
+        if (options.faIconMap && options.node.append === 'icon') {
+            if (options.iconMap[subType] && options.faIconMap[options.iconMap[subType]]) {
+                code = options.faIconMap[options.iconMap[subType]];
+            } else if (options.faIconMap[subType]) {
+                code = options.faIconMap[subType];
             } else if (options.iconMap[subType]) {
                 code = options.iconMap[subType];
-            } else if (options.icons[subType]) {
-                code = options.icons[subType];
             }
         }
 
@@ -376,14 +377,14 @@ function ProvenanceTree(d3, selector, _options) {
     function initImageMap() {
         let key, keys;
 
-        for (key in options.images) {
-            if (options.images.hasOwnProperty(key)) {
+        for (key in options.imageMap) {
+            if (options.imageMap.hasOwnProperty(key)) {
                 keys = key.split('|');
 
-                if (!options.imageMap[keys[0]]) {
-                    options.imageMap[keys[0]] = [key];
+                if (!options.imagesMap[keys[0]]) {
+                    options.imagesMap[keys[0]] = [key];
                 } else {
-                    options.imageMap[keys[0]].push(key);
+                    options.imagesMap[keys[0]].push(key);
                 }
             }
         }
@@ -392,8 +393,8 @@ function ProvenanceTree(d3, selector, _options) {
     function image(d) {
         let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
         const subType = getNodeCat(d)
-        if (options.images) {
-            imagesForLabel = options.imageMap[subType];
+        if (options.imageMap) {
+            imagesForLabel = options.imagesMap[subType];
 
             if (imagesForLabel) {
                 imgLevel = 0;
@@ -423,7 +424,7 @@ function ProvenanceTree(d3, selector, _options) {
                         (!property || properties[property] !== undefined) &&
                         (!value || properties[property] === value)) {
                         if (labelPropertyValue.length > imgLevel) {
-                            img = options.images[imagesForLabel[i]];
+                            img = options.imageMap[imagesForLabel[i]];
                             imgLevel = labelPropertyValue.length;
                         }
                     }
@@ -642,7 +643,7 @@ function ProvenanceTree(d3, selector, _options) {
                 excludeList.indexOf(property) === -1)) {
                 formattedUrl = true;
                 const url = isValidURL(value) ? value : options.idNavigate.url
-                href = url.replace('{classType}', label.toLowerCase())
+                href = url.replace('{subType}', label.toLowerCase())
                 href = href.replace('{id}', value)
                 href = (isValidURL(value) && href.indexOf('://') === -1) ? '//' + href : href
             }
@@ -925,7 +926,7 @@ function ProvenanceTree(d3, selector, _options) {
         });
     }
 
-    function flipRelationships(links) {
+    function reverseRelationships(links) {
         for (let l of links) {
             let temp = l.target
             l.target = l.source
@@ -939,7 +940,7 @@ function ProvenanceTree(d3, selector, _options) {
         const h = d3.hierarchy(root)
 
         const _links = links || h.links()
-        data.links = options.flipRelationships ? flipRelationships(_links) : _links
+        data.links = options.reverseRelationships ? reverseRelationships(_links) : _links
         data.nodes = nodes || h.descendants()
 
         buildLinks()

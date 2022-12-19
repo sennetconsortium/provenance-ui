@@ -48,7 +48,7 @@ export const AppProvider = ({ children }) => {
                 minHeight: 600,
                 idNavigate: {
                     props: ['sennet:uuid', 'sennet:protocol_url'],
-                    url: 'http://localhost:3000/{classType}?uuid={id}',
+                    url: 'http://localhost:3000/{subType}?uuid={id}',
                     exclude: { Activity: ['sennet:uuid'] }
                 }
             }
