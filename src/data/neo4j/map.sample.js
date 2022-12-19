@@ -2,10 +2,6 @@ const dataMap = {
     delimiters: {
         node: '/'
     },
-    keys: {
-        startNode: 'prov:entity',
-        endNode: 'prov:activity'
-    },
     root: {
         'id': 'sennet:uuid'
     },
