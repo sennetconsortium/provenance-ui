@@ -25,14 +25,18 @@ class DataConverterNeo4J extends _DataConverter.default {
         entityName: 'Activity'
       },
       generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
-      prov: this.map.keys.prov || 'prov:type',
-      type: this.map.keys.type || 'sennet:entity_type',
+      prov: this.map.root.type || 'prov:type',
+      type: this.map.root.subType || 'sennet:entity_type',
       nodes: this.map.keys.nodes || ['entity', 'activity'],
       relationships: this.map.keys.relationships || {
         // The keys in the data object and the corresponding prop that cross-references the parent entity.
         // Generally:
         // USED starts at activity, ends at entity
         // GENERATED starts at entity, ends at activity
+        // So: [E0] <-- used -- [A] <-- gen -- [E1]
+        // Therefore:
+        //  dict.used[A.id] = E0.id  , this reads: the parent id of a used activity, A, is E0.id
+        //  dict.gen[E1.id] = A.id  , this reads: the parent id of gen entity, E1, is A.id
         used: {
           id: 'prov:activity',
           val: 'prov:entity'
