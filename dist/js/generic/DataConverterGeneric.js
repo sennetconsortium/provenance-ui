@@ -11,9 +11,11 @@ class DataConverterGeneric extends _DataConverter.default {
   constructor(data, map) {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     super(data, map, ops);
+    if (this.error) return this;
     this.list = ops.list || {};
   }
   stratify() {
+    if (this.error) return this;
     let stack = [this.data];
     let visited = {};
     visited[this.data[this.map.root.id]] = true;
@@ -26,6 +28,9 @@ class DataConverterGeneric extends _DataConverter.default {
       n.entityAsParent = visited[n.id] ? visited[n.id].id : null;
       n.type = n[this.map.root.type] || 'Entity';
       n.subType = n[this.map.root.subType] || n.type;
+      if (this.map.root.text) {
+        n.text = n[this.map.root.text];
+      }
       this.setProperties(n, n.subType);
       n._children = this.ops.getNeighbors(n);
       n.children = [];

@@ -9,10 +9,15 @@ class DataConverter {
      * @param ops {object}
      */
     constructor(data, map, ops = {}) {
+        this.error = null
+        if (!map.root || !map.root.id) {
+            this.error = 'Data map must include root and root.id values.'
+            console.error(this.error)
+            return this
+        }
         this.ops = ops
         this.data = data
         this.map = map
-        this.error = null
     }
 
     /**

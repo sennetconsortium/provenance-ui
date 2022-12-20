@@ -1,9 +1,9 @@
 const dataMap = {
-    delimiters: {
-        node: '/'
-    },
+    delimiter: '/',
     root: {
-        'id': 'sennet:uuid'
+        id: 'sennet:uuid',
+        type: 'prov:type',
+        subType: 'sennet:entity_type'
     },
     props: ['sennet:uuid', 'sennet:sennet_id'],
     typeProps: {

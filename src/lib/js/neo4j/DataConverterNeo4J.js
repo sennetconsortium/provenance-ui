@@ -9,16 +9,16 @@ class DataConverterNeo4J extends DataConverter {
 
     constructor(data, map, ops = {}) {
         super(data, map, ops)
+        if (this.error) return this
         this.keys = {
-            activity: this.map.keys.activity || {
+            activity: (this.map.keys && this.map.keys.activity) || {
                 keyName: 'activity',
                 entityName: 'Activity'
             },
-            generatedBy: this.map.keys.generatedBy || 'wasGeneratedBy',
-            prov: this.map.root.type || 'prov:type',
-            type: this.map.root.subType || 'sennet:entity_type',
-            nodes: this.map.keys.nodes || ['entity', 'activity'],
-            relationships: this.map.keys.relationships || {
+            type: (this.map.root && this.map.root.type) || 'type',
+            subType: (this.map.root && this.map.root.subType) || 'subType',
+            nodes: (this.map.keys && this.map.keys.nodes) || ['entity', 'activity'],
+            relationships: (this.map.keys && this.map.keys.relationships) || {
                 // The keys in the data object and the corresponding prop that cross-references the parent entity.
                 // Generally:
                     // USED starts at activity, ends at entity
@@ -43,7 +43,7 @@ class DataConverterNeo4J extends DataConverter {
      * @returns {*}
      */
     getNodeIdFromValue(value) {
-        let parts = value.split(this.map.delimiters.node || '/')
+        let parts = value.split(this.map.delimiter || '/')
         return parts[parts.length - 1]
     }
 
@@ -62,6 +62,7 @@ class DataConverterNeo4J extends DataConverter {
      * @returns {DataConverterNeo4J}
      */
     buildAdjacencyList(rootId) {
+        if (this.error) return this
         this.dict = {}
         let id
         try {
@@ -99,8 +100,11 @@ class DataConverterNeo4J extends DataConverter {
                 let data = this.data[key]
                 for (let _prop in data) {
                     item = data[_prop]
-                    item.type = item[this.keys.prov]
-                    item.subType = item[this.keys.type] || item.type
+                    item.type = item[this.keys.type]
+                    item.subType = item[this.keys.subType] || item.type
+                    if (this.map.root.text) {
+                        item.text = item[this.map.root.text]
+                    }
                     id = item[this.map.root.id]
                     item.id = id
 
