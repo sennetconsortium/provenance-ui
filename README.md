@@ -85,7 +85,6 @@ If your data object has differently named keys, please see [src/lib/js/neo4j/Dat
         wasGeneratedBy: {...}
     }
     const converter = new DataConverterNeo4J(result, dataMap)
-    const hasDescendants = false
     const itemId = '1'
     converter.buildAdjacencyList(itemId)
     const data = {stratify: converter.result}
