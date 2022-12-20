@@ -48,12 +48,14 @@ export default sample
 ```
 ### Converting Your Data:
 #### Step 1. Setup Your Data Map
-The data map is required to convert your data into a format required by the module.
+The data map is required to convert your data into a format expected by `ProvenanceTree`.
 ```js
 const dataMap = {
         // Map Specific properties from raw data to required properties of the ProvenanceUI API
         root: {
-            id: 'uuid'
+            id: 'uuid',
+            type: 'type',
+            subType: 'sub_type'
         },
         // Capture common properties from raw data into the properties sub object of the ProvenanceUI API
         props: ['uuid', 'sennet_id'],
@@ -142,13 +144,13 @@ The specific options that can be passed to the UI are listed below:
 Running the data through the `DataConverterNeo4J` converter returns an adjacency list with id and parent properties that is passed to
 `d3`'s `stratify` method which returns a hierarchy model necessary to build the tree visualization. Each object in the list has the following properties:
 
-| Name                 | Type     | Description                                                                  |
-|----------------------|----------|------------------------------------------------------------------------------|
-| **id**               | *string* | The id of the node                                                           |
-| **activityAsParent** | *string* | The id of the Activity type node who is the parent of the current node       |
-| **entityAsParent**   | *string* | The id of the Entity type node who is the parent of the current node         | 
-| **type**             | *string* | The type of node. Value evaluated by setting `map.root.type`                 |  
-| **subType**          | *string* | The sub type or class of node. Value evaluated by setting `map.root.subType` | 
+| Name                 | Type     | Description                                                                                                                                                  |
+|----------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **id**               | *string* | The id of the node                                                                                                                                           |
+| **activityAsParent** | *string* | The id of the Activity type node who is the parent of the current node                                                                                       |
+| **entityAsParent**   | *string* | The id of the Entity type node who is the parent of the current node                                                                                         | 
+| **type**             | *string* | The type of node. Value evaluated by setting `dataMap.root.type`. [See the dataMap example above](#user-content-step-1-setup-your-data-map).                 |  
+| **subType**          | *string* | The sub type or class of node. Value evaluated by setting `dataMap.root.subType`. [See the dataMap example above](#user-content-step-1-setup-your-data-map). | 
 
 ##### Hierarchy Model
 Any hierarchy model passed as `{root: data}` as `data` option must be in the format:
