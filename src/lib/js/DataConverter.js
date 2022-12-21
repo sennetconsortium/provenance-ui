@@ -3,7 +3,8 @@ class DataConverter {
     static KEY_P_ACT = 'activityAsParent';
 
     /**
-     *
+     * Base class of the DataConverters
+     * @author dbmi.pitt.edu
      * @param data {object}
      * @param map {object}
      * @param ops {object}
@@ -15,9 +16,14 @@ class DataConverter {
             console.error(this.error)
             return this
         }
+
         this.ops = ops
         this.data = data
         this.map = map
+        this.keys = {
+            type: (this.map.root && this.map.root.type) || 'type',
+            subType: (this.map.root && this.map.root.subType) || 'subType',
+        }
     }
 
     /**

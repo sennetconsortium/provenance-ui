@@ -7,6 +7,10 @@ exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 var _DataConverter = _interopRequireDefault(require("../DataConverter"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/**
+ * A generic converter for data that is already in the form of a hierarchy.
+ * @author dbmi.pitt.edu
+ */
 class DataConverterGeneric extends _DataConverter.default {
   constructor(data, map) {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
@@ -26,8 +30,8 @@ class DataConverterGeneric extends _DataConverter.default {
       n = this.list[id] || n;
       n.id = id;
       n.entityAsParent = visited[n.id] ? visited[n.id].id : null;
-      n.type = n[this.map.root.type] || 'Entity';
-      n.subType = n[this.map.root.subType] || n.type;
+      n.type = n[this.keys.type] || 'Entity';
+      n.subType = n[this.keys.subType] || n.type;
       if (this.map.root.text) {
         n.text = n[this.map.root.text];
       }

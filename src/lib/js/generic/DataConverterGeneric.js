@@ -1,5 +1,9 @@
 import DataConverter from '../DataConverter'
 
+/**
+ * A generic converter for data that is already in the form of a hierarchy.
+ * @author dbmi.pitt.edu
+ */
 class DataConverterGeneric extends DataConverter {
 
     constructor(data, map, ops = {}) {
@@ -20,8 +24,8 @@ class DataConverterGeneric extends DataConverter {
             n = this.list[id] || n
             n.id = id
             n.entityAsParent = visited[n.id] ? visited[n.id].id : null
-            n.type = n[this.map.root.type] || 'Entity'
-            n.subType = n[this.map.root.subType] || n.type
+            n.type = n[this.keys.type] || 'Entity'
+            n.subType = n[this.keys.subType] || n.type
             if (this.map.root.text) {
                 n.text = n[this.map.root.text]
             }

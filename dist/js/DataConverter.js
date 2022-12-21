@@ -8,7 +8,8 @@ require("core-js/modules/web.dom-collections.iterator.js");
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 class DataConverter {
   /**
-   *
+   * Base class of the DataConverters
+   * @author dbmi.pitt.edu
    * @param data {object}
    * @param map {object}
    * @param ops {object}
@@ -24,6 +25,10 @@ class DataConverter {
     this.ops = ops;
     this.data = data;
     this.map = map;
+    this.keys = {
+      type: this.map.root && this.map.root.type || 'type',
+      subType: this.map.root && this.map.root.subType || 'subType'
+    };
   }
 
   /**

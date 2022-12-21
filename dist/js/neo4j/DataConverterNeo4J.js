@@ -20,13 +20,14 @@ class DataConverterNeo4J extends _DataConverter.default {
     let ops = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
     super(data, map, ops);
     if (this.error) return this;
+    const keys = this.keys;
     this.keys = {
       activity: this.map.keys && this.map.keys.activity || {
         keyName: 'activity',
         entityName: 'Activity'
       },
-      type: this.map.root && this.map.root.type || 'type',
-      subType: this.map.root && this.map.root.subType || 'subType',
+      type: keys.type,
+      subType: keys.subType,
       nodes: this.map.keys && this.map.keys.nodes || ['entity', 'activity'],
       relationships: this.map.keys && this.map.keys.relationships || {
         // The keys in the data object and the corresponding prop that cross-references the parent entity.
