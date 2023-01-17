@@ -1,9 +1,11 @@
 .c-provenance
   pos-rel()
   font-family $font-family
+  .invisible
+    opacity 0 !important
   &.has-hover
     .node:not(.has-hover)
-      circle.main
+      circle.main, .image.main
         fill #ddd !important
         stroke grey !important
       text

@@ -61,9 +61,11 @@ function ProvenanceTree(d3, selector, _options) {
             Sample: "#ebb5c8",
             Source: "#ffc255"
         },
+        imageMapActions: {},
         imageMap: {},
         imagesMap: {},
         node: {
+            glowMod: 10,
             append: 'text',
             radius: 15
         },
@@ -89,9 +91,14 @@ function ProvenanceTree(d3, selector, _options) {
         hideElementId: true,
         theme: {
             colors: {
+                glow: {
+                  highlighted: '#0f0',
+                  regular: '#6ac6ff'
+                },
                 nodeOutlineFill: undefined,
                 relationship: '#a5abb6',
-                gray: '#ced2d9'
+                gray: '#ced2d9',
+                inactive: '#dddddd'
             }
         }
     }
@@ -390,7 +397,18 @@ function ProvenanceTree(d3, selector, _options) {
         }
     }
 
-    function image(d) {
+    function getImageType(d) {
+        const subType = getNodeCat(d)
+        let type = 'image'
+        let actions
+        if (options.imageMap && options.imagesMap[subType]) {
+            actions = options.imageMapActions[options.imagesMap[subType][0]];
+            type = actions ? actions.type : 'image';
+        }
+        return {node: document.createElementNS('http://www.w3.org/2000/svg', type), type, actions}
+    }
+
+    function image(d, ops) {
         let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
         const subType = getNodeCat(d)
         if (options.imageMap) {
@@ -405,11 +423,9 @@ function ProvenanceTree(d3, selector, _options) {
                     switch (labelPropertyValue.length) {
                         case 3:
                             value = labelPropertyValue[2];
-                            break;
                         /* falls through */
                         case 2:
                             property = labelPropertyValue[1];
-                            break;
                         /* falls through */
                         case 1:
                             label = labelPropertyValue[0];
@@ -435,14 +451,36 @@ function ProvenanceTree(d3, selector, _options) {
         return img;
     }
 
-    function appendImageToNode(node) {
-        return node.append('image')
-            .attr('class', 'image')
-            .attr('height', d => icon(d) ? '24px': '30px')
-            .attr('x', d => icon(d) ? '5px': '-15px')
-            .attr('xlink:href', d => image(d))
-            .attr('y', d => icon(d) ? '5px': '-16px')
-            .attr('width', d => icon(d) ? '24px': '30px');
+    function getFillColor(d, ops) {
+        let fillColor;
+        const nodeOps = getImageType(d)
+        const id = getNodeId(d)
+        if (nodeOps.actions && nodeOps.actions.fn === 'colorize') {
+            const colors = options.theme.colors
+            const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular
+            fillColor = ops.className === 'glow' ?  glowColor : nodeOps.actions.color
+
+            if (nodeOps.actions.transparentMain) {
+                $(`#node--${id}`).find('circle.main').addClass('invisible')
+            }
+
+            if (nodeOps.actions.transparentGlow) {
+                $(`#node--${id}`).find('circle.glow').addClass('invisible')
+            }
+        }
+
+
+        return fillColor;
+    }
+
+    function appendImageToNode(node, ops) {
+        return node.append(d => getImageType(d).node)
+            .attr('class', `image ${ops.className}`)
+            .attr('id', d => `image--${getNodeId(d)}--${ops.className}`)
+            .attr('xlink:href', d => image(d, ops))
+            .attr('fill', d => getFillColor(d, ops))
+            .attr('height', d => icon(d) ? '24px': (30 + ops.sz) + 'px')
+            .attr('width', d => icon(d) ? '24px': (30 + ops.sz) + 'px');
     }
 
     function getHighlightClass(d, isNode = true) {
@@ -456,6 +494,10 @@ function ProvenanceTree(d3, selector, _options) {
             }
         }
         return ''
+    }
+
+    function isHighlighted(d) {
+        return getHighlightClass(d).indexOf('highlighted') !== -1
     }
 
     function buildNodes() {
@@ -541,8 +583,8 @@ function ProvenanceTree(d3, selector, _options) {
             if (options.node.append === 'text') {
                 appendTextToNode($el.nodeEnter)
             }
-
-            appendImageToNode($el.nodeEnter)
+            appendImageToNode($el.nodeEnter, {className: 'glow', sz: 10})
+            appendImageToNode($el.nodeEnter, {className: 'main', sz: 0})
         }
 
         $el.node = $el.node.merge($el.nodeEnter)
@@ -553,8 +595,10 @@ function ProvenanceTree(d3, selector, _options) {
         }
 
         $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked ? 'is-visited' : ''}`)
+            .attr('id', d => `node--${getNodeId(d)}`)
 
-        $el.node.select(`.${classNames.nodes.glow}`)
+        $el.node.select(`circle.${classNames.nodes.glow}`)
+            .attr('class', classNames.nodes.glow)
             .style('fill', (d) => {
                 return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
             })
@@ -563,10 +607,16 @@ function ProvenanceTree(d3, selector, _options) {
             })
             .append('title').text(d => getNodeCat(d))
 
-        $el.node.select(`.${classNames.nodes.main}`)
+        $el.node.select(`circle.${classNames.nodes.main}`)
+            .attr('class', classNames.nodes.main)
             .attr('fill', d => typeToColor(getNodeCat(d)))
             .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
             .append('title').text(d => getNodeCat(d))
+
+        $(`.${classNames.nodes.image}`).remove()
+        appendImageToNode($el.node, {className: 'glow', sz: 10})
+        appendImageToNode($el.node, {className: 'main', sz: 0})
+
 
     }
 
@@ -883,7 +933,7 @@ function ProvenanceTree(d3, selector, _options) {
             .attr("x2", d => d.target.x)
             .attr("y2", d => d.target.y);
 
-        $el.node.select(`.${classNames.nodes.main}`)
+        $el.node.select(`circle.${classNames.nodes.main}`)
             .attr("cx", d => {
                 positionData[d.id] = positionData[d.id] || {}
                 positionData[d.id].x = d.x
@@ -895,7 +945,7 @@ function ProvenanceTree(d3, selector, _options) {
                 return d.y
             });
 
-        $el.node.select(`.${classNames.nodes.glow}`)
+        $el.node.select(`circle.${classNames.nodes.glow}`)
             .attr("cx", d => d.x)
             .attr("cy", d => d.y);
 
@@ -903,9 +953,13 @@ function ProvenanceTree(d3, selector, _options) {
             .attr("x", d => d.x)
             .attr("y", d => d.y);
 
-        $el.node.select(`.${classNames.nodes.image}`)
-            .attr("x", d => d.x)
-            .attr("y", d => d.y);
+        $el.node.select(`.${classNames.nodes.image}.main`)
+            .attr("x", d => d.x - options.node.radius)
+            .attr("y", d => d.y - options.node.radius);
+
+        $el.node.select(`.${classNames.nodes.image}.glow`)
+            .attr("x", d => d.x - options.node.radius - options.node.glowMod / 2)
+            .attr("y", d => d.y - options.node.radius - options.node.glowMod / 2);
 
         $el.edgePaths.attr('d', d => {
             if (options.reverseEdgeLabels) {

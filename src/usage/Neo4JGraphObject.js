@@ -8,7 +8,7 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = {  token, url }
-    const itemId = '1a6c71594de9e37d3568a2c4d762ef78'
+    const itemId = 'ee13898b5fa54d1d0d1630a763cf996c'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -40,7 +40,19 @@ async function Neo4JGraphObject(serviceOps) {
             "Sample": "#ebb5c8",
             "Source": "#ffc255"
         }
-        ops = { ...ops, highlight: [{id: itemId}], colorMap}
+        const imageMap = {
+            "Sample|sennet:sample_category|organ": '/images/shapes/square.svg'
+        }
+        const imageMapActions = {
+            "Sample|sennet:sample_category|organ": {
+                fn: 'colorize',
+                color: "#ebb5c8",
+                transparentMain: true,
+                transparentGlow: true,
+                type: 'rect'
+            }
+        }
+        ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions}
         setOptions(ops)
         setLoading(false)
     }
