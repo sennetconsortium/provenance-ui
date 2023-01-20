@@ -47,7 +47,7 @@ function App() {
             {/*{ !loading && data && <ProvenanceUI data={data} options={{...options, selectorId: 'graph--other'}} /> }*/}
             {/*{ options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap} selectorId='graph--other' />}*/}
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} className='c-legend--flex' actionMap={actionMap} selectorId={SELECTOR_ID} />}
+            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} className='c-legend--flex c-legend--btns' actionMap={actionMap} selectorId={SELECTOR_ID} />}
 
 
         </div>

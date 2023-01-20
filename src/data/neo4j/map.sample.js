@@ -9,7 +9,8 @@ const dataMap = {
     typeProps: {
         Source: ['sennet:source_type'],
         Sample: ['sennet:sample_category'],
-        Activity: ['sennet:created_timestamp', 'sennet:protocol_url', 'sennet:created_by_user_displayname']
+        Activity: ['sennet:created_timestamp', 'sennet:protocol_url', 'sennet:created_by_user_displayname'],
+        Dataset: ['sennet:status']
     },
     callbacks: {
         'sennet:created_timestamp': 'formatDate',

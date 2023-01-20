@@ -1,13 +1,30 @@
 .c-legend
   font-family $font-family
   padding 20px
+  &--btns
+    ul
+      align-items center
+
+    li
+      padding-top 7px
+      padding-left 10px
+      padding-right 10px
+      border-radius 10px
+      border solid 1px $col-lgt-grey
+      &.c-legend__item--Help
+        background-color $col-alice-blue
+        border-color $col-periwinkle-grey
+        i
+          color $col-malibu
+
   &--flex
     ul
       height 30px
       display flex
       flex-direction column
       flex-wrap wrap
-      max-width 500px
+      max-width 700px
+
 
   &--filterable
     &:hover
@@ -47,6 +64,16 @@
           height 2px
           border-radius inherit
 
+    &--Help
+      margin-left 50px
+      .c-legend__color
+        span
+          font-size 18px
+        i
+          pos-abs()
+          right 0
+          bottom 0
+          color grey
 
   &__color
     pos-rel()

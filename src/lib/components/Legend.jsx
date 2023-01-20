@@ -4,7 +4,7 @@ import $ from 'jquery'
 import Toggle from './Toggle'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, helpLabel }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const loaded = useRef(false)
@@ -75,14 +75,20 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 
     const buildLegend = () => {
         let result = [];
+        if (helpLabel) {
+            colors[helpLabel] = 'transparent'
+        }
+        const isHelp = (key) => key === helpLabel
         for (let type in colors) {
             result.push(
-                <li className={`c-legend__item c-legend__item--${type} js-legend__item`} key={`legend--${type}`} data-node={type}>
-                    <span className={`c-legend__color js-legend--trigger c-legend__color--${type}`}>
-                        <span style={{backgroundColor: colors[type]}}></span>
+                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'}`} key={`legend--${type}`} data-node={type}>
+                    <span className={`c-legend__color ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'} c-legend__color--${type}`}>
+                        <span style={{backgroundColor: colors[type]}}>
+                            {isHelp(type) && <i className='fa fa-question-circle-o' role='presentation'></i>}
+                        </span>
                     </span>
                     <span className='c-legend__label'>
-                        <span className='c-legend__label__text js-legend--trigger'>
+                        <span className={`c-legend__label__text ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'}`}>
                             {type}
                         </span>
                         { actionMap[type] &&
@@ -92,6 +98,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                 </li>
             )
         }
+
         return result;
     }
 
@@ -107,6 +114,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 
 Legend.defaultProps = {
     filterNodes: true,
+    helpLabel: 'Help',
     actionMap: {},
     selectorId: SELECTOR_ID,
     className: ''
@@ -117,6 +125,7 @@ Legend.propTypes = {
     actionMap: PropTypes.object,
     children: PropTypes.object,
     filterNodes: PropTypes.bool,
+    helpLabel: PropTypes.string,
     selectorId: PropTypes.string,
     className: PropTypes.string
 }
