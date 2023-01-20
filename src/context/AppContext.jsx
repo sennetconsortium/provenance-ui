@@ -49,7 +49,7 @@ export const AppProvider = ({ children }) => {
                 idNavigate: {
                     props: ['sennet:sennet_id', 'sennet:protocol_url'],
                     url: 'http://localhost:3000/{subType}?uuid={id}',
-                    exclude: { Activity: ['sennet:uuid'] }
+                    exclude: { Activity: ['sennet:sennet_id'] }
                 }
             }
         }

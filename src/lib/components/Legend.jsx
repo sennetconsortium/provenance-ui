@@ -4,7 +4,7 @@ import $ from 'jquery'
 import Toggle from './Toggle'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const loaded = useRef(false)
@@ -78,7 +78,9 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
         for (let type in colors) {
             result.push(
                 <li className={`c-legend__item c-legend__item--${type} js-legend__item`} key={`legend--${type}`} data-node={type}>
-                    <span className={`c-legend__color js-legend--trigger c-legend__color--${type}`} style={{backgroundColor: colors[type]}}></span>
+                    <span className={`c-legend__color js-legend--trigger c-legend__color--${type}`}>
+                        <span style={{backgroundColor: colors[type]}}></span>
+                    </span>
                     <span className='c-legend__label'>
                         <span className='c-legend__label__text js-legend--trigger'>
                             {type}
@@ -94,7 +96,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
     }
 
     return (
-        <div className={`c-legend c-legend--${selectorId} ${filterable ? 'c-legend--filterable' : ''}`}>
+        <div className={`c-legend c-legend--${selectorId} ${filterable ? 'c-legend--filterable' : ''} ${className}`}>
             <ul>
                 {buildLegend()}
                 {children}
@@ -106,7 +108,8 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId }) => {
 Legend.defaultProps = {
     filterNodes: true,
     actionMap: {},
-    selectorId: SELECTOR_ID
+    selectorId: SELECTOR_ID,
+    className: ''
 }
 
 Legend.propTypes = {
@@ -114,7 +117,8 @@ Legend.propTypes = {
     actionMap: PropTypes.object,
     children: PropTypes.object,
     filterNodes: PropTypes.bool,
-    selectorId: PropTypes.string
+    selectorId: PropTypes.string,
+    className: PropTypes.string
 }
 
 export default Legend

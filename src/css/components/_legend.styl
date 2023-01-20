@@ -1,6 +1,14 @@
 .c-legend
   font-family $font-family
   padding 20px
+  &--flex
+    ul
+      height 30px
+      display flex
+      flex-direction column
+      flex-wrap wrap
+      max-width 500px
+
   &--filterable
     &:hover
       cursor pointer
@@ -34,15 +42,22 @@
 
     &--Edge
       .c-legend__color
-        pos-rel()
-        top -8px
-        height 2px
-        border-radius inherit
+        span
+          top 9px
+          height 2px
+          border-radius inherit
+
 
   &__color
+    pos-rel()
     width 20px
     height 20px
-    border-radius 50%
+    span
+      pos-abs()
+      display block
+      width 100%
+      height 100%
+      border-radius 50%
   &__label
     pos-rel()
     line-height 10px
