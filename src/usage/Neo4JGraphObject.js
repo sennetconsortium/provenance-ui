@@ -8,7 +8,7 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = {  token, url }
-    const itemId = 'ed98c78f9abab37be52fcba09e0c4793' //'ee13898b5fa54d1d0d1630a763cf996c'
+    const itemId = 'ee13898b5fa54d1d0d1630a763cf996c' //'ed98c78f9abab37be52fcba09e0c4793'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -72,6 +72,7 @@ async function Neo4JGraphObject(serviceOps) {
                 ]
             }
         }
+        ops.propertyPrefixClear = 'sennet:'
         ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions}
         setOptions(ops)
         setLoading(false)

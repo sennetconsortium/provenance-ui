@@ -72,6 +72,7 @@ function ProvenanceTree(d3, selector, _options) {
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
+        propertyPrefixClear: '',
         reverseRelationships: true,
         keepPositionsOnDataToggle: false,
         displayEdgeLabels: true,
@@ -761,7 +762,7 @@ function ProvenanceTree(d3, selector, _options) {
         elem.attr('href', formattedUrl ?  href : '#')
             .attr('target', formattedUrl ? '_blank' : '_parent')
             .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
-            .html('<strong>' + property + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
+            .html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
 
         if (!value) {
             elem.style('background-color', function(d) {

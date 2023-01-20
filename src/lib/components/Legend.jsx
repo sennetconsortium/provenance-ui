@@ -3,15 +3,26 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import Toggle from './Toggle'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
+import Swal from 'sweetalert2'
+import helpHtml from './help.html'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, helpLabel }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, helpLabel, helpText }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
+
     const loaded = useRef(false)
 
     useEffect(() => {
         if (filterable && !loaded.current) setEvents()
     })
+
+    const showHelp = () => {
+        Swal.fire({
+            title: `<h3><i class='fa fa-question-circle-o' role='presentation'></i> ${helpLabel}</h3>`,
+            html: helpText || helpHtml,
+            showCloseButton: true
+        })
+    }
 
     const setEvents = () => {
         loaded.current = true
@@ -71,6 +82,10 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
         }).on('mouseleave', (e) => {
             if (!$(`#${selectorId}`).hasClass(stickClass)) toggleClass(e, 'removeClass')
         })
+
+        $(`.c-legend--${selectorId} .js-legend--help`).on('click', (e) => {
+            showHelp()
+        })
     }
 
     const buildLegend = () => {
@@ -126,6 +141,7 @@ Legend.propTypes = {
     children: PropTypes.object,
     filterNodes: PropTypes.bool,
     helpLabel: PropTypes.string,
+    helpText: PropTypes.string,
     selectorId: PropTypes.string,
     className: PropTypes.string
 }
