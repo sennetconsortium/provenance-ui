@@ -397,18 +397,64 @@ function ProvenanceTree(d3, selector, _options) {
         }
     }
 
-    function getImageType(d) {
-        const subType = getNodeCat(d)
-        let type = 'image'
-        let actions
-        if (options.imageMap && options.imagesMap[subType]) {
-            actions = options.imageMapActions[options.imagesMap[subType][0]];
-            type = actions ? actions.type : 'image';
-        }
-        return {node: document.createElementNS('http://www.w3.org/2000/svg', type), type, actions}
+    function fetchImage(d, ops) {
+        fetch(image(d))
+            .then(r => r.text())
+            .then(svgXml => {
+                const id = getNodeId(d)
+                const toBase64 = (xml) => {
+                    return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)))
+                }
+
+                const fillColor = getFillColor(d, ops)
+                svgXml = svgXml.replace('$bgColor', fillColor)
+                svgXml = svgXml.replace('$borderColor', d3.rgb(fillColor).darker(1))
+
+                $(`#image--${id}--${ops.className}`).attr('href', toBase64(svgXml))
+
+            })
+            .catch(console.error.bind(console))
     }
 
-    function image(d, ops) {
+    function getImageActions(d, ops) {
+        const subType = getNodeCat(d)
+        if (options.imageMap && options.imagesMap[subType]) {
+            return options.imageMapActions[options.imagesMap[subType][0]];
+        }
+        return null
+    }
+
+    function getImageTypeClass(d, ops) {
+        const actions = getImageActions(d, ops)
+        return actions ? actions.type : ''
+    }
+
+    function getImageType(d, ops) {
+        let type = 'image'
+        let actions = getImageActions(d, ops)
+        let node = document.createElementNS('http://www.w3.org/2000/svg', type)
+        if (actions !== null) {
+            type = actions ? actions.type : 'image';
+            node =  document.createElementNS('http://www.w3.org/2000/svg', type)
+            const id = getNodeId(d)
+            if (actions.fn === 'append') {
+                if (type === 'image') {
+                    fetchImage(d, ops)
+                } else {
+                    node.classList.add(type)
+                    console.log(node.classList)
+                    for (let io of actions.data) {
+                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+                        path.setAttribute('d', io.draw)
+                        node.append(path)
+                    }
+                }
+            }
+        }
+        return {node, type, actions}
+    }
+
+    function image(d) {
         let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
         const subType = getNodeCat(d)
         if (options.imageMap) {
@@ -453,34 +499,35 @@ function ProvenanceTree(d3, selector, _options) {
 
     function getFillColor(d, ops) {
         let fillColor;
-        const nodeOps = getImageType(d)
+        const subType = getNodeCat(d)
+        const actions = options.imagesMap[subType] ? options.imageMapActions[options.imagesMap[subType][0]] : {};
         const id = getNodeId(d)
-        if (nodeOps.actions && nodeOps.actions.fn === 'colorize') {
+        if (actions && actions.color) {
             const colors = options.theme.colors
             const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular
-            fillColor = ops.className === 'glow' ?  glowColor : nodeOps.actions.color
+            fillColor = ops.className === 'glow' ?  glowColor : actions.color
 
-            if (nodeOps.actions.transparentMain) {
+            if (actions.transparentMain) {
                 $(`#node--${id}`).find('circle.main').addClass('invisible')
             }
 
-            if (nodeOps.actions.transparentGlow) {
+            if (actions.transparentGlow) {
                 $(`#node--${id}`).find('circle.glow').addClass('invisible')
             }
         }
-
 
         return fillColor;
     }
 
     function appendImageToNode(node, ops) {
-        return node.append(d => getImageType(d).node)
-            .attr('class', `image ${ops.className}`)
+        return node.append(d => getImageType(d, ops).node)
+            .attr('class', d => `image ${ops.className} ${getImageTypeClass(d, ops)}`)
             .attr('id', d => `image--${getNodeId(d)}--${ops.className}`)
-            .attr('xlink:href', d => image(d, ops))
+            .attr('xlink:href', d => image(d))
             .attr('fill', d => getFillColor(d, ops))
-            .attr('height', d => icon(d) ? '24px': (30 + ops.sz) + 'px')
-            .attr('width', d => icon(d) ? '24px': (30 + ops.sz) + 'px');
+            .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
+            .attr('height', d => icon(d) ? '24px': '30px')
+            .attr('width', d => icon(d) ? '24px': '30px');
     }
 
     function getHighlightClass(d, isNode = true) {
@@ -583,8 +630,8 @@ function ProvenanceTree(d3, selector, _options) {
             if (options.node.append === 'text') {
                 appendTextToNode($el.nodeEnter)
             }
-            appendImageToNode($el.nodeEnter, {className: 'glow', sz: 10})
-            appendImageToNode($el.nodeEnter, {className: 'main', sz: 0})
+            appendImageToNode($el.nodeEnter, {className: 'glow'})
+            appendImageToNode($el.nodeEnter, {className: 'main'})
         }
 
         $el.node = $el.node.merge($el.nodeEnter)
@@ -614,10 +661,8 @@ function ProvenanceTree(d3, selector, _options) {
             .append('title').text(d => getNodeCat(d))
 
         $(`.${classNames.nodes.image}`).remove()
-        appendImageToNode($el.node, {className: 'glow', sz: 10})
-        appendImageToNode($el.node, {className: 'main', sz: 0})
-
-
+        appendImageToNode($el.node, {className: 'glow'})
+        appendImageToNode($el.node, {className: 'main'})
     }
 
     function appendInfoPanel() {
@@ -953,13 +998,25 @@ function ProvenanceTree(d3, selector, _options) {
             .attr("x", d => d.x)
             .attr("y", d => d.y);
 
+
+        const getX = (d) => d.x - options.node.radius
+
+        const getY = (d) => d.y - options.node.radius
+
+        $el.node.select(`.${classNames.nodes.image}.main.g`)
+            .attr("transform", d => `translate(${getX(d)}, ${getY(d)})`)
+
+        $el.node.select(`.${classNames.nodes.image}.glow.g`)
+            .attr("transform", d => `translate(${getX(d)}, ${getY(d)})`)
+
         $el.node.select(`.${classNames.nodes.image}.main`)
-            .attr("x", d => d.x - options.node.radius)
-            .attr("y", d => d.y - options.node.radius);
+            .attr("x", d => getX(d))
+            .attr("y", d => getY(d));
 
         $el.node.select(`.${classNames.nodes.image}.glow`)
-            .attr("x", d => d.x - options.node.radius - options.node.glowMod / 2)
-            .attr("y", d => d.y - options.node.radius - options.node.glowMod / 2);
+            .attr("x", d => getX(d))
+            .attr("y", d => getY(d));
+
 
         $el.edgePaths.attr('d', d => {
             if (options.reverseEdgeLabels) {

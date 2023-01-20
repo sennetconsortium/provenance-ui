@@ -15,7 +15,7 @@
     &.edgeLabels--hidden
       .textPath
         display none
-    svg
+    > svg
       cursor move
 
     .is-inserted
@@ -42,6 +42,8 @@
           opacity .5
           stroke $col-lime !important
           stroke-width 12px
+          &.image
+            stroke-width 15px
         &.is-secondary
           .glow
             stroke $col-grey
@@ -56,6 +58,8 @@
         opacity 0
         stroke $col-malibu
         stroke-width 5px
+        &.image
+          stroke-width 12px
       .text
         fill white
         &.icon
