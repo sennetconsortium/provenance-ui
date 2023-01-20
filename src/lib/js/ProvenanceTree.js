@@ -75,7 +75,7 @@ function ProvenanceTree(d3, selector, _options) {
         reverseRelationships: true,
         keepPositionsOnDataToggle: false,
         displayEdgeLabels: true,
-        edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY' },
+        edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY', fontSize: 9 },
         highlight: [],
         iconMap: {},
         faIconMap: fontAwesomeIcons(),
@@ -288,7 +288,7 @@ function ProvenanceTree(d3, selector, _options) {
             .style('pointer-events', 'none')
             .attr('class', classNames.links.labels)
             .attr('id', (d, i) => classNames.links.labels + i + canvasId)
-            .attr('font-size', 8)
+            .attr('font-size', options.edgeLabels.fontSize)
             .attr('fill', '#aaa')
 
         $el.labelEnter.append('textPath')
@@ -429,6 +429,20 @@ function ProvenanceTree(d3, selector, _options) {
         return actions ? actions.type : ''
     }
 
+    function getDefaultSize() {
+        return options
+    }
+
+    function getImageHeight(d, ops) {
+        const actions = getImageActions(d, ops)
+        return actions ? actions.height || 30 : 30
+    }
+
+    function getImageWidth(d, ops) {
+        const actions = getImageActions(d, ops)
+        return actions ? actions.width || 30 : 30
+    }
+
     function getImageType(d, ops) {
         let type = 'image'
         let actions = getImageActions(d, ops)
@@ -526,8 +540,8 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('xlink:href', d => image(d))
             .attr('fill', d => getFillColor(d, ops))
             .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
-            .attr('height', d => icon(d) ? '24px': '30px')
-            .attr('width', d => icon(d) ? '24px': '30px');
+            .attr('height', d => icon(d) ? '24px': getImageHeight(d, ops) + 'px')
+            .attr('width', d => icon(d) ? '24px':  getImageWidth(d, ops) + 'px');
     }
 
     function getHighlightClass(d, isNode = true) {
@@ -739,7 +753,7 @@ function ProvenanceTree(d3, selector, _options) {
                 formattedUrl = true;
                 const url = isValidURL(value) ? value : options.idNavigate.url
                 href = url.replace('{subType}', label.toLowerCase())
-                href = href.replace('{id}', value)
+                href = href.replace('{id}', getNodeId(d))
                 href = (isValidURL(value) && href.indexOf('://') === -1) ? '//' + href : href
             }
         }
@@ -942,7 +956,7 @@ function ProvenanceTree(d3, selector, _options) {
             //.attr('transform', 'translate(' + (margin.left * 2) + ',' + (margin.top * 2) + ')')
 
         $el.svg.append('defs').append('marker')
-            .attr("id",'arrowhead')
+            .attr('id','arrowhead')
             .attr('viewBox','-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
             .attr('refX', 30) // X coordinate for the reference point of the marker. If circle is bigger, this needs to be bigger.
             .attr('refY', 0)
@@ -955,10 +969,10 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('fill', '#999')
             .style('stroke','none')
 
-        $el.linksGroup = $el.svgGroup.append("g")
+        $el.linksGroup = $el.svgGroup.append('g')
             .attr('class', 'links')
-            .attr("stroke", "#999")
-            .attr("stroke-opacity", 0.6)
+            .attr('stroke', '#999')
+            .attr('stroke-opacity', 0.6)
 
         $el.labelsGroup = $el.svgGroup.append('g')
             .attr('class', 'labels')
@@ -997,7 +1011,6 @@ function ProvenanceTree(d3, selector, _options) {
         $el.node.select(`.${classNames.nodes.text}`)
             .attr("x", d => d.x)
             .attr("y", d => d.y);
-
 
         const getX = (d) => d.x - options.node.radius
 

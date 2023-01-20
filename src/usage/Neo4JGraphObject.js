@@ -8,7 +8,7 @@ async function Neo4JGraphObject(serviceOps) {
     const feature = 'neo4j';
     const { token, url, getOptions, setContextData, setLoading, setOptions } = serviceOps;
     const graphOps = {  token, url }
-    const itemId = 'ee13898b5fa54d1d0d1630a763cf996c'
+    const itemId = '06b7b28ca738f128289a72aad58c0b08' //'ee13898b5fa54d1d0d1630a763cf996c'
 
     const handleResult = async (result) => {
         log.debug(`${feature}: Result from fetch`, result)
@@ -45,11 +45,19 @@ async function Neo4JGraphObject(serviceOps) {
             "Source": null,
         }
         const imageMapActions = {
+            // "Sample|sennet:sample_category|organ": {
+            //     color: "#ebb5c8",
+            //     transparentMain: true,
+            //     transparentGlow: true,
+            //     type: 'rect'
+            // },
             "Sample|sennet:sample_category|organ": {
                 color: "#ebb5c8",
                 transparentMain: true,
                 transparentGlow: true,
-                type: 'rect'
+                type: 'rect',
+                height: 25,
+                width: 50,
             },
             "Source": {
                 fn: 'append',

@@ -5,7 +5,7 @@ const dataMap = {
         type: 'prov:type',
         subType: 'sennet:entity_type'
     },
-    props: ['sennet:uuid', 'sennet:sennet_id'],
+    props: ['sennet:sennet_id'],
     typeProps: {
         Source: ['sennet:source_type'],
         Sample: ['sennet:sample_category'],
