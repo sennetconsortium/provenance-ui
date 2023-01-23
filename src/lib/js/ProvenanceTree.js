@@ -689,14 +689,14 @@ function ProvenanceTree(d3, selector, _options) {
 
          const onCloseButton = () => {
              const c = runCallback('onCloseButton')
-             return c ? c : 'ⓧ'
+             return c ? c : '<i class="fa fa-times" aria-hidden="true"></i>'
          }
 
          $el.info.append('span')
              .attr('class', classNames.info + '--close ' + classNames.infoCloseBtn)
              .attr('style', 'display: none;')
              .attr('title', 'Close Info Panel')
-             .text(onCloseButton())
+             .html(onCloseButton())
 
         $(selector).on('click', `.${classNames.infoCloseBtn}`, (e) => {
             clearInfo()
@@ -747,7 +747,7 @@ function ProvenanceTree(d3, selector, _options) {
         const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
         value = value ? value.replaceAll('"', '') : value
         let formattedUrl = false;
-        let elem = $el.info.append('a');
+
         let href = '#';
         if (isNavigation && options.idNavigate && options.idNavigate.url) {
             const label = getNodeCat(d) || 'Unknown'
@@ -761,11 +761,14 @@ function ProvenanceTree(d3, selector, _options) {
                 href = (isValidURL(value) && href.indexOf('://') === -1) ? '//' + href : href
             }
         }
-
-        elem.attr('href', formattedUrl ?  href : '#')
-            .attr('target', formattedUrl ? '_blank' : '_parent')
-            .attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover'))
-            .html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + (value ? (`: <span>${value}</span>`) : ''));
+        let elem = $el.info.append('span');
+        let valueHtml = ''
+        if (value) {
+            valueHtml = !formattedUrl ? `: <span>${value}</span>` : `: <a href="${href}" target="_blank">${value} </a>`;
+        }
+        cls += ' cell'
+        elem.attr('class', cls + (!formattedUrl ? ' flat' : ' link'))
+            .html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + valueHtml );
 
         if (!value) {
             elem.style('background-color', function(d) {

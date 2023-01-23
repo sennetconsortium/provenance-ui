@@ -23,9 +23,10 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                 title: 'c-help__title',
                 confirmButton: 'c-help__btn'
             },
-            title: `<i class='fa fa-question-circle-o' role='presentation'></i> ${helpLabel}`,
+            title: `${helpLabel}`,
             html: helpText || helpHtml,
-            showCloseButton: true
+            showCloseButton: true,
+            confirmButtonText: 'Close'
         })
     }
 

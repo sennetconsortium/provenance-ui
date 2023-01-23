@@ -10,6 +10,8 @@ var _propTypes = _interopRequireDefault(require("prop-types"));
 var _jquery = _interopRequireDefault(require("jquery"));
 var _Toggle = _interopRequireDefault(require("./Toggle"));
 var _constants = require("../js/constants");
+var _sweetalert = _interopRequireDefault(require("sweetalert2"));
+var _help = _interopRequireDefault(require("./help.html"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -19,7 +21,10 @@ const Legend = _ref => {
     colorMap,
     filterNodes,
     actionMap,
-    selectorId
+    selectorId,
+    className,
+    helpLabel,
+    helpText
   } = _ref;
   const [colors] = (0, _react.useState)(colorMap);
   const [filterable] = (0, _react.useState)(filterNodes);
@@ -27,6 +32,19 @@ const Legend = _ref => {
   (0, _react.useEffect)(() => {
     if (filterable && !loaded.current) setEvents();
   });
+  const showHelp = () => {
+    _sweetalert.default.fire({
+      customClass: {
+        container: 'c-help',
+        title: 'c-help__title',
+        confirmButton: 'c-help__btn'
+      },
+      title: "".concat(helpLabel),
+      html: helpText || _help.default,
+      showCloseButton: true,
+      confirmButtonText: 'Close'
+    });
+  };
   const setEvents = () => {
     loaded.current = true;
     const stickClass = 'has-activeFilters';
@@ -78,23 +96,34 @@ const Legend = _ref => {
     }).on('mouseleave', e => {
       if (!(0, _jquery.default)("#".concat(selectorId)).hasClass(stickClass)) toggleClass(e, 'removeClass');
     });
+    (0, _jquery.default)(".c-legend--".concat(selectorId, " .js-legend--help")).on('click', e => {
+      showHelp();
+    });
   };
   const buildLegend = () => {
     let result = [];
+    if (helpLabel) {
+      colors[helpLabel] = 'transparent';
+    }
+    const isHelp = key => key === helpLabel;
     for (let type in colors) {
       result.push( /*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(type, " js-legend__item"),
+        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item'),
         key: "legend--".concat(type),
         "data-node": type
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__color js-legend--trigger c-legend__color--".concat(type),
+        className: "c-legend__color ".concat(isHelp(type) ? 'js-legend--help' : 'js-legend--trigger', " c-legend__color--").concat(type)
+      }, /*#__PURE__*/_react.default.createElement("span", {
         style: {
           backgroundColor: colors[type]
         }
-      }), /*#__PURE__*/_react.default.createElement("span", {
+      }, isHelp(type) && /*#__PURE__*/_react.default.createElement("i", {
+        className: "fa fa-question-circle-o",
+        role: "presentation"
+      }))), /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__label"
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__label__text js-legend--trigger"
+        className: "c-legend__label__text ".concat(isHelp(type) ? 'js-legend--help' : 'js-legend--trigger')
       }, type), actionMap[type] && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
         context: actionMap[type].callback,
         selectorId: actionMap[type].selectorId || selectorId,
@@ -105,20 +134,25 @@ const Legend = _ref => {
     return result;
   };
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "c-legend c-legend--".concat(selectorId, " ").concat(filterable ? 'c-legend--filterable' : '')
+    className: "c-legend c-legend--".concat(selectorId, " ").concat(filterable ? 'c-legend--filterable' : '', " ").concat(className)
   }, /*#__PURE__*/_react.default.createElement("ul", null, buildLegend(), children));
 };
 Legend.defaultProps = {
   filterNodes: true,
+  helpLabel: 'Help',
   actionMap: {},
-  selectorId: _constants.SELECTOR_ID
+  selectorId: _constants.SELECTOR_ID,
+  className: ''
 };
 Legend.propTypes = {
   colorMap: _propTypes.default.object.isRequired,
   actionMap: _propTypes.default.object,
   children: _propTypes.default.object,
   filterNodes: _propTypes.default.bool,
-  selectorId: _propTypes.default.string
+  helpLabel: _propTypes.default.string,
+  helpText: _propTypes.default.string,
+  selectorId: _propTypes.default.string,
+  className: _propTypes.default.string
 };
 var _default = Legend;
 exports.default = _default;

@@ -4,12 +4,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/web.dom-collections.iterator.js");
+require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/es.parse-int.js");
+require("core-js/modules/es.promise.js");
 require("core-js/modules/es.regexp.exec.js");
-require("core-js/modules/es.string.match.js");
 require("core-js/modules/es.string.replace.js");
+require("core-js/modules/es.string.match.js");
 require("core-js/modules/esnext.string.replace-all.js");
 var _jquery = _interopRequireDefault(require("jquery"));
 var _DataConverter = _interopRequireDefault(require("./DataConverter"));
@@ -71,6 +72,8 @@ function ProvenanceTree(d3, selector, _options) {
       Sample: "#ebb5c8",
       Source: "#ffc255"
     },
+    visitedNodes: new Set(),
+    imageMapActions: {},
     imageMap: {},
     imagesMap: {},
     node: {
@@ -80,12 +83,14 @@ function ProvenanceTree(d3, selector, _options) {
     propertyMap: {
       'sennet:created_by_user_displayname': 'agent'
     },
+    propertyPrefixClear: '',
     reverseRelationships: true,
     keepPositionsOnDataToggle: false,
     displayEdgeLabels: true,
     edgeLabels: {
       used: 'USED',
-      wasGeneratedBy: 'WAS_GENERATED_BY'
+      wasGeneratedBy: 'WAS_GENERATED_BY',
+      fontSize: 9
     },
     highlight: [],
     iconMap: {},
@@ -102,9 +107,14 @@ function ProvenanceTree(d3, selector, _options) {
     hideElementId: true,
     theme: {
       colors: {
+        glow: {
+          highlighted: '#0f0',
+          regular: '#6ac6ff'
+        },
         nodeOutlineFill: undefined,
         relationship: '#a5abb6',
-        gray: '#ced2d9'
+        gray: '#ced2d9',
+        inactive: '#dddddd'
       }
     }
   };
@@ -898,7 +908,7 @@ function ProvenanceTree(d3, selector, _options) {
     // Labels
     $el.edgeLabel = $el.labelsGroup.selectAll(".".concat(classNames.links.labels)).data(data.links);
     $el.edgeLabel.exit().remove();
-    $el.labelEnter = $el.edgeLabel.enter().append('text').style('pointer-events', 'none').attr('class', classNames.links.labels).attr('id', (d, i) => classNames.links.labels + i + canvasId).attr('font-size', 8).attr('fill', '#aaa');
+    $el.labelEnter = $el.edgeLabel.enter().append('text').style('pointer-events', 'none').attr('class', classNames.links.labels).attr('id', (d, i) => classNames.links.labels + i + canvasId).attr('font-size', options.edgeLabels.fontSize).attr('fill', '#aaa');
     $el.labelEnter.append('textPath').style('text-anchor', 'middle').style('pointer-events', 'none').attr('startOffset', '50%').attr('class', d => 'textPath ' + className(d));
     $el.edgeLabel = $el.edgeLabel.merge($el.labelEnter);
 
@@ -979,6 +989,70 @@ function ProvenanceTree(d3, selector, _options) {
       }
     }
   }
+  function fetchImage(d, ops) {
+    fetch(image(d)).then(r => r.text()).then(svgXml => {
+      const id = getNodeId(d);
+      const toBase64 = xml => {
+        return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(xml)));
+      };
+      const fillColor = getFillColor(d, ops);
+      svgXml = svgXml.replace('$bgColor', fillColor);
+      svgXml = svgXml.replace('$borderColor', d3.rgb(fillColor).darker(1));
+      (0, _jquery.default)("#image--".concat(id, "--").concat(ops.className)).attr('href', toBase64(svgXml));
+    }).catch(console.error.bind(console));
+  }
+  function getImageActions(d, ops) {
+    const subType = getNodeCat(d);
+    if (options.imageMap && options.imagesMap[subType]) {
+      return options.imageMapActions[options.imagesMap[subType][0]];
+    }
+    return null;
+  }
+  function getImageTypeClass(d, ops) {
+    const actions = getImageActions(d, ops);
+    return actions ? actions.type : '';
+  }
+  function getDefaultSize() {
+    return options.node.radius * 2;
+  }
+  function getImageHeight(d, ops) {
+    const actions = getImageActions(d, ops);
+    const sz = getDefaultSize();
+    return actions ? actions.height || sz : sz;
+  }
+  function getImageWidth(d, ops) {
+    const actions = getImageActions(d, ops);
+    const sz = getDefaultSize();
+    return actions ? actions.width || sz : sz;
+  }
+  function getImageType(d, ops) {
+    let type = 'image';
+    let actions = getImageActions(d, ops);
+    const uri = 'http://www.w3.org/2000/svg';
+    let node = document.createElementNS(uri, type);
+    if (actions) {
+      type = actions ? actions.type : 'image';
+      node = document.createElementNS(uri, type);
+      const id = getNodeId(d);
+      if (actions.fn === 'append') {
+        if (type === 'image') {
+          fetchImage(d, ops);
+        } else {
+          node.classList.add(type);
+          for (let io of actions.data) {
+            const path = document.createElementNS(uri, 'path');
+            path.setAttribute('d', io.draw);
+            node.append(path);
+          }
+        }
+      }
+    }
+    return {
+      node,
+      type,
+      actions
+    };
+  }
   function image(d) {
     let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
     const subType = getNodeCat(d);
@@ -991,11 +1065,9 @@ function ProvenanceTree(d3, selector, _options) {
           switch (labelPropertyValue.length) {
             case 3:
               value = labelPropertyValue[2];
-              break;
             /* falls through */
             case 2:
               property = labelPropertyValue[1];
-              break;
             /* falls through */
             case 1:
               label = labelPropertyValue[0];
@@ -1016,8 +1088,26 @@ function ProvenanceTree(d3, selector, _options) {
     }
     return img;
   }
-  function appendImageToNode(node) {
-    return node.append('image').attr('class', 'image').attr('height', d => icon(d) ? '24px' : '30px').attr('x', d => icon(d) ? '5px' : '-15px').attr('xlink:href', d => image(d)).attr('y', d => icon(d) ? '5px' : '-16px').attr('width', d => icon(d) ? '24px' : '30px');
+  function getFillColor(d, ops) {
+    let fillColor;
+    const subType = getNodeCat(d);
+    const actions = options.imagesMap[subType] ? options.imageMapActions[options.imagesMap[subType][0]] : {};
+    const id = getNodeId(d);
+    if (actions && actions.color) {
+      const colors = options.theme.colors;
+      const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular;
+      fillColor = ops.className === 'glow' ? glowColor : actions.color;
+      if (actions.transparentMain) {
+        (0, _jquery.default)("#node--".concat(id)).find('circle.main').addClass('invisible');
+      }
+      if (actions.transparentGlow) {
+        (0, _jquery.default)("#node--".concat(id)).find('circle.glow').addClass('invisible');
+      }
+    }
+    return fillColor;
+  }
+  function appendImageToNode(node, ops) {
+    return node.append(d => getImageType(d, ops).node).attr('class', d => "image ".concat(ops.className, " ").concat(getImageTypeClass(d, ops))).attr('id', d => "image--".concat(getNodeId(d), "--").concat(ops.className)).attr('xlink:href', d => image(d)).attr('fill', d => getFillColor(d, ops)).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('height', d => icon(d) ? '24px' : getImageHeight(d, ops) + 'px').attr('width', d => icon(d) ? '24px' : getImageWidth(d, ops) + 'px');
   }
   function getHighlightClass(d) {
     let isNode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -1030,6 +1120,9 @@ function ProvenanceTree(d3, selector, _options) {
       }
     }
     return '';
+  }
+  function isHighlighted(d) {
+    return getHighlightClass(d).indexOf('highlighted') !== -1;
   }
   function buildNodes() {
     const getDepth = d => {
@@ -1111,28 +1204,40 @@ function ProvenanceTree(d3, selector, _options) {
       if (options.node.append === 'text') {
         appendTextToNode($el.nodeEnter);
       }
-      appendImageToNode($el.nodeEnter);
+      appendImageToNode($el.nodeEnter, {
+        className: 'glow'
+      });
+      appendImageToNode($el.nodeEnter, {
+        className: 'main'
+      });
     }
     $el.node = $el.node.merge($el.nodeEnter);
     const getHoverClass = d => {
       const cat = getNodeCat(d);
       return legendFilters[cat] ? 'has-hover ' : '';
     };
-    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked ? 'is-visited' : ''));
-    $el.node.select(".".concat(classNames.nodes.glow)).style('fill', d => {
+    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked ? 'is-visited' : '')).attr('id', d => "node--".concat(getNodeId(d)));
+    $el.node.select("circle.".concat(classNames.nodes.glow)).attr('class', classNames.nodes.glow).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
     }).style('stroke', d => {
       return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
     }).append('title').text(d => getNodeCat(d));
-    $el.node.select(".".concat(classNames.nodes.main)).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
+    $el.node.select("circle.".concat(classNames.nodes.main)).attr('class', classNames.nodes.main).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
+    (0, _jquery.default)(".".concat(classNames.nodes.image)).remove();
+    appendImageToNode($el.node, {
+      className: 'glow'
+    });
+    appendImageToNode($el.node, {
+      className: 'main'
+    });
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
     const onCloseButton = () => {
       const c = runCallback('onCloseButton');
-      return c ? c : 'ⓧ';
+      return c ? c : '<i class="fa fa-times" aria-hidden="true"></i>';
     };
-    $el.info.append('span').attr('class', classNames.info + '--close ' + classNames.infoCloseBtn).attr('style', 'display: none;').attr('title', 'Close Info Panel').text(onCloseButton());
+    $el.info.append('span').attr('class', classNames.info + '--close ' + classNames.infoCloseBtn).attr('style', 'display: none;').attr('title', 'Close Info Panel').html(onCloseButton());
     (0, _jquery.default)(selector).on('click', ".".concat(classNames.infoCloseBtn), e => {
       clearInfo();
       (0, _jquery.default)(e.currentTarget).hide();
@@ -1172,7 +1277,6 @@ function ProvenanceTree(d3, selector, _options) {
     const isNavigation = options.idNavigate.props.indexOf(property) !== -1;
     value = value ? value.replaceAll('"', '') : value;
     let formattedUrl = false;
-    let elem = $el.info.append('a');
     let href = '#';
     if (isNavigation && options.idNavigate && options.idNavigate.url) {
       const label = getNodeCat(d) || 'Unknown';
@@ -1181,11 +1285,17 @@ function ProvenanceTree(d3, selector, _options) {
         formattedUrl = true;
         const url = isValidURL(value) ? value : options.idNavigate.url;
         href = url.replace('{subType}', label.toLowerCase());
-        href = href.replace('{id}', value);
+        href = href.replace('{id}', getNodeId(d));
         href = isValidURL(value) && href.indexOf('://') === -1 ? '//' + href : href;
       }
     }
-    elem.attr('href', formattedUrl ? href : '#').attr('target', formattedUrl ? '_blank' : '_parent').attr('class', cls + (!formattedUrl ? ' flat' : ' has-hover')).html('<strong>' + property + '</strong>' + (value ? ": <span>".concat(value, "</span>") : ''));
+    let elem = $el.info.append('span');
+    let valueHtml = '';
+    if (value) {
+      valueHtml = !formattedUrl ? ": <span>".concat(value, "</span>") : ": <a href=\"".concat(href, "\" target=\"_blank\">").concat(value, " </a>");
+    }
+    cls += ' cell';
+    elem.attr('class', cls + (!formattedUrl ? ' flat' : ' link')).html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + valueHtml);
     if (!value) {
       elem.style('background-color', function (d) {
         return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : isNode ? typeToColor(property) : defaultColor();
@@ -1368,17 +1478,17 @@ function ProvenanceTree(d3, selector, _options) {
     $el.svgGroup = $el.svg.append('g');
     //.attr('transform', 'translate(' + (margin.left * 2) + ',' + (margin.top * 2) + ')')
 
-    $el.svg.append('defs').append('marker').attr("id", 'arrowhead').attr('viewBox', '-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
+    $el.svg.append('defs').append('marker').attr('id', 'arrowhead').attr('viewBox', '-0 -5 10 10') // The bound of the SVG viewport for the current SVG fragment. Defines a coordinate system 10 wide and 10 high starting on (0, -5)
     .attr('refX', 30) // X coordinate for the reference point of the marker. If circle is bigger, this needs to be bigger.
     .attr('refY', 0).attr('orient', 'auto').attr('markerWidth', 8).attr('markerHeight', 8).attr('xoverflow', 'visible').append('svg:path').attr('d', 'M 0,-5 L 10 ,0 L 0,5').attr('fill', '#999').style('stroke', 'none');
-    $el.linksGroup = $el.svgGroup.append("g").attr('class', 'links').attr("stroke", "#999").attr("stroke-opacity", 0.6);
+    $el.linksGroup = $el.svgGroup.append('g').attr('class', 'links').attr('stroke', '#999').attr('stroke-opacity', 0.6);
     $el.labelsGroup = $el.svgGroup.append('g').attr('class', 'labels');
     $el.nodeGroup = $el.svgGroup.append("g").attr('class', 'nodes').attr("stroke-width", 1.5);
     appendInfoPanel();
   }
   function updatePositions() {
     $el.link.attr("x1", d => d.source.x).attr("y1", d => d.source.y).attr("x2", d => d.target.x).attr("y2", d => d.target.y);
-    $el.node.select(".".concat(classNames.nodes.main)).attr("cx", d => {
+    $el.node.select("circle.".concat(classNames.nodes.main)).attr("cx", d => {
       positionData[d.id] = positionData[d.id] || {};
       positionData[d.id].x = d.x;
       return d.x;
@@ -1387,9 +1497,14 @@ function ProvenanceTree(d3, selector, _options) {
       positionData[d.id].y = d.y;
       return d.y;
     });
-    $el.node.select(".".concat(classNames.nodes.glow)).attr("cx", d => d.x).attr("cy", d => d.y);
+    $el.node.select("circle.".concat(classNames.nodes.glow)).attr("cx", d => d.x).attr("cy", d => d.y);
     $el.node.select(".".concat(classNames.nodes.text)).attr("x", d => d.x).attr("y", d => d.y);
-    $el.node.select(".".concat(classNames.nodes.image)).attr("x", d => d.x).attr("y", d => d.y);
+    const getX = d => d.x - options.node.radius;
+    const getY = d => d.y - options.node.radius;
+    $el.node.select(".".concat(classNames.nodes.image, ".main.g")).attr("transform", d => "translate(".concat(getX(d), ", ").concat(getY(d), ")"));
+    $el.node.select(".".concat(classNames.nodes.image, ".glow.g")).attr("transform", d => "translate(".concat(getX(d), ", ").concat(getY(d), ")"));
+    $el.node.select(".".concat(classNames.nodes.image, ".main")).attr("x", d => getX(d)).attr("y", d => getY(d));
+    $el.node.select(".".concat(classNames.nodes.image, ".glow")).attr("x", d => getX(d)).attr("y", d => getY(d));
     $el.edgePaths.attr('d', d => {
       if (options.reverseEdgeLabels) {
         return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y;
@@ -1445,7 +1560,8 @@ function ProvenanceTree(d3, selector, _options) {
     toggleEdgeLabels,
     legendFilters,
     treeWidth,
-    buildTree
+    buildTree,
+    visitedNodes: options.visitedNodes
   };
 }
 var _default = ProvenanceTree;
