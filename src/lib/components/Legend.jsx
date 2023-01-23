@@ -6,7 +6,7 @@ import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 import Swal from 'sweetalert2'
 import helpHtml from './help.html'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, helpLabel, helpText }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
 
@@ -23,8 +23,8 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                 title: 'c-help__title',
                 confirmButton: 'c-help__btn'
             },
-            title: `${helpLabel}`,
-            html: helpText || helpHtml,
+            title: `${help.title || help.label}`,
+            html: help.text || helpHtml,
             showCloseButton: true,
             confirmButtonText: 'Close'
         })
@@ -95,9 +95,11 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
     }
 
     const buildLegend = () => {
-        let result = [];
-        if (helpLabel) {
-            colors[helpLabel] = 'transparent'
+        let result = []
+        let helpLabel
+        if (help) {
+            help.label = helpLabel = help.label || 'Help'
+            colors[help.label] = 'transparent'
         }
         const isHelp = (key) => key === helpLabel
         for (let type in colors) {
@@ -135,7 +137,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 
 Legend.defaultProps = {
     filterNodes: true,
-    helpLabel: 'Help',
+    help: {},
     actionMap: {},
     selectorId: SELECTOR_ID,
     className: ''
@@ -143,11 +145,10 @@ Legend.defaultProps = {
 
 Legend.propTypes = {
     colorMap: PropTypes.object.isRequired,
+    help: PropTypes.object,
     actionMap: PropTypes.object,
     children: PropTypes.object,
     filterNodes: PropTypes.bool,
-    helpLabel: PropTypes.string,
-    helpText: PropTypes.string,
     selectorId: PropTypes.string,
     className: PropTypes.string
 }

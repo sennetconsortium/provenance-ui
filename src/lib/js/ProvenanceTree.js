@@ -77,7 +77,7 @@ function ProvenanceTree(d3, selector, _options) {
         reverseRelationships: true,
         keepPositionsOnDataToggle: false,
         displayEdgeLabels: true,
-        edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY', fontSize: 9 },
+        edgeLabels: { used: 'USED', wasGeneratedBy: 'WAS_GENERATED_BY', fontSize: 9, offset: -2 },
         highlight: [],
         iconMap: {},
         faIconMap: fontAwesomeIcons(),
@@ -1040,9 +1040,9 @@ function ProvenanceTree(d3, selector, _options) {
 
         $el.edgePaths.attr('d', d => {
             if (options.reverseEdgeLabels) {
-                return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y
+                return 'M ' + d.target.x + ' ' + (d.target.y + options.edgeLabels.offset) + ' L ' + d.source.x + ' ' + (d.source.y + options.edgeLabels.offset)
             } else {
-                return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y
+                return 'M ' + d.source.x + ' ' + (d.source.y + options.edgeLabels.offset) + ' L ' + d.target.x + ' ' + (d.target.y + options.edgeLabels.offset)
             }
         })
     }

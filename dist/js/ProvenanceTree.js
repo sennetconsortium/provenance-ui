@@ -90,7 +90,8 @@ function ProvenanceTree(d3, selector, _options) {
     edgeLabels: {
       used: 'USED',
       wasGeneratedBy: 'WAS_GENERATED_BY',
-      fontSize: 9
+      fontSize: 9,
+      offset: -2
     },
     highlight: [],
     iconMap: {},
@@ -1507,9 +1508,9 @@ function ProvenanceTree(d3, selector, _options) {
     $el.node.select(".".concat(classNames.nodes.image, ".glow")).attr("x", d => getX(d)).attr("y", d => getY(d));
     $el.edgePaths.attr('d', d => {
       if (options.reverseEdgeLabels) {
-        return 'M ' + d.target.x + ' ' + d.target.y + ' L ' + d.source.x + ' ' + d.source.y;
+        return 'M ' + d.target.x + ' ' + (d.target.y + options.edgeLabels.offset) + ' L ' + d.source.x + ' ' + (d.source.y + options.edgeLabels.offset);
       } else {
-        return 'M ' + d.source.x + ' ' + d.source.y + ' L ' + d.target.x + ' ' + d.target.y;
+        return 'M ' + d.source.x + ' ' + (d.source.y + options.edgeLabels.offset) + ' L ' + d.target.x + ' ' + (d.target.y + options.edgeLabels.offset);
       }
     });
   }

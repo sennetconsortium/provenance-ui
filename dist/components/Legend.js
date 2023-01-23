@@ -23,8 +23,7 @@ const Legend = _ref => {
     actionMap,
     selectorId,
     className,
-    helpLabel,
-    helpText
+    help
   } = _ref;
   const [colors] = (0, _react.useState)(colorMap);
   const [filterable] = (0, _react.useState)(filterNodes);
@@ -39,8 +38,8 @@ const Legend = _ref => {
         title: 'c-help__title',
         confirmButton: 'c-help__btn'
       },
-      title: "".concat(helpLabel),
-      html: helpText || _help.default,
+      title: "".concat(help.title || help.label),
+      html: help.text || _help.default,
       showCloseButton: true,
       confirmButtonText: 'Close'
     });
@@ -102,8 +101,10 @@ const Legend = _ref => {
   };
   const buildLegend = () => {
     let result = [];
-    if (helpLabel) {
-      colors[helpLabel] = 'transparent';
+    let helpLabel;
+    if (help) {
+      help.label = helpLabel = help.label || 'Help';
+      colors[help.label] = 'transparent';
     }
     const isHelp = key => key === helpLabel;
     for (let type in colors) {
@@ -139,18 +140,17 @@ const Legend = _ref => {
 };
 Legend.defaultProps = {
   filterNodes: true,
-  helpLabel: 'Help',
+  help: {},
   actionMap: {},
   selectorId: _constants.SELECTOR_ID,
   className: ''
 };
 Legend.propTypes = {
   colorMap: _propTypes.default.object.isRequired,
+  help: _propTypes.default.object,
   actionMap: _propTypes.default.object,
   children: _propTypes.default.object,
   filterNodes: _propTypes.default.bool,
-  helpLabel: _propTypes.default.string,
-  helpText: _propTypes.default.string,
   selectorId: _propTypes.default.string,
   className: _propTypes.default.string
 };
