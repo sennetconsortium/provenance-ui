@@ -1,4 +1,17 @@
 {
+  "plugins": [
+    [
+      "file-loader",
+      {
+        "name": "[name].[ext]",
+        "extensions": ["png", "jpg", "jpeg", "gif", "svg"],
+        "publicPath": "/images/provenance-ui/",
+        "outputPath": "/dist/assets",
+        "context": "",
+        "limit": 0
+      }
+    ]
+  ],
   "presets": [
     [
       "@babel/env",
