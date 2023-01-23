@@ -249,7 +249,6 @@ function ProvenanceTree(d3, selector, _options) {
                 return 'link '+className(d)
             })
             .on('click', function(e, d) {
-                d.wasClicked = true
                 updateInfo(d.data, false)
             })
             // .attr("d", d3.linkHorizontal()
@@ -435,14 +434,14 @@ function ProvenanceTree(d3, selector, _options) {
         return options.node.radius * 2
     }
 
-    function getImageHeight(d, ops) {
-        const actions = getImageActions(d, ops)
+    function getImageHeight(d) {
+        const actions = getImageActions(d)
         const sz = getDefaultSize()
         return actions ? actions.height || sz : sz
     }
 
-    function getImageWidth(d, ops) {
-        const actions = getImageActions(d, ops)
+    function getImageWidth(d) {
+        const actions = getImageActions(d)
         const sz = getDefaultSize()
         return actions ? actions.width || sz : sz
     }
@@ -544,8 +543,8 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('xlink:href', d => image(d))
             .attr('fill', d => getFillColor(d, ops))
             .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
-            .attr('height', d => icon(d) ? '24px': getImageHeight(d, ops) + 'px')
-            .attr('width', d => icon(d) ? '24px':  getImageWidth(d, ops) + 'px');
+            .attr('height', d => icon(d) ? '24px': getImageHeight(d) + 'px')
+            .attr('width', d => icon(d) ? '24px':  getImageWidth(d) + 'px');
     }
 
     function getHighlightClass(d, isNode = true) {
@@ -628,6 +627,7 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('id', d => `node--${getNodeId(d)}`)
             .on('click', function(e, d) {
                 d.wasClicked = true
+                options.visitedNodes.add(getNodeId(d))
                 updateInfo(d.data, true)
                 $(`${selector} .${classNames.infoCloseBtn}`).fadeIn()
             })
@@ -659,7 +659,7 @@ function ProvenanceTree(d3, selector, _options) {
             return (legendFilters[cat]) ? 'has-hover ' : ''
         }
 
-        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked ? 'is-visited' : ''}`)
+        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : ''}`)
             .attr('id', d => `node--${getNodeId(d)}`)
 
         $el.node.select(`circle.${classNames.nodes.glow}`)
@@ -1019,9 +1019,9 @@ function ProvenanceTree(d3, selector, _options) {
             .attr("x", d => d.x)
             .attr("y", d => d.y);
 
-        const getX = (d) => d.x - options.node.radius
+        const getX = (d) => d.x - (getImageWidth(d)/2)
 
-        const getY = (d) => d.y - options.node.radius
+        const getY = (d) => d.y - (getImageHeight(d)/2)
 
         $el.node.select(`.${classNames.nodes.image}.main.g`)
             .attr("transform", d => `translate(${getX(d)}, ${getY(d)})`)

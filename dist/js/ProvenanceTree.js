@@ -890,7 +890,6 @@ function ProvenanceTree(d3, selector, _options) {
     $el.link.attr('class', d => {
       return 'link ' + className(d);
     }).on('click', function (e, d) {
-      d.wasClicked = true;
       updateInfo(d.data, false);
     })
     // .attr("d", d3.linkHorizontal()
@@ -1015,13 +1014,13 @@ function ProvenanceTree(d3, selector, _options) {
   function getDefaultSize() {
     return options.node.radius * 2;
   }
-  function getImageHeight(d, ops) {
-    const actions = getImageActions(d, ops);
+  function getImageHeight(d) {
+    const actions = getImageActions(d);
     const sz = getDefaultSize();
     return actions ? actions.height || sz : sz;
   }
-  function getImageWidth(d, ops) {
-    const actions = getImageActions(d, ops);
+  function getImageWidth(d) {
+    const actions = getImageActions(d);
     const sz = getDefaultSize();
     return actions ? actions.width || sz : sz;
   }
@@ -1107,7 +1106,7 @@ function ProvenanceTree(d3, selector, _options) {
     return fillColor;
   }
   function appendImageToNode(node, ops) {
-    return node.append(d => getImageType(d, ops).node).attr('class', d => "image ".concat(ops.className, " ").concat(getImageTypeClass(d, ops))).attr('id', d => "image--".concat(getNodeId(d), "--").concat(ops.className)).attr('xlink:href', d => image(d)).attr('fill', d => getFillColor(d, ops)).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('height', d => icon(d) ? '24px' : getImageHeight(d, ops) + 'px').attr('width', d => icon(d) ? '24px' : getImageWidth(d, ops) + 'px');
+    return node.append(d => getImageType(d, ops).node).attr('class', d => "image ".concat(ops.className, " ").concat(getImageTypeClass(d, ops))).attr('id', d => "image--".concat(getNodeId(d), "--").concat(ops.className)).attr('xlink:href', d => image(d)).attr('fill', d => getFillColor(d, ops)).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).attr('height', d => icon(d) ? '24px' : getImageHeight(d) + 'px').attr('width', d => icon(d) ? '24px' : getImageWidth(d) + 'px');
   }
   function getHighlightClass(d) {
     let isNode = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -1195,6 +1194,7 @@ function ProvenanceTree(d3, selector, _options) {
     $el.node.exit().remove();
     $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).on('click', function (e, d) {
       d.wasClicked = true;
+      options.visitedNodes.add(getNodeId(d));
       updateInfo(d.data, true);
       (0, _jquery.default)("".concat(selector, " .").concat(classNames.infoCloseBtn)).fadeIn();
     }).call(drag());
@@ -1216,7 +1216,7 @@ function ProvenanceTree(d3, selector, _options) {
       const cat = getNodeCat(d);
       return legendFilters[cat] ? 'has-hover ' : '';
     };
-    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked ? 'is-visited' : '')).attr('id', d => "node--".concat(getNodeId(d)));
+    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : '')).attr('id', d => "node--".concat(getNodeId(d)));
     $el.node.select("circle.".concat(classNames.nodes.glow)).attr('class', classNames.nodes.glow).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
     }).style('stroke', d => {
@@ -1499,8 +1499,8 @@ function ProvenanceTree(d3, selector, _options) {
     });
     $el.node.select("circle.".concat(classNames.nodes.glow)).attr("cx", d => d.x).attr("cy", d => d.y);
     $el.node.select(".".concat(classNames.nodes.text)).attr("x", d => d.x).attr("y", d => d.y);
-    const getX = d => d.x - options.node.radius;
-    const getY = d => d.y - options.node.radius;
+    const getX = d => d.x - getImageWidth(d) / 2;
+    const getY = d => d.y - getImageHeight(d) / 2;
     $el.node.select(".".concat(classNames.nodes.image, ".main.g")).attr("transform", d => "translate(".concat(getX(d), ", ").concat(getY(d), ")"));
     $el.node.select(".".concat(classNames.nodes.image, ".glow.g")).attr("transform", d => "translate(".concat(getX(d), ", ").concat(getY(d), ")"));
     $el.node.select(".".concat(classNames.nodes.image, ".main")).attr("x", d => getX(d)).attr("y", d => getY(d));
