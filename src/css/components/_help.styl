@@ -1,23 +1,37 @@
 .c-help
   font-family $font-family
-  font-size .9em
-  max-height 500px
-  overflow-y auto
+  &__body
+    font-size .9em
+    max-height 500px
+    overflow-y auto
+  .c-help__btn
+    background-color transparent
+    width 100px
+    border solid 1px $col-pale-sky
+    color $col-pale-sky
+    border-radius 0
+    &:hover
+      background-color $col-pale-sky
+      color white
+    &:focus
+      box-shadow 0 0 0 3px rgba(108, 117, 125, 0.5)
+
+  .mgn-v
+    margin .9em 0
   h4
-    padding-bottom 1em
+    padding 1em 0 .3em
     font-size 1.2em
-    padding-top .6em
+  h5
+    padding-bottom .5em 0
+    font-size 1em
   p
     padding .5em 0
   li
     padding .6em 0
 
-.swal2-styled.swal2-confirm
-  background-color transparent
-  width 100px
-  border solid 1px $col-pale-sky
-  color $col-pale-sky
-  border-radius 0
-  &:hover
-    background-color $col-pale-sky
-    color white
+  &__title
+    color black
+    font-family $font-family
+    padding-bottom .5em
+    border-bottom solid 1px #dee2e6
+

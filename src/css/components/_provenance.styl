@@ -93,9 +93,17 @@
       margin-top 5px
       padding 6px 12px
       text-decoration none
-      &.has-hover:hover
+      &.has-hover
         span
-          color $col-malibu
+          &:after
+            font-family 'FontAwesome'
+            content '\f08e'
+            margin-left 3px
+            font-size 11px
+
+        &:hover
+          span
+            color $col-malibu
       &.flat
         cursor default
       &.class

@@ -32,6 +32,7 @@ function ProvenanceTree(d3, selector, _options) {
         has: false,
         original: true
     }
+
     const classNames = {
         info: 'c-provenance__info',
         infoMain: 'c-provenance__info__main',
@@ -61,11 +62,11 @@ function ProvenanceTree(d3, selector, _options) {
             Sample: "#ebb5c8",
             Source: "#ffc255"
         },
+        visitedNodes: new Set(),
         imageMapActions: {},
         imageMap: {},
         imagesMap: {},
         node: {
-            glowMod: 10,
             append: 'text',
             radius: 15
         },
@@ -431,35 +432,37 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function getDefaultSize() {
-        return options
+        return options.node.radius * 2
     }
 
     function getImageHeight(d, ops) {
         const actions = getImageActions(d, ops)
-        return actions ? actions.height || 30 : 30
+        const sz = getDefaultSize()
+        return actions ? actions.height || sz : sz
     }
 
     function getImageWidth(d, ops) {
         const actions = getImageActions(d, ops)
-        return actions ? actions.width || 30 : 30
+        const sz = getDefaultSize()
+        return actions ? actions.width || sz : sz
     }
 
     function getImageType(d, ops) {
         let type = 'image'
         let actions = getImageActions(d, ops)
-        let node = document.createElementNS('http://www.w3.org/2000/svg', type)
-        if (actions !== null) {
+        const uri = 'http://www.w3.org/2000/svg'
+        let node = document.createElementNS(uri, type)
+        if (actions) {
             type = actions ? actions.type : 'image';
-            node =  document.createElementNS('http://www.w3.org/2000/svg', type)
+            node =  document.createElementNS(uri, type)
             const id = getNodeId(d)
             if (actions.fn === 'append') {
                 if (type === 'image') {
                     fetchImage(d, ops)
                 } else {
                     node.classList.add(type)
-                    console.log(node.classList)
                     for (let io of actions.data) {
-                        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+                        const path = document.createElementNS(uri, 'path')
                         path.setAttribute('d', io.draw)
                         node.append(path)
                     }
@@ -1090,7 +1093,8 @@ function ProvenanceTree(d3, selector, _options) {
         toggleEdgeLabels,
         legendFilters,
         treeWidth,
-        buildTree
+        buildTree,
+        visitedNodes: options.visitedNodes
     }
 }
 

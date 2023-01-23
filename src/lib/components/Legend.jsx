@@ -18,7 +18,12 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 
     const showHelp = () => {
         Swal.fire({
-            title: `<h3><i class='fa fa-question-circle-o' role='presentation'></i> ${helpLabel}</h3>`,
+            customClass: {
+                container: 'c-help',
+                title: 'c-help__title',
+                confirmButton: 'c-help__btn'
+            },
+            title: `<i class='fa fa-question-circle-o' role='presentation'></i> ${helpLabel}`,
             html: helpText || helpHtml,
             showCloseButton: true
         })

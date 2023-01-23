@@ -59,18 +59,18 @@ async function Neo4JGraphObject(serviceOps) {
                 height: 25,
                 width: 50,
             },
-            "Source": {
-                fn: 'append',
-                color: "#ffc255",
-                transparentMain: true,
-                transparentGlow: true,
-                type: 'g',
-                data: [
-                    {
-                        draw: 'm14.98,29.55C10.15,24.72,5.29,19.86.44,15.01,5.29,10.16,10.15,5.3,14.99.46c4.84,4.84,9.7,9.7,14.54,14.54-4.83,4.83-9.7,9.7-14.55,14.55Z'
-                    }
-                ]
-            }
+            // "Source": {
+            //     fn: 'append',
+            //     color: "#ffc255",
+            //     transparentMain: true,
+            //     transparentGlow: true,
+            //     type: 'g',
+            //     data: [
+            //         {
+            //             draw: 'm14.98,29.55C10.15,24.72,5.29,19.86.44,15.01,5.29,10.16,10.15,5.3,14.99.46c4.84,4.84,9.7,9.7,14.54,14.54-4.83,4.83-9.7,9.7-14.55,14.55Z'
+            //         }
+            //     ]
+            // }
         }
         ops.propertyPrefixClear = 'sennet:'
         ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions}
