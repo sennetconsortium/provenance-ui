@@ -890,6 +890,7 @@ function ProvenanceTree(d3, selector, _options) {
     const zoom = d3.zoom().scaleExtent([0.2, 5]).on('zoom', function (event) {
       $el.svgGroup.selectAll('.links, .nodes, .labels').attr('transform', event.transform);
     });
+    options.zoom = zoom;
     $el.svg.call(zoom);
   }
   function buildLinks() {

@@ -231,7 +231,7 @@ function ProvenanceTree(d3, selector, _options) {
                 $el.svgGroup.selectAll('.links, .nodes, .labels')
                     .attr('transform', event.transform);
             });
-
+        options.zoom = zoom
         $el.svg.call(zoom)
     }
 
