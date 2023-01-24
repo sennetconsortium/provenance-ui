@@ -109,7 +109,7 @@ const Legend = _ref => {
     const isHelp = key => key === helpLabel;
     for (let type in colors) {
       result.push( /*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item'),
+        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item', " ").concat(actionMap[type] && actionMap[type].disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(type),
         "data-node": type
       }, /*#__PURE__*/_react.default.createElement("span", {
@@ -129,6 +129,7 @@ const Legend = _ref => {
         context: actionMap[type].callback,
         selectorId: actionMap[type].selectorId || selectorId,
         className: "c-legend__action ".concat(actionMap[type].className),
+        disabled: actionMap[type].disabled,
         ariaLabel: actionMap[type].ariaLabel
       }))));
     }

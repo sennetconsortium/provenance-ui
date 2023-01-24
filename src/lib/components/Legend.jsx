@@ -104,7 +104,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
         const isHelp = (key) => key === helpLabel
         for (let type in colors) {
             result.push(
-                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'}`} key={`legend--${type}`} data-node={type}>
+                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'} ${actionMap[type] && actionMap[type].disabled ? CLASS_NAMES.disabled : ''}`} key={`legend--${type}`} data-node={type}>
                     <span className={`c-legend__color ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'} c-legend__color--${type}`}>
                         <span style={{backgroundColor: colors[type]}}>
                             {isHelp(type) && <i className='fa fa-question-circle-o' role='presentation'></i>}
@@ -115,7 +115,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                             {type}
                         </span>
                         { actionMap[type] &&
-                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId || selectorId} className={`c-legend__action ${actionMap[type].className}`} ariaLabel={actionMap[type].ariaLabel} />
+                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId || selectorId} className={`c-legend__action ${actionMap[type].className}`} disabled={actionMap[type].disabled} ariaLabel={actionMap[type].ariaLabel} />
                         }
                     </span>
                 </li>

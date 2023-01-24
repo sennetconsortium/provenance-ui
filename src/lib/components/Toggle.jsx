@@ -3,7 +3,7 @@ import $ from 'jquery'
 import PropTypes from 'prop-types'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
-function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
+function Toggle({ context, icon, selectorId, ariaLabel, text, className, disabled}) {
 
     const toggleData = (e) => {
         const $el = $(e.currentTarget)
@@ -15,7 +15,6 @@ function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
         }
         const $trigger = $p.find(SELECTORS.legend.legendTrigger)
         if (!isEdge($p) && $p.hasClass(CLASS_NAMES.hover)) {
-
             $trigger.eq(0).trigger('click', {force: true})
         }
         if (context !== null) {
@@ -24,7 +23,7 @@ function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
     }
 
     return (
-        <label className={`c-toggle ${className}`} >
+        <label className={`c-toggle ${className} ${disabled ? CLASS_NAMES.toggled : ''}`} >
 
             {!icon &&
                 <>
@@ -36,7 +35,7 @@ function Toggle({ context, icon, selectorId, ariaLabel, text, className}) {
                 </>
             }
             {icon && <>
-                <span className={`c-toggle__icon fa fa-eye`} aria-label={ariaLabel} onClick={toggleData} title={ariaLabel}></span>
+                <span className={`c-toggle__icon fa fa-eye ${disabled ? CLASS_NAMES.toggled : ''}`} aria-label={ariaLabel} onClick={toggleData} title={ariaLabel}></span>
             </> }
 
         </label>
@@ -47,6 +46,7 @@ Toggle.defaultProps = {
     icon: true,
     selectorId: SELECTOR_ID,
     ariaLabel: 'Toggle',
+    disabled: false,
     text: '',
     className: ''
 }
@@ -54,6 +54,7 @@ Toggle.defaultProps = {
 Toggle.propTypes = {
     context: PropTypes.func,
     icon: PropTypes.bool,
+    disabled: PropTypes.bool,
     selectorId: PropTypes.string,
     ariaLabel: PropTypes.string,
     text: PropTypes.string,

@@ -54,6 +54,7 @@ function ProvenanceTree(d3, selector, _options) {
     }
     const sz = {}
     let simulation
+    let isInit = true
     const data = {}
     const options = {
         colorMap: {
@@ -73,6 +74,7 @@ function ProvenanceTree(d3, selector, _options) {
         propertyMap: {
             'sennet:created_by_user_displayname': 'agent'
         },
+        initParentKey: DataConverter.KEY_P_ACT,
         propertyPrefixClear: '',
         reverseRelationships: true,
         keepPositionsOnDataToggle: false,
@@ -121,7 +123,13 @@ function ProvenanceTree(d3, selector, _options) {
         $el.canvas.html('')
         setUpSvg()
         allData = JSON.parse(JSON.stringify(data))
-        buildTree(loadData(data), true)
+        isInit = true
+        const d = loadData(data)
+        if (options.initParentKey === DataConverter.KEY_P_ENTITY) {
+            toggleData({filter: 'Activity', parentKey: options.initParentKey })
+        } else {
+            buildTree(d)
+        }
     }
 
     function log(title, obj, fn = 'log', color = '#da8f55') {
@@ -909,7 +917,10 @@ function ProvenanceTree(d3, selector, _options) {
     function toggleData(ops) {
         toggled.has = true
         const {filter, parentKey} = ops
-        simulation.stop()
+        if (simulation) {
+            simulation.stop()
+        }
+
         let _data = dataKey ? allData[dataKey] : allData
         if (filter) {
             toggled.original = false
@@ -1066,7 +1077,7 @@ function ProvenanceTree(d3, selector, _options) {
         return links
     }
 
-    function buildTree(_data, isInit) {
+    function buildTree(_data) {
         const { root, nodes, links } = _data
         const h = d3.hierarchy(root)
 
@@ -1078,6 +1089,7 @@ function ProvenanceTree(d3, selector, _options) {
         buildNodes()
 
         if (isInit) {
+            isInit = false
             initSimulation()
         } else {
             updateSimulation()

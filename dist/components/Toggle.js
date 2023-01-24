@@ -16,7 +16,8 @@ function Toggle(_ref) {
     selectorId,
     ariaLabel,
     text,
-    className
+    className,
+    disabled
   } = _ref;
   const toggleData = e => {
     const $el = (0, _jquery.default)(e.currentTarget);
@@ -37,7 +38,7 @@ function Toggle(_ref) {
     }
   };
   return /*#__PURE__*/_react.default.createElement("label", {
-    className: "c-toggle ".concat(className)
+    className: "c-toggle ".concat(className, " ").concat(disabled ? _constants.CLASS_NAMES.toggled : '')
   }, !icon && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("span", {
     className: "c-toggle__text"
   }, text), /*#__PURE__*/_react.default.createElement("span", {
@@ -49,7 +50,7 @@ function Toggle(_ref) {
     className: "c-toggle__slider c-toggle__slider--round",
     "aria-label": ariaLabel
   }))), icon && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("span", {
-    className: "c-toggle__icon fa fa-eye",
+    className: "c-toggle__icon fa fa-eye ".concat(disabled ? _constants.CLASS_NAMES.toggled : ''),
     "aria-label": ariaLabel,
     onClick: toggleData,
     title: ariaLabel
@@ -59,12 +60,14 @@ Toggle.defaultProps = {
   icon: true,
   selectorId: _constants.SELECTOR_ID,
   ariaLabel: 'Toggle',
+  disabled: false,
   text: '',
   className: ''
 };
 Toggle.propTypes = {
   context: _propTypes.default.func,
   icon: _propTypes.default.bool,
+  disabled: _propTypes.default.bool,
   selectorId: _propTypes.default.string,
   ariaLabel: _propTypes.default.string,
   text: _propTypes.default.string,

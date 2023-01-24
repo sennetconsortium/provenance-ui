@@ -32,7 +32,8 @@ function App() {
         Activity: {
             callback: toggleData,
             className: 'c-toggle--eye',
-            ariaLabel: 'Toggle Activity Nodes'
+            ariaLabel: 'Toggle Activity Nodes',
+            disabled: true,
         },
         Edge: {
             callback: toggleEdgeLabels,
