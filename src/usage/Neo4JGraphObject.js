@@ -73,6 +73,7 @@ async function Neo4JGraphObject(serviceOps) {
             // }
         }
         ops.propertyPrefixClear = 'sennet:'
+        ops.displayEdgeLabels = false
         ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions}
         setOptions(ops)
         setLoading(false)

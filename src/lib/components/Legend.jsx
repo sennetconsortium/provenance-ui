@@ -102,9 +102,11 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             colors[help.label] = 'transparent'
         }
         const isHelp = (key) => key === helpLabel
+        let action
         for (let type in colors) {
+            action = actionMap[type]
             result.push(
-                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'} ${actionMap[type] && actionMap[type].disabled ? CLASS_NAMES.disabled : ''}`} key={`legend--${type}`} data-node={type}>
+                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`} key={`legend--${type}`} data-node={type}>
                     <span className={`c-legend__color ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'} c-legend__color--${type}`}>
                         <span style={{backgroundColor: colors[type]}}>
                             {isHelp(type) && <i className='fa fa-question-circle-o' role='presentation'></i>}
@@ -114,8 +116,9 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                         <span className={`c-legend__label__text ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'}`}>
                             {type}
                         </span>
-                        { actionMap[type] &&
-                            <Toggle context={ actionMap[type].callback } selectorId={actionMap[type].selectorId || selectorId} className={`c-legend__action ${actionMap[type].className}`} disabled={actionMap[type].disabled} ariaLabel={actionMap[type].ariaLabel} />
+                        { action &&
+                            <Toggle context={ action.callback } selectorId={action.selectorId || selectorId} className={`c-legend__action ${action.className}`}
+                                    disabled={action.visible !== undefined ? !action.visible : action.disabled} ariaLabel={action.ariaLabel} />
                         }
                     </span>
                 </li>

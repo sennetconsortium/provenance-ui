@@ -4,6 +4,12 @@ require("core-js/modules/web.dom-collections.iterator.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+Object.defineProperty(exports, "DataConverter", {
+  enumerable: true,
+  get: function get() {
+    return _DataConverter.default;
+  }
+});
 Object.defineProperty(exports, "DataConverterGeneric", {
   enumerable: true,
   get: function get() {
@@ -53,6 +59,12 @@ Object.defineProperty(exports, "Toggle", {
     return _Toggle.default;
   }
 });
+Object.defineProperty(exports, "helpHtml", {
+  enumerable: true,
+  get: function get() {
+    return _help.default;
+  }
+});
 Object.defineProperty(exports, "useD3", {
   enumerable: true,
   get: function get() {
@@ -65,6 +77,7 @@ var _Legend = _interopRequireDefault(require("./components/Legend"));
 var _Toggle = _interopRequireDefault(require("./components/Toggle"));
 var _GraphGeneric = _interopRequireDefault(require("./js/generic/GraphGeneric"));
 var _DataGraphGeneric = _interopRequireDefault(require("./js/generic/DataGraphGeneric"));
+var _DataConverter = _interopRequireDefault(require("./js/DataConverter"));
 var _DataConverterNeo4J = _interopRequireDefault(require("./js/neo4j/DataConverterNeo4J"));
 var _DataConverterGeneric = _interopRequireDefault(require("./js/generic/DataConverterGeneric"));
 var _ProvenanceTree = _interopRequireDefault(require("./js/ProvenanceTree"));

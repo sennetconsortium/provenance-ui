@@ -107,9 +107,11 @@ const Legend = _ref => {
       colors[help.label] = 'transparent';
     }
     const isHelp = key => key === helpLabel;
+    let action;
     for (let type in colors) {
+      action = actionMap[type];
       result.push( /*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item', " ").concat(actionMap[type] && actionMap[type].disabled ? _constants.CLASS_NAMES.disabled : ''),
+        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(type),
         "data-node": type
       }, /*#__PURE__*/_react.default.createElement("span", {
@@ -125,12 +127,12 @@ const Legend = _ref => {
         className: "c-legend__label"
       }, /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__label__text ".concat(isHelp(type) ? 'js-legend--help' : 'js-legend--trigger')
-      }, type), actionMap[type] && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
-        context: actionMap[type].callback,
-        selectorId: actionMap[type].selectorId || selectorId,
-        className: "c-legend__action ".concat(actionMap[type].className),
-        disabled: actionMap[type].disabled,
-        ariaLabel: actionMap[type].ariaLabel
+      }, type), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
+        context: action.callback,
+        selectorId: action.selectorId || selectorId,
+        className: "c-legend__action ".concat(action.className),
+        disabled: action.visible !== undefined ? !action.visible : action.disabled,
+        ariaLabel: action.ariaLabel
       }))));
     }
     return result;

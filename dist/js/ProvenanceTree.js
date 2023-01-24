@@ -93,7 +93,8 @@ function ProvenanceTree(d3, selector, _options) {
       used: 'USED',
       wasGeneratedBy: 'WAS_GENERATED_BY',
       fontSize: 9,
-      offset: -2
+      offset: -2,
+      print: true
     },
     highlight: [],
     iconMap: {},
@@ -134,6 +135,9 @@ function ProvenanceTree(d3, selector, _options) {
   }
   function clearCanvas() {
     $el.canvas.html('');
+    if (!options.displayEdgeLabels) {
+      toggleEdgeLabels();
+    }
     setUpSvg();
     allData = JSON.parse(JSON.stringify(data));
     isInit = true;
@@ -928,7 +932,7 @@ function ProvenanceTree(d3, selector, _options) {
       if (options.callbacks.onEdgeLabel) {
         return runCallback('onEdgeLabel', d);
       } else {
-        if (options.displayEdgeLabels) {
+        if (options.edgeLabels.print) {
           return d.source.data.type === 'Entity' && toggled.original ? options.edgeLabels.wasGeneratedBy : options.edgeLabels.used;
         } else {
           return '';
@@ -1430,7 +1434,7 @@ function ProvenanceTree(d3, selector, _options) {
       });
     }
   }
-  function toggleEdgeLabels(ops) {
+  function toggleEdgeLabels() {
     (0, _jquery.default)(selector).toggleClass(classNames.links.hidden);
   }
   function toggleData(ops) {
