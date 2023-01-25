@@ -1020,7 +1020,7 @@ function ProvenanceTree(d3, selector, _options) {
   function getImageActions(d, ops) {
     const subType = getNodeCat(d);
     if (options.imageMap && options.imagesMap[subType]) {
-      return options.imageMapActions[options.imagesMap[subType][0]];
+      return propertyValueSearch(d, options.imagesMap[subType], options.imageMapActions);
     }
     return null;
   }
@@ -1070,44 +1070,48 @@ function ProvenanceTree(d3, selector, _options) {
     };
   }
   function image(d) {
-    let i, imagesForLabel, img, imgLevel, label, labelPropertyValue, property, value;
+    let img;
     const subType = getNodeCat(d);
     if (options.imageMap) {
-      imagesForLabel = options.imagesMap[subType];
-      if (imagesForLabel) {
-        imgLevel = 0;
-        for (i = 0; i < imagesForLabel.length; i++) {
-          labelPropertyValue = imagesForLabel[i].split('|');
-          switch (labelPropertyValue.length) {
-            case 3:
-              value = labelPropertyValue[2];
-            /* falls through */
-            case 2:
-              property = labelPropertyValue[1];
-            /* falls through */
-            case 1:
-              label = labelPropertyValue[0];
-              break;
-            default:
-              //console.error()
-              break;
-          }
-          const properties = getNodeProperties(d);
-          if (subType === label && (!property || properties[property] !== undefined) && (!value || properties[property] === value)) {
-            if (labelPropertyValue.length > imgLevel) {
-              img = options.imageMap[imagesForLabel[i]];
-              imgLevel = labelPropertyValue.length;
-            }
+      img = propertyValueSearch(d, options.imagesMap[subType], options.imageMap);
+    }
+    return img;
+  }
+  function propertyValueSearch(d, imagesForLabel, dict) {
+    let i, result, imgLevel, label, labelPropertyValue, property, value;
+    if (imagesForLabel) {
+      imgLevel = 0;
+      const subType = getNodeCat(d);
+      for (i = 0; i < imagesForLabel.length; i++) {
+        labelPropertyValue = imagesForLabel[i].split('|');
+        switch (labelPropertyValue.length) {
+          case 3:
+            value = labelPropertyValue[2];
+          /* falls through */
+          case 2:
+            property = labelPropertyValue[1];
+          /* falls through */
+          case 1:
+            label = labelPropertyValue[0];
+            break;
+          default:
+            break;
+        }
+        const properties = getNodeProperties(d);
+        if (subType === label && (!property || properties[property] !== undefined) && (!value || properties[property] === value)) {
+          if (labelPropertyValue.length > imgLevel) {
+            result = dict[imagesForLabel[i]];
+            imgLevel = labelPropertyValue.length;
           }
         }
       }
     }
-    return img;
+    return result;
   }
   function getFillColor(d, ops) {
     let fillColor;
     const subType = getNodeCat(d);
-    const actions = options.imagesMap[subType] ? options.imageMapActions[options.imagesMap[subType][0]] : {};
+    const actions = getImageActions(d, ops);
     const id = getNodeId(d);
     if (actions && actions.color) {
       const colors = options.theme.colors;

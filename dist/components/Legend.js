@@ -38,6 +38,7 @@ const Legend = _ref => {
         title: 'c-help__title',
         confirmButton: 'c-help__btn'
       },
+      width: help.width || 700,
       title: "".concat(help.title || help.label),
       html: help.text || _help.default,
       showCloseButton: true,

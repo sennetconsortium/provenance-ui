@@ -23,6 +23,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                 title: 'c-help__title',
                 confirmButton: 'c-help__btn'
             },
+            width: help.width || 700,
             title: `${help.title || help.label}`,
             html: help.text || helpHtml,
             showCloseButton: true,
