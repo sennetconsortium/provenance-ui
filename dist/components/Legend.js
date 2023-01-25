@@ -11,7 +11,7 @@ var _jquery = _interopRequireDefault(require("jquery"));
 var _Toggle = _interopRequireDefault(require("./Toggle"));
 var _constants = require("../js/constants");
 var _sweetalert = _interopRequireDefault(require("sweetalert2"));
-var _help = _interopRequireDefault(require("./help.html"));
+var _useHelpHtml = _interopRequireDefault(require("../hooks/useHelpHtml"));
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -27,6 +27,9 @@ const Legend = _ref => {
   } = _ref;
   const [colors] = (0, _react.useState)(colorMap);
   const [filterable] = (0, _react.useState)(filterNodes);
+  const {
+    html
+  } = (0, _useHelpHtml.default)(help);
   const loaded = (0, _react.useRef)(false);
   (0, _react.useEffect)(() => {
     if (filterable && !loaded.current) setEvents();
@@ -40,7 +43,7 @@ const Legend = _ref => {
       },
       width: help.width || 700,
       title: "".concat(help.title || help.label),
-      html: help.text || _help.default,
+      html: html,
       showCloseButton: true,
       confirmButtonText: 'Close'
     });
@@ -70,7 +73,8 @@ const Legend = _ref => {
         (0, _jquery.default)("#".concat(selectorId))[fn](className);
       }
     };
-    (0, _jquery.default)(".c-legend--".concat(selectorId, "  ").concat(selectors.legendTrigger)).on('click', (e, data) => {
+    const $trigger = (0, _jquery.default)(".c-legend--".concat(selectorId, "  ").concat(selectors.legendTrigger));
+    $trigger.on('click', (e, data) => {
       e.stopPropagation();
       e.preventDefault();
       if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled) || data.force) {
@@ -89,7 +93,7 @@ const Legend = _ref => {
         }
       }
     });
-    (0, _jquery.default)(".c-legend--".concat(selectorId, "  ").concat(selectors.legendTrigger)).on('mouseover', e => {
+    $trigger.on('mouseover', e => {
       if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled)) {
         if (!(0, _jquery.default)("#".concat(selectorId)).hasClass(stickClass)) toggleClass(e);
       }

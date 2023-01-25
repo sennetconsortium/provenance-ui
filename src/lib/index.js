@@ -10,7 +10,7 @@ import DataConverterGeneric from './js/generic/DataConverterGeneric'
 import ProvenanceTree from './js/ProvenanceTree'
 import * as PUI from './js/constants'
 import useD3 from './hooks/useD3'
-import helpHtml from './components/help.html'
+import useHelpHtml from './hooks/useHelpHtml'
 
 
-export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataConverterGeneric, DataConverter, DataGraphGeneric, GraphGeneric, ProvenanceTree, PUI, useD3, helpHtml }
+export { ProvenanceUI, Legend, Toggle, DataConverterNeo4J, DataConverterGeneric, DataConverter, DataGraphGeneric, GraphGeneric, ProvenanceTree, PUI, useD3, useHelpHtml }

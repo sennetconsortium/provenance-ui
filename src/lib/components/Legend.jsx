@@ -4,11 +4,12 @@ import $ from 'jquery'
 import Toggle from './Toggle'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 import Swal from 'sweetalert2'
-import helpHtml from './help.html'
+import useHelpHtml from '../hooks/useHelpHtml';
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
+    const { html } = useHelpHtml(help)
 
     const loaded = useRef(false)
 
@@ -25,7 +26,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             },
             width: help.width || 700,
             title: `${help.title || help.label}`,
-            html: help.text || helpHtml,
+            html: html,
             showCloseButton: true,
             confirmButtonText: 'Close'
         })
@@ -58,8 +59,8 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                 $(`#${selectorId}`)[fn](className)
             }
         }
-
-        $(`.c-legend--${selectorId}  ${selectors.legendTrigger}`).on('click', (e, data) => {
+        const $trigger = $(`.c-legend--${selectorId}  ${selectors.legendTrigger}`)
+        $trigger.on('click', (e, data) => {
             e.stopPropagation()
             e.preventDefault()
 
@@ -82,7 +83,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 
         })
 
-        $(`.c-legend--${selectorId}  ${selectors.legendTrigger}`).on('mouseover', (e) => {
+        $trigger.on('mouseover', (e) => {
             if (!getItem(e).hasClass(CLASS_NAMES.disabled)) {
                 if (!$(`#${selectorId}`).hasClass(stickClass)) toggleClass(e)
             }
