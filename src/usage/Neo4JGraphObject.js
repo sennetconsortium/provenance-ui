@@ -47,14 +47,11 @@ async function Neo4JGraphObject(serviceOps) {
         const imageMapActions = {
             // "Sample|sennet:sample_category|organ": {
             //     color: "#ebb5c8",
-            //     transparentMain: true,
-            //     transparentGlow: true,
+            // showMain: true,
+            // showMainGlow: true,
             //     type: 'rect'
             // },
             "Sample|sennet:sample_category|organ": {
-                color: "#ebb5c8",
-                transparentMain: true,
-                transparentGlow: true,
                 type: 'rect',
                 height: 25,
                 width: 50,
@@ -62,8 +59,6 @@ async function Neo4JGraphObject(serviceOps) {
             // "Source": {
             //     fn: 'append',
             //     color: "#ffc255",
-            //     transparentMain: true,
-            //     transparentGlow: true,
             //     type: 'g',
             //     data: [
             //         {
