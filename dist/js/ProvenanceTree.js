@@ -81,9 +81,7 @@ function ProvenanceTree(d3, selector, _options) {
       append: 'text',
       radius: 15
     },
-    propertyMap: {
-      'sennet:created_by_user_displayname': 'agent'
-    },
+    propertyMap: {},
     initParentKey: _DataConverter.default.KEY_P_ACT,
     propertyPrefixClear: '',
     reverseRelationships: true,
@@ -1109,18 +1107,18 @@ function ProvenanceTree(d3, selector, _options) {
     return result;
   }
   function getFillColor(d, ops) {
-    let fillColor;
     const subType = getNodeCat(d);
+    let fillColor = typeToColor(subType);
     const actions = getImageActions(d, ops);
     const id = getNodeId(d);
-    if (actions && actions.color) {
+    if (actions) {
       const colors = options.theme.colors;
       const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular;
-      fillColor = ops.className === 'glow' ? glowColor : actions.color;
-      if (actions.transparentMain) {
+      fillColor = ops.className === 'glow' ? glowColor : actions.color || fillColor;
+      if (!actions.showMain) {
         (0, _jquery.default)("#node--".concat(id)).find('circle.main').addClass('invisible');
       }
-      if (actions.transparentGlow) {
+      if (!actions.showMainGlow) {
         (0, _jquery.default)("#node--".concat(id)).find('circle.glow').addClass('invisible');
       }
     }
