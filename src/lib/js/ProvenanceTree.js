@@ -537,12 +537,13 @@ function ProvenanceTree(d3, selector, _options) {
             const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular
             fillColor = ops.className === 'glow' ?  glowColor : (actions.color || fillColor)
 
+            const $node = $(`${selector} #node--${id}`)
             if (!actions.showMain) {
-                $(`#node--${id}`).find('circle.main').addClass('invisible')
+                $node.find('circle.main').addClass('invisible')
             }
 
             if (!actions.showMainGlow) {
-                $(`#node--${id}`).find('circle.glow').addClass('invisible')
+                $node.find('circle.glow').addClass('invisible')
             }
         }
 
@@ -691,7 +692,7 @@ function ProvenanceTree(d3, selector, _options) {
             .attr('stroke', d => typeToDarkenColor(getNodeCat(d)))
             .append('title').text(d => getNodeCat(d))
 
-        $(`.${classNames.nodes.image}`).remove()
+        $(`${selector} .${classNames.nodes.image}`).remove()
         appendImageToNode($el.node, {className: 'glow'})
         appendImageToNode($el.node, {className: 'main'})
     }

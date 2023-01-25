@@ -1115,11 +1115,12 @@ function ProvenanceTree(d3, selector, _options) {
       const colors = options.theme.colors;
       const glowColor = isHighlighted(d) ? colors.glow.highlighted : colors.glow.regular;
       fillColor = ops.className === 'glow' ? glowColor : actions.color || fillColor;
+      const $node = (0, _jquery.default)("".concat(selector, " #node--").concat(id));
       if (!actions.showMain) {
-        (0, _jquery.default)("#node--".concat(id)).find('circle.main').addClass('invisible');
+        $node.find('circle.main').addClass('invisible');
       }
       if (!actions.showMainGlow) {
-        (0, _jquery.default)("#node--".concat(id)).find('circle.glow').addClass('invisible');
+        $node.find('circle.glow').addClass('invisible');
       }
     }
     return fillColor;
@@ -1242,7 +1243,7 @@ function ProvenanceTree(d3, selector, _options) {
       return options.theme.colors.nodeOutlineFill ? typeToDarkenColor(options.theme.colors.nodeOutlineFill) : typeToDarkenColor(getNodeCat(d));
     }).append('title').text(d => getNodeCat(d));
     $el.node.select("circle.".concat(classNames.nodes.main)).attr('class', classNames.nodes.main).attr('fill', d => typeToColor(getNodeCat(d))).attr('stroke', d => typeToDarkenColor(getNodeCat(d))).append('title').text(d => getNodeCat(d));
-    (0, _jquery.default)(".".concat(classNames.nodes.image)).remove();
+    (0, _jquery.default)("".concat(selector, " .").concat(classNames.nodes.image)).remove();
     appendImageToNode($el.node, {
       className: 'glow'
     });
