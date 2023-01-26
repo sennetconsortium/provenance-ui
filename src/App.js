@@ -50,7 +50,8 @@ function App() {
     const otherLegend = {
         Expand: {
             icon: 'fa-expand',
-            callback: expandCb
+            callback: expandCb,
+            title: 'Expand to full view'
         }
     }
 

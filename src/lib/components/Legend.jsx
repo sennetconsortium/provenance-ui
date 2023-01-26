@@ -107,24 +107,26 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
         const isOther = (key) => otherLegend[key] !== undefined
         const isHelpOrOther = (key) => isHelp(key) || isOther(key)
         const getColor = (key) => (typeof colors[key] === 'string') ? colors[key] : (colors[key].color || 'transparent')
-        const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) ? `js-legend--${key}` : 'js-legend--trigger'
+        const keyToClassName = (key) => key.replaceAll(' ', '-')
+        const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) ? `js-legend--${keyToClassName(key)}` : 'js-legend--trigger'
+        const getTitle = (key) => isOther(key) && otherLegend[key].title ? otherLegend[key].title : null
 
         let action
         $.extend(colors, otherLegend)
-        for (let type in colors) {
-            action = actionMap[type]
+        for (let key in colors) {
+            action = actionMap[key]
             result.push(
-                <li className={`c-legend__item c-legend__item--${type}  ${isHelpOrOther(type) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
-                    key={`legend--${type}`} data-node={type} onClick={isOther(type) && otherLegend[type].callback ? otherLegend[type].callback : null}>
-                    <span className={`c-legend__color ${getJsClassName(type)} c-legend__color--${type}`}>
-                        <span style={{backgroundColor: getColor(type)}}>
-                            {isHelp(type) && <i className='fa fa-question-circle-o' role='presentation'></i>}
-                            {isOther(type) && <i className={`fa ${otherLegend[type].icon}`} role='presentation'></i>}
+                <li className={`c-legend__item c-legend__item--${keyToClassName(key)}  ${isHelpOrOther(key) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
+                    key={`legend--${key}`} data-node={key} onClick={isOther(key) && otherLegend[key].callback ? otherLegend[key].callback : null} title={getTitle(key)}>
+                    <span className={`c-legend__color ${getJsClassName(key)} c-legend__color--${keyToClassName(key)}`}>
+                        <span style={{backgroundColor: getColor(key)}}>
+                            {isHelp(key) && <i className='fa fa-question-circle-o' role='presentation'></i>}
+                            {isOther(key) && otherLegend[key].icon && <i className={`fa ${otherLegend[key].icon}`} role='presentation'></i>}
                         </span>
                     </span>
                     <span className='c-legend__label'>
-                        <span className={`c-legend__label__text ${getJsClassName(type)}`}>
-                            {type}
+                        <span className={`c-legend__label__text ${getJsClassName(key)}`}>
+                            {key}
                         </span>
                         { action &&
                             <Toggle context={ action.callback } selectorId={action.selectorId || selectorId} className={`c-legend__action ${action.className}`}

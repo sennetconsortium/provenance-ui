@@ -5,6 +5,9 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
+require("core-js/modules/es.regexp.exec.js");
+require("core-js/modules/es.string.replace.js");
+require("core-js/modules/esnext.string.replace-all.js");
 var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -116,33 +119,36 @@ const Legend = _ref => {
     const isOther = key => otherLegend[key] !== undefined;
     const isHelpOrOther = key => isHelp(key) || isOther(key);
     const getColor = key => typeof colors[key] === 'string' ? colors[key] : colors[key].color || 'transparent';
-    const getJsClassName = key => isHelp(key) ? 'js-legend--help' : isOther(key) ? "js-legend--".concat(key) : 'js-legend--trigger';
+    const keyToClassName = key => key.replaceAll(' ', '-');
+    const getJsClassName = key => isHelp(key) ? 'js-legend--help' : isOther(key) ? "js-legend--".concat(keyToClassName(key)) : 'js-legend--trigger';
+    const getTitle = key => isOther(key) && otherLegend[key].title ? otherLegend[key].title : null;
     let action;
     _jquery.default.extend(colors, otherLegend);
-    for (let type in colors) {
-      action = actionMap[type];
+    for (let key in colors) {
+      action = actionMap[key];
       result.push( /*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelpOrOther(type) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
-        key: "legend--".concat(type),
-        "data-node": type,
-        onClick: isOther(type) && otherLegend[type].callback ? otherLegend[type].callback : null
+        className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelpOrOther(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
+        key: "legend--".concat(key),
+        "data-node": key,
+        onClick: isOther(key) && otherLegend[key].callback ? otherLegend[key].callback : null,
+        title: getTitle(key)
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__color ".concat(getJsClassName(type), " c-legend__color--").concat(type)
+        className: "c-legend__color ".concat(getJsClassName(key), " c-legend__color--").concat(keyToClassName(key))
       }, /*#__PURE__*/_react.default.createElement("span", {
         style: {
-          backgroundColor: getColor(type)
+          backgroundColor: getColor(key)
         }
-      }, isHelp(type) && /*#__PURE__*/_react.default.createElement("i", {
+      }, isHelp(key) && /*#__PURE__*/_react.default.createElement("i", {
         className: "fa fa-question-circle-o",
         role: "presentation"
-      }), isOther(type) && /*#__PURE__*/_react.default.createElement("i", {
-        className: "fa ".concat(otherLegend[type].icon),
+      }), isOther(key) && otherLegend[key].icon && /*#__PURE__*/_react.default.createElement("i", {
+        className: "fa ".concat(otherLegend[key].icon),
         role: "presentation"
       }))), /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__label"
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__label__text ".concat(getJsClassName(type))
-      }, type), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
+        className: "c-legend__label__text ".concat(getJsClassName(key))
+      }, key), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
         context: action.callback,
         selectorId: action.selectorId || selectorId,
         className: "c-legend__action ".concat(action.className),
