@@ -6,7 +6,7 @@ import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 import Swal from 'sweetalert2'
 import useHelpHtml from '../hooks/useHelpHtml';
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help }) => {
+const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help, otherLegend }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const { html } = useHelpHtml(help)
@@ -104,18 +104,26 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             colors[help.label] = 'transparent'
         }
         const isHelp = (key) => key === helpLabel
+        const isOther = (key) => otherLegend[key] !== undefined
+        const isHelpOrOther = (key) => isHelp(key) || isOther(key)
+        const getColor = (key) => (typeof colors[key] === 'string') ? colors[key] : (colors[key].color || 'transparent')
+        const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) ? `js-legend--${key}` : 'js-legend--trigger'
+
         let action
+        $.extend(colors, otherLegend)
         for (let type in colors) {
             action = actionMap[type]
             result.push(
-                <li className={`c-legend__item c-legend__item--${type}  ${isHelp(type) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`} key={`legend--${type}`} data-node={type}>
-                    <span className={`c-legend__color ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'} c-legend__color--${type}`}>
-                        <span style={{backgroundColor: colors[type]}}>
+                <li className={`c-legend__item c-legend__item--${type}  ${isHelpOrOther(type) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
+                    key={`legend--${type}`} data-node={type} onClick={isOther(type) && otherLegend[type].callback ? otherLegend[type].callback : null}>
+                    <span className={`c-legend__color ${getJsClassName(type)} c-legend__color--${type}`}>
+                        <span style={{backgroundColor: getColor(type)}}>
                             {isHelp(type) && <i className='fa fa-question-circle-o' role='presentation'></i>}
+                            {isOther(type) && <i className={`fa ${otherLegend[type].icon}`} role='presentation'></i>}
                         </span>
                     </span>
                     <span className='c-legend__label'>
-                        <span className={`c-legend__label__text ${isHelp(type) ? 'js-legend--help' : 'js-legend--trigger'}`}>
+                        <span className={`c-legend__label__text ${getJsClassName(type)}`}>
                             {type}
                         </span>
                         { action &&
@@ -143,6 +151,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
 Legend.defaultProps = {
     filterNodes: true,
     help: {},
+    otherLegend: {},
     actionMap: {},
     selectorId: SELECTOR_ID,
     className: ''
@@ -151,6 +160,7 @@ Legend.defaultProps = {
 Legend.propTypes = {
     colorMap: PropTypes.object.isRequired,
     help: PropTypes.object,
+    otherLegend: PropTypes.object,
     actionMap: PropTypes.object,
     children: PropTypes.object,
     filterNodes: PropTypes.bool,

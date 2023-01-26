@@ -23,7 +23,8 @@ const Legend = _ref => {
     actionMap,
     selectorId,
     className,
-    help
+    help,
+    otherLegend
   } = _ref;
   const [colors] = (0, _react.useState)(colorMap);
   const [filterable] = (0, _react.useState)(filterNodes);
@@ -112,26 +113,35 @@ const Legend = _ref => {
       colors[help.label] = 'transparent';
     }
     const isHelp = key => key === helpLabel;
+    const isOther = key => otherLegend[key] !== undefined;
+    const isHelpOrOther = key => isHelp(key) || isOther(key);
+    const getColor = key => typeof colors[key] === 'string' ? colors[key] : colors[key].color || 'transparent';
+    const getJsClassName = key => isHelp(key) ? 'js-legend--help' : isOther(key) ? "js-legend--".concat(key) : 'js-legend--trigger';
     let action;
+    _jquery.default.extend(colors, otherLegend);
     for (let type in colors) {
       action = actionMap[type];
       result.push( /*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelp(type) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
+        className: "c-legend__item c-legend__item--".concat(type, "  ").concat(isHelpOrOther(type) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(type),
-        "data-node": type
+        "data-node": type,
+        onClick: isOther(type) && otherLegend[type].callback ? otherLegend[type].callback : null
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__color ".concat(isHelp(type) ? 'js-legend--help' : 'js-legend--trigger', " c-legend__color--").concat(type)
+        className: "c-legend__color ".concat(getJsClassName(type), " c-legend__color--").concat(type)
       }, /*#__PURE__*/_react.default.createElement("span", {
         style: {
-          backgroundColor: colors[type]
+          backgroundColor: getColor(type)
         }
       }, isHelp(type) && /*#__PURE__*/_react.default.createElement("i", {
         className: "fa fa-question-circle-o",
         role: "presentation"
+      }), isOther(type) && /*#__PURE__*/_react.default.createElement("i", {
+        className: "fa ".concat(otherLegend[type].icon),
+        role: "presentation"
       }))), /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__label"
       }, /*#__PURE__*/_react.default.createElement("span", {
-        className: "c-legend__label__text ".concat(isHelp(type) ? 'js-legend--help' : 'js-legend--trigger')
+        className: "c-legend__label__text ".concat(getJsClassName(type))
       }, type), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
         context: action.callback,
         selectorId: action.selectorId || selectorId,
@@ -149,6 +159,7 @@ const Legend = _ref => {
 Legend.defaultProps = {
   filterNodes: true,
   help: {},
+  otherLegend: {},
   actionMap: {},
   selectorId: _constants.SELECTOR_ID,
   className: ''
@@ -156,6 +167,7 @@ Legend.defaultProps = {
 Legend.propTypes = {
   colorMap: _propTypes.default.object.isRequired,
   help: _propTypes.default.object,
+  otherLegend: _propTypes.default.object,
   actionMap: _propTypes.default.object,
   children: _propTypes.default.object,
   filterNodes: _propTypes.default.bool,

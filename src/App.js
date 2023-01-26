@@ -43,13 +43,24 @@ function App() {
         }
     }
 
+    const expandCb = () => {
+        console.log('expanded')
+    }
+
+    const otherLegend = {
+        Expand: {
+            icon: 'fa-expand',
+            callback: expandCb
+        }
+    }
+
     return (
         <div className={`c-App`}>
 
             {/*{ !loading && data && <ProvenanceUI data={data} options={{...options, selectorId: 'graph--other'}} /> }*/}
             {/*{ options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} actionMap={actionMap} selectorId='graph--other' />}*/}
             { !loading && data && <ProvenanceUI data={data} options={ options } /> }
-            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} className='c-legend--flex c-legend--btns' help={{title: 'Help, Provenance Graph', infoPanel: '<li>Some entities have different shapes.</li>'}} actionMap={actionMap} selectorId={SELECTOR_ID} />}
+            { options.colorMap && <Legend colorMap={{...options.colorMap, Edge: '#a5abb6'}} otherLegend={otherLegend} className='c-legend--flex c-legend--btns' help={{title: 'Help, Provenance Graph', infoPanel: '<li>Some entities have different shapes.</li>'}} actionMap={actionMap} selectorId={SELECTOR_ID} />}
 
 
         </div>

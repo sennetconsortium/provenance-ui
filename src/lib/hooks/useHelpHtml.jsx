@@ -28,6 +28,7 @@ const useHelpHtml = ( help = {}) => {
                 <li>
                     The graph is zoomable. Use the mouse scroll wheel to control the zoom/scale of the graph.
                 </li>
+                ${help.theGraph || ''}
             </ul>
             <h5 class="mgn-v">Interactions &amp; Colors</h5>
             <table>
@@ -43,6 +44,7 @@ const useHelpHtml = ( help = {}) => {
                     <td><img src="${images.visitedNode}" alt="visited node" /></td>
                     <td>Visited nodes are denoted by a faint blue halo.</td>
                 </tr>
+                ${help.interactionAndColors || ''}
             </table>
             <h4 id="info-panel">The Info Panel</h4>
             <img src="${images.infoPanel}" alt="node info panel" width="100%" />
