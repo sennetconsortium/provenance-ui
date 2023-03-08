@@ -47,11 +47,22 @@ function App() {
         console.log('expanded')
     }
 
+    const zoomCb = (e, selectorId) => {
+        const ui = window.ProvenanceTreeD3[selectorId]
+        ui.disableZoom()
+    }
+
     const otherLegend = {
         Expand: {
             icon: 'fa-expand',
             callback: expandCb,
             title: 'Expand to full view'
+        },
+        ToggleZoom: {
+            name: 'Toggle Lock',
+            icon: 'fa-lock',
+            callback: zoomCb,
+            title: 'Toggle zooming and moving the graph'
         }
     }
 

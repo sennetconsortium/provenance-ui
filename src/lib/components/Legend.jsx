@@ -117,7 +117,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             action = actionMap[key]
             result.push(
                 <li className={`c-legend__item c-legend__item--${keyToClassName(key)}  ${isHelpOrOther(key) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
-                    key={`legend--${key}`} data-node={key} onClick={isOther(key) && otherLegend[key].callback ? otherLegend[key].callback : null} title={getTitle(key)}>
+                    key={`legend--${key}`} data-node={key} onClick={isOther(key) && otherLegend[key].callback ? (e) => otherLegend[key].callback(e, selectorId, key) : null} title={getTitle(key)}>
                     <span className={`c-legend__color ${getJsClassName(key)} c-legend__color--${keyToClassName(key)}`}>
                         <span style={{backgroundColor: getColor(key)}}>
                             {isHelp(key) && <i className='fa fa-question-circle-o' role='presentation'></i>}
@@ -126,7 +126,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
                     </span>
                     <span className='c-legend__label'>
                         <span className={`c-legend__label__text ${getJsClassName(key)}`}>
-                            {key}
+                            {colors[key].name ? colors[key].name : key}
                         </span>
                         { action &&
                             <Toggle context={ action.callback } selectorId={action.selectorId || selectorId} className={`c-legend__action ${action.className}`}

@@ -26,7 +26,9 @@ const useHelpHtml = ( help = {}) => {
                     Clicking any node reveals its <a href="#info-panel">info panel</a>.
                 </li>
                 <li>
-                    The graph is zoomable. Use the mouse scroll wheel to control the zoom/scale of the graph.
+                    The graph is zoomable. Zoom is activated by first clicking anywhere on the graph.
+                    Use the mouse scroll wheel to control the zoom/scale of the graph. Zoom may be toggled via
+                    the toggle button within the legend area. Zoom automatically deactivates once the graph is out of viewport.
                 </li>
                 ${help.theGraph || ''}
             </ul>

@@ -39,6 +39,7 @@ function ProvenanceTree(d3, selector, _options) {
         infoNode: 'c-provenance__info--node',
         infoRelation: 'c-provenance__info--relationship',
         infoCloseBtn: 'js-btn--close',
+        hasZoom: 'has-zoom',
         links: {
             hidden: 'edgeLabels--hidden',
             labels: 'edgeLabels',
@@ -57,6 +58,7 @@ function ProvenanceTree(d3, selector, _options) {
     let isInit = true
     const data = {}
     const options = {
+        zoomActivated: false,
         colorMap: {
             Dataset: "#8ecb93",
             Activity: "#f16766",
@@ -108,6 +110,7 @@ function ProvenanceTree(d3, selector, _options) {
     function init() {
         $.extend(options, _options)
         initImageMap()
+        handleZoomActivation()
         data.stratify = options.data.stratify
         data.root = options.data.root
         if (!data.root && (data.stratify && !data.stratify.length)) {
@@ -115,6 +118,46 @@ function ProvenanceTree(d3, selector, _options) {
         } else {
             clearCanvas()
         }
+    }
+
+    function handleZoomActivation() {
+
+        if (options.zoomActivated) {
+            enableZoom()
+        } else {
+            disableZoom()
+        }
+
+        $(selector).click((e)=> {
+            enableZoom()
+        })
+
+        $(document).on('scroll', (e)=>{
+            if (!isElementInViewport($(selector)[0])) {
+                disableZoom()
+            }
+        })
+    }
+
+    function enableZoom() {
+        options.zoomActivated = true
+        $(selector).addClass(classNames.hasZoom)
+    }
+
+    function disableZoom() {
+        options.zoomActivated = false
+        $(selector).removeClass(classNames.hasZoom)
+    }
+
+    function isElementInViewport (el) {
+
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top >= 0 &&
+            rect.left >= 0 &&
+            rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) && /* or $(window).height() */
+            rect.right <= (window.innerWidth || document.documentElement.clientWidth) /* or $(window).width() */
+        );
     }
 
     function clearCanvas() {
@@ -226,8 +269,10 @@ function ProvenanceTree(d3, selector, _options) {
         const zoom = d3.zoom()
             .scaleExtent([0.2, 5])
             .on('zoom', function(event) {
-                $el.svgGroup.selectAll('.links, .nodes, .labels')
-                    .attr('transform', event.transform);
+                if (options.zoomActivated) {
+                    $el.svgGroup.selectAll('.links, .nodes, .labels')
+                        .attr('transform', event.transform);
+                }
             });
         options.zoom = zoom
         $el.svg.call(zoom)
@@ -546,7 +591,6 @@ function ProvenanceTree(d3, selector, _options) {
                 $node.find('circle.glow').addClass('invisible')
             }
         }
-
         return fillColor;
     }
 
@@ -713,6 +757,7 @@ function ProvenanceTree(d3, selector, _options) {
              .html(onCloseButton())
 
         $(selector).on('click', `.${classNames.infoCloseBtn}`, (e) => {
+            e.stopPropagation()
             clearInfo()
             $(e.currentTarget).hide()
         })
@@ -1115,7 +1160,10 @@ function ProvenanceTree(d3, selector, _options) {
         legendFilters,
         treeWidth,
         buildTree,
-        visitedNodes: options.visitedNodes
+        options,
+        visitedNodes: options.visitedNodes,
+        disableZoom,
+        enableZoom
     }
 }
 

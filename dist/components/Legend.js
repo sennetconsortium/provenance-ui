@@ -130,7 +130,7 @@ const Legend = _ref => {
         className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelpOrOther(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(key),
         "data-node": key,
-        onClick: isOther(key) && otherLegend[key].callback ? otherLegend[key].callback : null,
+        onClick: isOther(key) && otherLegend[key].callback ? e => otherLegend[key].callback(e, selectorId, key) : null,
         title: getTitle(key)
       }, /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__color ".concat(getJsClassName(key), " c-legend__color--").concat(keyToClassName(key))
@@ -148,7 +148,7 @@ const Legend = _ref => {
         className: "c-legend__label"
       }, /*#__PURE__*/_react.default.createElement("span", {
         className: "c-legend__label__text ".concat(getJsClassName(key))
-      }, key), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
+      }, colors[key].name ? colors[key].name : key), action && /*#__PURE__*/_react.default.createElement(_Toggle.default, {
         context: action.callback,
         selectorId: action.selectorId || selectorId,
         className: "c-legend__action ".concat(action.className),
