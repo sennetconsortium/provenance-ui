@@ -152,10 +152,12 @@ function ProvenanceTree(d3, selector, _options) {
   function enableZoom() {
     options.zoomActivated = true;
     (0, _jquery.default)(selector).addClass(classNames.hasZoom);
+    createZoom();
   }
   function disableZoom() {
     options.zoomActivated = false;
     (0, _jquery.default)(selector).removeClass(classNames.hasZoom);
+    createZoom();
   }
   function isElementInViewport(el) {
     const rect = el.getBoundingClientRect();
@@ -917,13 +919,20 @@ function ProvenanceTree(d3, selector, _options) {
     return d3.rgb(typeToColor(cls)).darker(1);
   }
   function createZoom() {
-    const zoom = d3.zoom().scaleExtent([0.2, 5]).on('zoom', function (event) {
+    if ($el.svg) {
       if (options.zoomActivated) {
-        $el.svgGroup.selectAll('.links, .nodes, .labels').attr('transform', event.transform);
+        options.scaleExtent = [0.2, 5];
+      } else {
+        options.scaleExtent = [1, 1];
       }
-    });
-    options.zoom = zoom;
-    $el.svg.call(zoom);
+      let zoom = d3.zoom().scaleExtent(options.scaleExtent).on('zoom', function (event) {
+        if (options.zoomActivated) {
+          $el.svgGroup.selectAll('.links, .nodes, .labels').attr('transform', event.transform);
+        }
+      });
+      options.zoom = zoom;
+      $el.svg.call(zoom);
+    }
   }
   function buildLinks() {
     $el.link = $el.linksGroup.selectAll('line').data(data.links);
