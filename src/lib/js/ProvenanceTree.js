@@ -142,11 +142,13 @@ function ProvenanceTree(d3, selector, _options) {
     function enableZoom() {
         options.zoomActivated = true
         $(selector).addClass(classNames.hasZoom)
+        createZoom()
     }
 
     function disableZoom() {
         options.zoomActivated = false
         $(selector).removeClass(classNames.hasZoom)
+        createZoom()
     }
 
     function isElementInViewport (el) {
@@ -266,17 +268,25 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function createZoom() {
-        const zoom = d3.zoom()
-            .scaleExtent([0.2, 5])
-            .on('zoom', function(event) {
-                if (options.zoomActivated) {
-                    $el.svgGroup.selectAll('.links, .nodes, .labels')
-                        .attr('transform', event.transform);
-                }
-            });
-        options.zoom = zoom
-        $el.svg.call(zoom)
+        if ($el.svg) {
+            if (options.zoomActivated) {
+                options.scaleExtent = [0.2, 5]
+            } else {
+                options.scaleExtent = [1, 1]
+            }
+            let zoom = d3.zoom()
+                .scaleExtent(options.scaleExtent)
+                .on('zoom', function(event) {
+                    if (options.zoomActivated) {
+                        $el.svgGroup.selectAll('.links, .nodes, .labels')
+                            .attr('transform', event.transform);
+                    }
+                });
+            options.zoom = zoom
+            $el.svg.call(zoom)
+        }
     }
+
 
     function buildLinks() {
 
