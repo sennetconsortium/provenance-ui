@@ -4,7 +4,7 @@ import $ from 'jquery'
 import Toggle from './Toggle'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 import Swal from 'sweetalert2'
-import useHelpHtml from '../hooks/useHelpHtml';
+import useHelpHtml from '../hooks/useHelpHtml'
 
 const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help, otherLegend }) => {
     const [colors] = useState(colorMap)
