@@ -48,8 +48,8 @@ function ProvenanceUI(_ref) {
     window.ProvenanceTreeD3[selectorId] = (0, _ProvenanceTree.default)(d3, "#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
       data
     }));
-    if (options.onInitializationComplete) {
-      options.onInitializationComplete(selectorId);
+    if (options.callbacks.onInitializationComplete) {
+      options.callbacks.onInitializationComplete(selectorId);
     }
   }
   return /*#__PURE__*/_react.default.createElement("div", {
