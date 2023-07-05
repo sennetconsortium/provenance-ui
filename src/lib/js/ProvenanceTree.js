@@ -700,7 +700,7 @@ function ProvenanceTree(d3, selector, _options) {
                 d.wasClicked = true
                 options.visitedNodes.add(getNodeId(d))
                 updateInfo(d.data, true)
-                runCallback('onNodeClick', e, d)
+                runCallback('onNodeClick', {event: e, node: d})
                 $(`${selector} .${classNames.infoCloseBtn}`).fadeIn()
             })
             .call(drag())
