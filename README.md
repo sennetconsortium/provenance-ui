@@ -174,15 +174,16 @@ Any hierarchy model passed as `{root: data}` as `data` option must be in the for
 ```
 
 #### `ProvenanceTree` Callbacks
-| Name                 | Description                                                                        | Returns              | Returns Description                           |
-|----------------------|------------------------------------------------------------------------------------|----------------------|-----------------------------------------------|
-| **onEdgeLabels**     | The callback to run on building the edge labels.                                   | *string*             | The actual label for the respective data      |
-| **onCloseButton**    | The callback to run on building of the close info panel button.                    | *string*             | The icon/text/html to be set as close button. |
-| **onCenterX**        | The callback to run for the positioning of the simulation's `forceCenter` x value. | *integer*            | The x value positioning                       |
-| **onCenterY**        | The callback to run for the positioning of the simulation's `forceCenter` y value. | *integer*            | The y value positioning                       |
-| **onSvgSizing**      | The callback to run on sizing of the SVG                                           | *object.map.integer* | The `width` and `height` values of the svg.   |
-| **onBeforeBuild**    | The callback to run before building of the visual                                  | *any*                | The return value is not used.                 |
-| **onAfterBuild**     | The callback to run after the building of the visual                               | *any*                | The return value is not used.                 |
+| Name              | Description                                                                        | Returns              | Returns Description                           |
+|-------------------|------------------------------------------------------------------------------------|----------------------|-----------------------------------------------|
+| **onEdgeLabels**  | The callback to run on building the edge labels.                                   | *string*             | The actual label for the respective data      |
+| **onCloseButton** | The callback to run on building of the close info panel button.                    | *string*             | The icon/text/html to be set as close button. |
+| **onCenterX**     | The callback to run for the positioning of the simulation's `forceCenter` x value. | *integer*            | The x value positioning                       |
+| **onCenterY**     | The callback to run for the positioning of the simulation's `forceCenter` y value. | *integer*            | The y value positioning                       |
+| **onSvgSizing**   | The callback to run on sizing of the SVG                                           | *object.map.integer* | The `width` and `height` values of the svg.   |
+| **onBeforeBuild** | The callback to run before building of the visual                                  | *any*                | The return value is not used.                 |
+| **onAfterBuild**  | The callback to run after the building of the visual                               | *any*                | The return value is not used.                 |
+| **onNodeClick**   | The callback to run on clicking a node                                             | *any*                | The return value is not used.                 | 
 
 ### Legend 
 | Parameter         | Type                | Description                                                                                                                                                                                                                  |

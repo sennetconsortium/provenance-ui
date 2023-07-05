@@ -70,10 +70,10 @@ function ProvenanceTree(d3, selector, _options) {
   const options = {
     zoomActivated: false,
     colorMap: {
-      Dataset: "#8ecb93",
-      Activity: "#f16766",
       Sample: "#ebb5c8",
-      Source: "#ffc255"
+      Source: "#ffc255",
+      Activity: "#f16766",
+      Dataset: "#8ecb93"
     },
     visitedNodes: new Set(),
     imageMapActions: {},
@@ -1262,6 +1262,7 @@ function ProvenanceTree(d3, selector, _options) {
       d.wasClicked = true;
       options.visitedNodes.add(getNodeId(d));
       updateInfo(d.data, true);
+      runCallback('onNodeClick', e, d);
       (0, _jquery.default)("".concat(selector, " .").concat(classNames.infoCloseBtn)).fadeIn();
     }).call(drag());
     $el.nodeGlow = $el.nodeEnter.append('circle').attr('class', classNames.nodes.glow).attr('r', options.node.radius * 1.3);
