@@ -1303,15 +1303,15 @@ function ProvenanceTree(d3, selector, _options) {
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
-    const onCloseButton = () => {
-      const c = runCallback('onCloseButton');
+    const onInfoCloseBuild = () => {
+      const c = runCallback('onInfoCloseBuild');
       return c ? c : '<i class="fa fa-times" aria-hidden="true"></i>';
     };
-    $el.info.append('span').attr('class', classNames.info + '--close ' + classNames.infoCloseBtn).attr('style', 'display: none;').attr('title', 'Close Info Panel').html(onCloseButton());
+    $el.info.append('span').attr('class', classNames.info + '--close ' + classNames.infoCloseBtn).attr('style', 'display: none;').attr('title', 'Close Info Panel').html(onInfoCloseBuild());
     (0, _jquery.default)(selector).on('click', ".".concat(classNames.infoCloseBtn), e => {
       e.stopPropagation();
       clearInfo();
-      runCallback('onInfoClose', {
+      runCallback('onInfoCloseClick', {
         event: e
       });
       (0, _jquery.default)(e.currentTarget).hide();

@@ -759,8 +759,8 @@ function ProvenanceTree(d3, selector, _options) {
          $el.info = $el.canvas.append('div')
             .attr('class', classNames.info);
 
-         const onCloseButton = () => {
-             const c = runCallback('onCloseButton')
+         const onInfoCloseBuild = () => {
+             const c = runCallback('onInfoCloseBuild')
              return c ? c : '<i class="fa fa-times" aria-hidden="true"></i>'
          }
 
@@ -768,12 +768,12 @@ function ProvenanceTree(d3, selector, _options) {
              .attr('class', classNames.info + '--close ' + classNames.infoCloseBtn)
              .attr('style', 'display: none;')
              .attr('title', 'Close Info Panel')
-             .html(onCloseButton())
+             .html(onInfoCloseBuild())
 
         $(selector).on('click', `.${classNames.infoCloseBtn}`, (e) => {
             e.stopPropagation()
             clearInfo()
-            runCallback('onInfoClose', {event: e})
+            runCallback('onInfoCloseClick', {event: e})
             $(e.currentTarget).hide()
         })
 
