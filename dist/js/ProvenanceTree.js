@@ -1311,6 +1311,9 @@ function ProvenanceTree(d3, selector, _options) {
     (0, _jquery.default)(selector).on('click', ".".concat(classNames.infoCloseBtn), e => {
       e.stopPropagation();
       clearInfo();
+      runCallback('onInfoClose', {
+        event: e
+      });
       (0, _jquery.default)(e.currentTarget).hide();
     });
     $el.info = $el.info.append('div').attr('class', classNames.infoMain);

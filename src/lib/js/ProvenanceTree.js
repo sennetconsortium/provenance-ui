@@ -773,6 +773,7 @@ function ProvenanceTree(d3, selector, _options) {
         $(selector).on('click', `.${classNames.infoCloseBtn}`, (e) => {
             e.stopPropagation()
             clearInfo()
+            runCallback('onInfoClose', {event: e})
             $(e.currentTarget).hide()
         })
 
