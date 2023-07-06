@@ -81,7 +81,7 @@ const Legend = _ref => {
     $trigger.on('click', (e, data) => {
       e.stopPropagation();
       e.preventDefault();
-      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled) || data.force) {
+      if (!getItem(e).hasClass(_constants.CLASS_NAMES.disabled) || data !== null && data !== void 0 && data.force) {
         const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add;
         toggleClass(e, fn);
         toggleClass(e, fn, stickClass);

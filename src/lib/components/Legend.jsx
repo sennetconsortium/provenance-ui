@@ -64,7 +64,7 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             e.stopPropagation()
             e.preventDefault()
 
-            if (!getItem(e).hasClass(CLASS_NAMES.disabled) || data.force) {
+            if (!getItem(e).hasClass(CLASS_NAMES.disabled) || data?.force) {
                 const fn = getItem(e).hasClass(stickClass) ? classFns.remove : classFns.add
                 toggleClass(e, fn)
                 toggleClass(e, fn, stickClass)
