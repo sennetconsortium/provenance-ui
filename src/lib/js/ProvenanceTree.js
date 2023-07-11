@@ -818,12 +818,12 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function appendInfoElement(d, cls, isNode, property, value) {
-        const isNavigation =  options.idNavigate.props.indexOf(property) !== -1
+        const isNavigation =  options.idNavigate?.props[property]
         value = value ? value.replaceAll('"', '') : value
         let formattedUrl = false;
 
         let href = '#';
-        if (isNavigation && options.idNavigate && options.idNavigate.url) {
+        if (isNavigation && (options.idNavigate?.url || isNavigation.url) && !isNavigation.callback) {
             const label = getNodeCat(d) || 'Unknown'
             const excludeList = options.idNavigate.exclude[label]
             if (!excludeList || (excludeList &&
@@ -833,6 +833,15 @@ function ProvenanceTree(d3, selector, _options) {
                 href = url.replace('{subType}', label.toLowerCase())
                 href = href.replace('{id}', getNodeId(d))
                 href = (isValidURL(value) && href.indexOf('://') === -1) ? '//' + href : href
+            }
+        } else {
+            if (isNavigation && isNavigation.callback ) {
+                const result = isNavigation.callback(d, property, value)
+                href = result.href
+                value = result.value || value
+                if (result.href) {
+                    formattedUrl = true
+                }
             }
         }
         let elem = $el.info.append('span');

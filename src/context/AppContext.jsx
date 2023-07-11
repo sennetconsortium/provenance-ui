@@ -32,6 +32,10 @@ export const AppProvider = ({ children }) => {
         const itemId = getEnv('API_ITEM_ID')
         const feature = getEnv('API_FEATURE')
 
+        const jsonView = (d, property, value) => {
+            return {href: `/api/json?view=${btoa(value)}`, value: `${value.substr(0, 20)}...}`}
+        }
+
         const getOptions = () => {
             let ops = getEnv('OPTIONS')
             log.debug('Environment options', ops)
@@ -47,7 +51,7 @@ export const AppProvider = ({ children }) => {
                 simulation: { charge: -100 },
                 minHeight: 600,
                 idNavigate: {
-                    props: ['sennet:sennet_id', 'sennet:protocol_url'],
+                    props: {'sennet:sennet_id': true, 'sennet:protocol_url': true, 'sennet:processing_information': {callback: jsonView}},
                     url: 'https://data.dev.sennetconsortium.org/{subType}?uuid={id}',
                     exclude: { Activity: ['sennet:sennet_id'] }
                 }

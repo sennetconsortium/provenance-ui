@@ -1348,11 +1348,12 @@ function ProvenanceTree(d3, selector, _options) {
     }
   }
   function appendInfoElement(d, cls, isNode, property, value) {
-    const isNavigation = options.idNavigate.props.indexOf(property) !== -1;
+    var _options$idNavigate, _options$idNavigate2;
+    const isNavigation = (_options$idNavigate = options.idNavigate) === null || _options$idNavigate === void 0 ? void 0 : _options$idNavigate.props[property];
     value = value ? value.replaceAll('"', '') : value;
     let formattedUrl = false;
     let href = '#';
-    if (isNavigation && options.idNavigate && options.idNavigate.url) {
+    if (isNavigation && ((_options$idNavigate2 = options.idNavigate) !== null && _options$idNavigate2 !== void 0 && _options$idNavigate2.url || isNavigation.url) && !isNavigation.callback) {
       const label = getNodeCat(d) || 'Unknown';
       const excludeList = options.idNavigate.exclude[label];
       if (!excludeList || excludeList && excludeList.indexOf(property) === -1) {
@@ -1361,6 +1362,15 @@ function ProvenanceTree(d3, selector, _options) {
         href = url.replace('{subType}', label.toLowerCase());
         href = href.replace('{id}', getNodeId(d));
         href = isValidURL(value) && href.indexOf('://') === -1 ? '//' + href : href;
+      }
+    } else {
+      if (isNavigation && isNavigation.callback) {
+        const result = isNavigation.callback(d, property, value);
+        href = result.href;
+        value = result.value || value;
+        if (result.href) {
+          formattedUrl = true;
+        }
       }
     }
     let elem = $el.info.append('span');
