@@ -1,6 +1,6 @@
 {
   "name": "provenance-ui",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "Provenance",
   "author": "lisabruney@pitt.edu",
   "keywords": [
@@ -70,7 +70,7 @@
   "devDependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.20.2",
-    "@babel/preset-env": "^7.20.2",
+    "@babel/preset-env": "^7.22.9",
     "@babel/preset-react": "^7.18.6",
     "babel-plugin-file-loader": "^2.0.0",
     "loglevel": "^1.8.1",
