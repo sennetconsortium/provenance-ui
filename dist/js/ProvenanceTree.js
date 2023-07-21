@@ -1378,7 +1378,7 @@ function ProvenanceTree(d3, selector, _options) {
     if (value) {
       valueHtml = !formattedUrl ? ": <span>".concat(value, "</span>") : ": <a href=\"".concat(href, "\" target=\"_blank\">").concat(value, " </a>");
     }
-    cls += ' cell';
+    cls += " ".concat(property.replace(options.propertyPrefixClear, ''), " cell");
     elem.attr('class', cls + (!formattedUrl ? ' flat' : ' link')).html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + valueHtml);
     if (!value) {
       elem.style('background-color', function (d) {

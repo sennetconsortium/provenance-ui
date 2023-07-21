@@ -849,7 +849,7 @@ function ProvenanceTree(d3, selector, _options) {
         if (value) {
             valueHtml = !formattedUrl ? `: <span>${value}</span>` : `: <a href="${href}" target="_blank">${value} </a>`;
         }
-        cls += ' cell'
+        cls += ` ${property.replace(options.propertyPrefixClear, '')} cell`
         elem.attr('class', cls + (!formattedUrl ? ' flat' : ' link'))
             .html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + valueHtml );
 
