@@ -798,6 +798,7 @@ function ProvenanceTree(d3, selector, _options) {
 
         isNode ? $info.addClass(classNames.infoNode) : $info.removeClass(classNames.infoNode)
         !isNode ? $info.addClass(classNames.infoRelation) : $info.removeClass(classNames.infoRelation)
+        $info.attr('data-id', getNodeId(d))
         const type = getNodeType(d)
 
         if (type) {
@@ -805,7 +806,7 @@ function ProvenanceTree(d3, selector, _options) {
         }
 
         if (!options.hideElementId) {
-            appendInfoElement(d,'property', isNode, '&lt;id&gt;', d.id || d.data.id);
+            appendInfoElement(d,'property', isNode, '&lt;id&gt;',  getNodeId(d));
         }
 
         const properties = getNodeProperties(d)
