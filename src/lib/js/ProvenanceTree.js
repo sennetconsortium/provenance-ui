@@ -93,6 +93,7 @@ function ProvenanceTree(d3, selector, _options) {
         },
         callbacks: {},
         hideElementId: true,
+        nodeLabelProperty: 'text',
         theme: {
             colors: {
                 glow: {
@@ -385,9 +386,9 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function getTextToAppendToNode(d) {
-        let text = icon(d) || d.data.text || '';
+        let text = icon(d) || getNodeText(d) || '';
         text = icon(d) ? '&#x' + text : text;
-        const className = icon(d) ? ' icon' : (d.text) ? ' has-label' : '';
+        const className = icon(d) ? ' icon' : getNodeText(d) ? ' has-label' : '';
         return {text, className};
     }
 
@@ -399,6 +400,10 @@ function ProvenanceTree(d3, selector, _options) {
 
     function getNodeProperties(d) {
         return getNodeProp(d, 'properties')
+    }
+
+    function getNodeText(d) {
+        return getNodeProp(d, options.nodeLabelProperty)
     }
 
     function getNodeType(d) {
