@@ -93,6 +93,7 @@ function ProvenanceTree(d3, selector, _options) {
         },
         callbacks: {},
         hideElementId: true,
+        nodeLabelProperty: 'text',
         theme: {
             colors: {
                 glow: {
@@ -385,9 +386,9 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function getTextToAppendToNode(d) {
-        let text = icon(d) || d.data.text || '';
+        let text = icon(d) || getNodeText(d) || '';
         text = icon(d) ? '&#x' + text : text;
-        const className = icon(d) ? ' icon' : (d.text) ? ' has-label' : '';
+        const className = icon(d) ? ' icon' : getNodeText(d) ? ' has-label' : '';
         return {text, className};
     }
 
@@ -399,6 +400,10 @@ function ProvenanceTree(d3, selector, _options) {
 
     function getNodeProperties(d) {
         return getNodeProp(d, 'properties')
+    }
+
+    function getNodeText(d) {
+        return getNodeProp(d, options.nodeLabelProperty)
     }
 
     function getNodeType(d) {
@@ -798,6 +803,7 @@ function ProvenanceTree(d3, selector, _options) {
 
         isNode ? $info.addClass(classNames.infoNode) : $info.removeClass(classNames.infoNode)
         !isNode ? $info.addClass(classNames.infoRelation) : $info.removeClass(classNames.infoRelation)
+        $info.attr('data-id', getNodeId(d))
         const type = getNodeType(d)
 
         if (type) {
@@ -805,7 +811,7 @@ function ProvenanceTree(d3, selector, _options) {
         }
 
         if (!options.hideElementId) {
-            appendInfoElement(d,'property', isNode, '&lt;id&gt;', d.id || d.data.id);
+            appendInfoElement(d,'property', isNode, '&lt;id&gt;',  getNodeId(d));
         }
 
         const properties = getNodeProperties(d)
@@ -849,7 +855,7 @@ function ProvenanceTree(d3, selector, _options) {
         if (value) {
             valueHtml = !formattedUrl ? `: <span>${value}</span>` : `: <a href="${href}" target="_blank">${value} </a>`;
         }
-        cls += ' cell'
+        cls += ` ${property.replace(options.propertyPrefixClear, '')} cell`
         elem.attr('class', cls + (!formattedUrl ? ' flat' : ' link'))
             .html('<strong>' + property.replace(options.propertyPrefixClear, '') + '</strong>' + valueHtml );
 
