@@ -1,6 +1,5 @@
 "use strict";
 
-require("core-js/modules/es.weak-map.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });

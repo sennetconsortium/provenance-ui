@@ -5,7 +5,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = void 0;
 require("core-js/modules/es.promise.js");
-require("core-js/modules/es.weak-map.js");
 require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
@@ -39,7 +38,7 @@ function ProvenanceUI(_ref) {
   };
   (0, _react.useEffect)(() => {
     if (!options.noStyles) {
-      (specifier => new Promise(r => r(specifier)).then(s => _interopRequireWildcard(require(s))))("../ProvenanceUI.css");
+      Promise.resolve("../ProvenanceUI.css").then(s => _interopRequireWildcard(require(s)));
     }
     addVisitedClass();
   });
