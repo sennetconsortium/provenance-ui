@@ -40,21 +40,27 @@ async function Neo4JGraphObject(serviceOps) {
             "Source": "#ffc255"
         }
         const imageMap = {
-            "Sample|sennet:sample_category|organ": null,
+            "Sample|sennet:sample_category|Organ": null,
+            "Dataset|sennet:creation_action|Multi-Assay Split": null,
             "Source": null,
         }
         const imageMapActions = {
-            // "Sample|sennet:sample_category|organ": {
-            //     color: "#ebb5c8",
-            // showMain: true,
-            // showMainGlow: true,
-            //     type: 'rect'
+            "Dataset|sennet:creation_action|Multi-Assay Split": {
+                fn: 'append',
+                type: 'g',
+                data: [
+                    {
+                        tag: 'polygon',
+                        property: 'points',
+                        draw: '1,27.9 15,1.1 29,27.9'
+                    }
+                ]
+            }
+            // "Sample|sennet:sample_category|Organ": {
+            //     type: 'rect',
+            //     height: 25,
+            //     width: 50,
             // },
-            "Sample|sennet:sample_category|organ": {
-                type: 'rect',
-                height: 25,
-                width: 50,
-            },
             // "Source": {
             //     fn: 'append',
             //     color: "#ffc255",
@@ -68,7 +74,7 @@ async function Neo4JGraphObject(serviceOps) {
         }
         ops.propertyPrefixClear = 'sennet:'
         ops.displayEdgeLabels = false
-        ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions}
+        ops = { ...ops, highlight: [{id: itemId}], colorMap, imageMap, imageMapActions, initParentKey: DataConverterNeo4J.KEY_P_ENTITY}
         setOptions(ops)
         setLoading(false)
     }
