@@ -220,6 +220,58 @@ Any hierarchy model passed as `{root: data}` as `data` option must be in the for
 | **onNodeClick**      | The callback to run on clicking a node                                                 | *any*                | The return value is not used.                 | 
 | **onInfoCloseClick** | The callback to run on clicking of the info panel close button                         | *any*                | The return value is not used.                 | 
 
+#### Assigning Custom Images and Shapes For Nodes
+To apply an image as a node, simply add the node value path and src to the `imageMap` object. Example:
+```
+// Form:
+imageMap: {
+ 'subType': 'image/path'
+ 'subType|propertyName|value': 'image/path'
+}
+
+imageMap: {
+'Source': '..somepath/file.svg'
+'Sample|sennet:sample_category|Organ': '..someotherpath/file.svg'
+}
+```
+`propertyName` must be a property included in the `dataMap`'s `props` or `typeProps` section.
+Also, if needed to instead draw some shape or svg path, must also specify the corresponding `imageMapActions`. Example:
+```
+imageMap: {
+'Sample|sennet:sample_category|Block': null
+}
+
+imageMapActions: {
+'Sample|sennet:sample_category|Block': {
+        fn: 'append', // currently, only the 'append' action is valid
+        type: 'g', // can specify type as 'image', 'g' or 'rect'
+        data: [ // when specified as 'g', should also specify drawing points, paths etc.
+            {
+                tag: 'polygon',
+                property: 'points',
+                draw: '1,27.9 15,1.1 29,27.9'
+            }
+        ]
+    }
+}
+```
+This will create code like:
+```
+<g ...><polygon points="1,27.9 15,1.1 29,27.9"></polygon></g>
+```
+
+Specifying type as `image` is useful in order to apply custom SVG path specified in `imageMap`, while maintaining other default drawing behavior, thereby having two shapes per node; the default ellipsis, plus custom shape. Example:
+```
+imageMapActions: {
+ 'Sample|sennet:sample_category|Organ': {
+     fn: 'image',
+     color: '#ff0000'
+     showMain: true,
+     showMainGlow: true,
+  }
+}
+```
+`showMain` will maintain the default ellipsis and `showMainGlow` will maintain the default ellipsis glow respectively.
 ### Legend 
 | Parameter               | Type                | Description                                                                                                                                                                                                                  |
 |-------------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
