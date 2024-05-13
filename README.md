@@ -271,7 +271,10 @@ imageMapActions: {
   }
 }
 ```
-`showMain` will maintain the default circle and `showMainGlow` will maintain the default circle glow respectively.
+`showMain` will maintain the default circle and `showMainGlow` will maintain the default circle glow respectively.  
+NOTE: In order to color a specified SVG from path, please make sure that the svg file has a `fill="$bgColor"` on the tag. If the SVG has a border it can be likewise colored via
+`fill="$borderColor"`. This will take on a darker hue than that specified in `color`.
+
 ### Legend 
 | Parameter               | Type                | Description                                                                                                                                                                                                                  |
 |-------------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
