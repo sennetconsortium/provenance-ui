@@ -221,7 +221,7 @@ Any hierarchy model passed as `{root: data}` as `data` option must be in the for
 | **onInfoCloseClick** | The callback to run on clicking of the info panel close button                         | *any*                | The return value is not used.                 | 
 
 #### Assigning Custom Images and Shapes For Nodes
-To apply an image as a node, simply add the node value path and src to the `imageMap` object. Example:
+To apply an image as a node, simply add the node value and src to the `imageMap` object. Example:
 ```
 // Form:
 imageMap: {
@@ -260,7 +260,7 @@ This will create code like:
 <g ...><polygon points="1,27.9 15,1.1 29,27.9"></polygon></g>
 ```
 
-Specifying type as `image` is useful in order to apply custom SVG path specified in `imageMap`, while maintaining other default drawing behavior, thereby having two shapes per node; the default ellipsis, plus custom shape. Example:
+Specifying type as `image` is useful in order to apply custom SVG path specified in `imageMap`, while maintaining other default drawing behavior, thereby having two shapes per node; the default circle, plus custom shape. Example:
 ```
 imageMapActions: {
  'Sample|sennet:sample_category|Organ': {
@@ -271,7 +271,7 @@ imageMapActions: {
   }
 }
 ```
-`showMain` will maintain the default ellipsis and `showMainGlow` will maintain the default ellipsis glow respectively.
+`showMain` will maintain the default circle and `showMainGlow` will maintain the default circle glow respectively.
 ### Legend 
 | Parameter               | Type                | Description                                                                                                                                                                                                                  |
 |-------------------------|---------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
