@@ -40,13 +40,21 @@ async function Neo4JGraphObject(serviceOps) {
             "Source": "#ffc255"
         }
         const imageMap = {
-            "Sample|sennet:sample_category|Organ": null,
+            "Sample|sennet:sample_category|Organ": '/images/shapes/triangle.svg',
             "Dataset|sennet:creation_action|Multi-Assay Split": null,
             "Source": null,
         }
         const imageMapActions = {
+            "Sample|sennet:sample_category|Organ": {
+                fn: 'append',
+                type: 'image',
+                color: '#ff0000',
+                showMain: true,
+                showMainGlow: true,
+            },
             "Dataset|sennet:creation_action|Multi-Assay Split": {
                 fn: 'append',
+                color: '#00ff00',
                 type: 'g',
                 data: [
                     {
