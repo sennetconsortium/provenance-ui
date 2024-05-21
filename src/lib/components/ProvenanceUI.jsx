@@ -28,7 +28,7 @@ function ProvenanceUI({ children, data, options = {} }) {
         initialized.current = true
         window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {}
         window.ProvenanceTreeD3[selectorId] = ProvenanceTree(d3,`#${selectorId}`, {...options, data })
-        if (options.callbacks.onInitializationComplete) {
+        if (options.callbacks?.onInitializationComplete) {
             options.callbacks.onInitializationComplete(selectorId)
         }
     }

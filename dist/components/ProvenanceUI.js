@@ -43,12 +43,13 @@ function ProvenanceUI(_ref) {
     addVisitedClass();
   });
   if ((options.dontCheckInitialized || !initialized.current) && !loading && !error) {
+    var _options$callbacks;
     initialized.current = true;
     window.ProvenanceTreeD3 = window.ProvenanceTreeD3 || {};
     window.ProvenanceTreeD3[selectorId] = (0, _ProvenanceTree.default)(d3, "#".concat(selectorId), _objectSpread(_objectSpread({}, options), {}, {
       data
     }));
-    if (options.callbacks.onInitializationComplete) {
+    if ((_options$callbacks = options.callbacks) !== null && _options$callbacks !== void 0 && _options$callbacks.onInitializationComplete) {
       options.callbacks.onInitializationComplete(selectorId);
     }
   }

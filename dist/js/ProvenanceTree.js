@@ -33,6 +33,7 @@ function ProvenanceTree(d3, selector, _options) {
     root: 'root'
   };
   let $info;
+  let $infoParent;
   let dataKey;
   let allData;
   let positionData = {};
@@ -61,7 +62,8 @@ function ProvenanceTree(d3, selector, _options) {
       main: 'main',
       text: 'text',
       image: 'image'
-    }
+    },
+    active: 'is-active'
   };
   const sz = {};
   let simulation;
@@ -1307,6 +1309,7 @@ function ProvenanceTree(d3, selector, _options) {
   }
   function appendInfoPanel() {
     $el.info = $el.canvas.append('div').attr('class', classNames.info);
+    $infoParent = (0, _jquery.default)(selector).find(".".concat(classNames.info));
     const onInfoCloseBuild = () => {
       const c = runCallback('onInfoCloseBuild');
       return c ? c : '<i class="fa fa-times" aria-hidden="true"></i>';
@@ -1328,12 +1331,14 @@ function ProvenanceTree(d3, selector, _options) {
     return res !== null;
   }
   function clearInfo() {
+    $infoParent.removeClass(classNames.active);
     $info.removeClass(classNames.infoNode);
     $info.removeClass(classNames.infoRelation);
     $info.html('');
   }
   function updateInfo(d, isNode) {
     clearInfo();
+    $infoParent.addClass(classNames.active);
     isNode ? $info.addClass(classNames.infoNode) : $info.removeClass(classNames.infoNode);
     !isNode ? $info.addClass(classNames.infoRelation) : $info.removeClass(classNames.infoRelation);
     $info.attr('data-id', getNodeId(d));
