@@ -60,6 +60,7 @@ function ProvenanceTree(d3, selector, _options) {
     let isInit = true
     const data = {}
     const options = {
+        graphDepth: null,
         zoomActivated: false,
         colorMap: {
             Sample: "#ebb5c8",
@@ -649,7 +650,8 @@ function ProvenanceTree(d3, selector, _options) {
         const childInfo = (d, i) => {
             const posY = (ci, mod) => {
                 const k = (mod ? 12 : 20)
-                return (ci * k * d.depth)
+                options.graphDepth = (ci * k * d.depth)
+                return options.graphDepth
             }
             treeWidth = Math.max(treeWidth, (d.children ? d.children.length : 0))
             if (d.parent) {
