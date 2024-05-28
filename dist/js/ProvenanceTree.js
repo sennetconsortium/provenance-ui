@@ -1362,6 +1362,7 @@ function ProvenanceTree(d3, selector, _options) {
         appendInfoElement(d, 'property', isNode, mapped, JSON.stringify(properties[property]));
       });
     }
+    runCallback('onAfterInfoUpdateBuild');
   }
   function appendInfoElement(d, cls, isNode, property, value) {
     var _options$idNavigate, _options$idNavigate2;

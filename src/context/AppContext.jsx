@@ -51,6 +51,9 @@ export const AppProvider = ({ children }) => {
                 callbacks: {
                     onCenterY: (args) => {
                         return args.options.graphDepth / 2
+                    },
+                    onAfterInfoUpdateBuild: (args) => {
+                        console.log('Build info')
                     }
                 },
                 simulation: { charge: -100 },
