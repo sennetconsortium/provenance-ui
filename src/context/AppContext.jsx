@@ -48,6 +48,14 @@ export const AppProvider = ({ children }) => {
             }
 
             return {
+                callbacks: {
+                    onCenterY: (args) => {
+                        return args.options.graphDepth / 2
+                    },
+                    onAfterInfoUpdateBuild: (args) => {
+                        console.log('Build info')
+                    }
+                },
                 simulation: { charge: -100 },
                 minHeight: 600,
                 idNavigate: {

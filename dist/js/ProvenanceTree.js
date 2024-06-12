@@ -70,6 +70,7 @@ function ProvenanceTree(d3, selector, _options) {
   let isInit = true;
   const data = {};
   const options = {
+    graphDepth: 0,
     zoomActivated: false,
     colorMap: {
       Sample: "#ebb5c8",
@@ -1196,13 +1197,18 @@ function ProvenanceTree(d3, selector, _options) {
     return getHighlightClass(d).indexOf('highlighted') !== -1;
   }
   function buildNodes() {
+    options.graphDepth = 0;
     const getDepth = d => {
       return d.depth;
     };
     const childInfo = (d, i) => {
       const posY = (ci, mod) => {
         const k = mod ? 12 : 20;
-        return ci * k * d.depth;
+        const gDepth = ci * k * d.depth;
+        if (gDepth > options.graphDepth) {
+          options.graphDepth = gDepth;
+        }
+        return gDepth;
       };
       treeWidth = Math.max(treeWidth, d.children ? d.children.length : 0);
       if (d.parent) {
@@ -1356,6 +1362,7 @@ function ProvenanceTree(d3, selector, _options) {
         appendInfoElement(d, 'property', isNode, mapped, JSON.stringify(properties[property]));
       });
     }
+    runCallback('onAfterInfoUpdateBuild');
   }
   function appendInfoElement(d, cls, isNode, property, value) {
     var _options$idNavigate, _options$idNavigate2;
