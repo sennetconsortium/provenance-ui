@@ -1108,7 +1108,13 @@ function ProvenanceTree(d3, selector, _options) {
           node.classList.add(type);
           for (let io of actions.data) {
             const path = document.createElementNS(uri, io.tag || 'path');
-            path.setAttribute(io.property || 'd', io.draw);
+            if (io.draw && Array.isArray(io.draw)) {
+              for (let attr of io.draw) {
+                path.setAttribute(attr[0], attr[1]);
+              }
+            } else {
+              path.setAttribute(io.property || 'd', io.draw);
+            }
             node.append(path);
           }
         }
