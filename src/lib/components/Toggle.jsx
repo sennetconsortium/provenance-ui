@@ -3,7 +3,7 @@ import $ from 'jquery'
 import PropTypes from 'prop-types'
 import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 
-function Toggle({ context, icon, selectorId, ariaLabel, text, className, disabled}) {
+function Toggle({ context, icon = true, selectorId = SELECTOR_ID, ariaLabel = 'Toggle', text = '', className = '', disabled = false}) {
 
     const toggleData = (e) => {
         const $el = $(e.currentTarget)
@@ -40,15 +40,6 @@ function Toggle({ context, icon, selectorId, ariaLabel, text, className, disable
 
         </label>
     )
-}
-
-Toggle.defaultProps = {
-    icon: true,
-    selectorId: SELECTOR_ID,
-    ariaLabel: 'Toggle',
-    disabled: false,
-    text: '',
-    className: ''
 }
 
 Toggle.propTypes = {

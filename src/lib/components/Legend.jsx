@@ -6,7 +6,7 @@ import {CLASS_NAMES, isEdge, SELECTOR_ID, SELECTORS} from '../js/constants'
 import Swal from 'sweetalert2'
 import useHelpHtml from '../hooks/useHelpHtml'
 
-const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, className, help, otherLegend }) => {
+const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, selectorId = SELECTOR_ID, className = '', help = {}, otherLegend = {} }) => {
     const [colors] = useState(colorMap)
     const [filterable] = useState(filterNodes)
     const { html } = useHelpHtml(help)
@@ -148,15 +148,6 @@ const Legend = ({ children, colorMap, filterNodes, actionMap, selectorId, classN
             </ul>
         </div>
     )
-}
-
-Legend.defaultProps = {
-    filterNodes: true,
-    help: {},
-    otherLegend: {},
-    actionMap: {},
-    selectorId: SELECTOR_ID,
-    className: ''
 }
 
 Legend.propTypes = {
