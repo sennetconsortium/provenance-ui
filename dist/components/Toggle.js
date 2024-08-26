@@ -12,12 +12,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 function Toggle(_ref) {
   let {
     context,
-    icon,
-    selectorId,
-    ariaLabel,
-    text,
-    className,
-    disabled
+    icon = true,
+    selectorId = _constants.SELECTOR_ID,
+    ariaLabel = 'Toggle',
+    text = '',
+    className = '',
+    disabled = false
   } = _ref;
   const toggleData = e => {
     const $el = (0, _jquery.default)(e.currentTarget);
@@ -56,14 +56,6 @@ function Toggle(_ref) {
     title: ariaLabel
   })));
 }
-Toggle.defaultProps = {
-  icon: true,
-  selectorId: _constants.SELECTOR_ID,
-  ariaLabel: 'Toggle',
-  disabled: false,
-  text: '',
-  className: ''
-};
 Toggle.propTypes = {
   context: _propTypes.default.func,
   icon: _propTypes.default.bool,
