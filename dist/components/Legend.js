@@ -22,12 +22,12 @@ const Legend = _ref => {
   let {
     children,
     colorMap,
-    filterNodes,
-    actionMap,
-    selectorId,
-    className,
-    help,
-    otherLegend
+    filterNodes = true,
+    actionMap = {},
+    selectorId = _constants.SELECTOR_ID,
+    className = '',
+    help = {},
+    otherLegend = {}
   } = _ref;
   const [colors] = (0, _react.useState)(colorMap);
   const [filterable] = (0, _react.useState)(filterNodes);
@@ -161,14 +161,6 @@ const Legend = _ref => {
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "c-legend c-legend--".concat(selectorId, " ").concat(filterable ? 'c-legend--filterable' : '', " ").concat(className)
   }, /*#__PURE__*/_react.default.createElement("ul", null, buildLegend(), children));
-};
-Legend.defaultProps = {
-  filterNodes: true,
-  help: {},
-  otherLegend: {},
-  actionMap: {},
-  selectorId: _constants.SELECTOR_ID,
-  className: ''
 };
 Legend.propTypes = {
   colorMap: _propTypes.default.object.isRequired,
