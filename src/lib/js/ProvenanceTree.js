@@ -108,7 +108,8 @@ function ProvenanceTree(d3, selector, _options) {
                 gray: '#ced2d9',
                 inactive: '#dddddd'
             }
-        }
+        },
+        infoPanelBeforeSvg: true
     }
 
     function init() {
@@ -775,8 +776,10 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function appendInfoPanel() {
-         $el.info = $el.canvas.append('div')
-            .attr('class', classNames.info);
+
+        $el.info = options.infoPanelBeforeSvg ? $el.canvas.append('div').lower() : $el.canvas.append('div')
+        $el.info.attr('class', classNames.info)
+
 
         $infoParent = $(selector).find(`.${classNames.info}`)
 
