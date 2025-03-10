@@ -7,7 +7,7 @@ exports.default = void 0;
 require("core-js/modules/web.dom-collections.iterator.js");
 var _react = require("react");
 var _jquery = _interopRequireDefault(require("jquery"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 const useHelpHtml = function useHelpHtml() {
   let help = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   let images = {
@@ -26,5 +26,4 @@ const useHelpHtml = function useHelpHtml() {
     html
   };
 };
-var _default = useHelpHtml;
-exports.default = _default;
+var _default = exports.default = useHelpHtml;

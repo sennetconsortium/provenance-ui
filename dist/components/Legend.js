@@ -1,13 +1,16 @@
 "use strict";
 
+require("core-js/modules/es.weak-map.js");
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.regexp.exec.js");
 require("core-js/modules/es.string.replace.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.find.js");
 require("core-js/modules/esnext.string.replace-all.js");
+require("core-js/modules/web.dom-collections.iterator.js");
 var _react = _interopRequireWildcard(require("react"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _jquery = _interopRequireDefault(require("jquery"));
@@ -15,9 +18,9 @@ var _Toggle = _interopRequireDefault(require("./Toggle"));
 var _constants = require("../js/constants");
 var _sweetalert = _interopRequireDefault(require("sweetalert2"));
 var _useHelpHtml = _interopRequireDefault(require("../hooks/useHelpHtml"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
+function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
+function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const Legend = _ref => {
   let {
     children,
@@ -126,7 +129,7 @@ const Legend = _ref => {
     _jquery.default.extend(colors, otherLegend);
     for (let key in colors) {
       action = actionMap[key];
-      result.push( /*#__PURE__*/_react.default.createElement("li", {
+      result.push(/*#__PURE__*/_react.default.createElement("li", {
         className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelpOrOther(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(key),
         "data-node": key,
@@ -172,5 +175,4 @@ Legend.propTypes = {
   selectorId: _propTypes.default.string,
   className: _propTypes.default.string
 };
-var _default = Legend;
-exports.default = _default;
+var _default = exports.default = Legend;
