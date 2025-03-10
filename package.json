@@ -1,6 +1,6 @@
 {
   "name": "provenance-ui",
-  "version": "2.6.6",
+  "version": "2.6.7",
   "description": "Provenance",
   "author": "lisabruney@pitt.edu",
   "keywords": [
@@ -29,8 +29,8 @@
     "@babel/polyfill": "^7.12.1",
     "d3": "^7.9.0",
     "jquery": "^3.7.1",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
     "stylus": "0.64.0",
     "sweetalert2": "^11.17.2",
