@@ -4,17 +4,22 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/es.parse-int.js");
 require("core-js/modules/es.promise.js");
 require("core-js/modules/es.regexp.exec.js");
-require("core-js/modules/es.string.replace.js");
+require("core-js/modules/es.regexp.to-string.js");
 require("core-js/modules/es.string.match.js");
+require("core-js/modules/es.string.replace.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.filter.js");
+require("core-js/modules/esnext.iterator.find.js");
+require("core-js/modules/esnext.iterator.for-each.js");
 require("core-js/modules/esnext.string.replace-all.js");
+require("core-js/modules/web.dom-collections.iterator.js");
 var _jquery = _interopRequireDefault(require("jquery"));
 var _DataConverter = _interopRequireDefault(require("./DataConverter"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * @author dbmi.pitt.edu
  * @param d3 {object} The d3 library
@@ -76,7 +81,8 @@ function ProvenanceTree(d3, selector, _options) {
       Sample: "#ebb5c8",
       Source: "#ffc255",
       Activity: "#f16766",
-      Dataset: "#8ecb93"
+      Dataset: "#8ecb93",
+      Publication: "#a556d9"
     },
     visitedNodes: new Set(),
     imageMapActions: {},
@@ -275,7 +281,6 @@ function ProvenanceTree(d3, selector, _options) {
     '#ff75ea' // pink
     ];
   }
-
   function fontAwesomeIcons() {
     return {
       'glass': 'f000',
@@ -1101,7 +1106,6 @@ function ProvenanceTree(d3, selector, _options) {
     if (actions) {
       type = actions ? actions.type : 'image';
       node = document.createElementNS(uri, type);
-      const id = getNodeId(d);
       if (actions.fn === 'append') {
         if (type === 'image') {
           fetchImage(d, ops);
@@ -1375,7 +1379,7 @@ function ProvenanceTree(d3, selector, _options) {
   function appendInfoElement(d, cls, isNode, property, value) {
     var _options$idNavigate, _options$idNavigate2;
     const isNavigation = (_options$idNavigate = options.idNavigate) === null || _options$idNavigate === void 0 ? void 0 : _options$idNavigate.props[property];
-    value = value ? value.replaceAll('"', '') : value;
+    value = value ? value.toString().replaceAll('"', '') : value;
     let formattedUrl = false;
     let href = '#';
     if (isNavigation && ((_options$idNavigate2 = options.idNavigate) !== null && _options$idNavigate2 !== void 0 && _options$idNavigate2.url || isNavigation.url) && !isNavigation.callback) {
@@ -1437,7 +1441,6 @@ function ProvenanceTree(d3, selector, _options) {
     //.force("x", d3.forceX())
     //.force('y', d3.forceY(20).strength(.2))
   }
-
   function updateSimulation() {
     simulation.nodes(data.nodes);
     simulation.alpha(.5).alphaTarget(0).restart();
@@ -1679,5 +1682,4 @@ function ProvenanceTree(d3, selector, _options) {
     enableZoom
   };
 }
-var _default = ProvenanceTree;
-exports.default = _default;
+var _default = exports.default = ProvenanceTree;
