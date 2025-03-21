@@ -4,12 +4,14 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/web.dom-collections.iterator.js");
+require("core-js/modules/es.json.stringify.js");
 require("core-js/modules/es.regexp.exec.js");
 require("core-js/modules/es.string.split.js");
-require("core-js/modules/es.json.stringify.js");
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.map.js");
+require("core-js/modules/web.dom-collections.iterator.js");
 var _DataConverter = _interopRequireDefault(require("../DataConverter"));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * This converts a data object in Neo4J format to an adjacency list that will be later
  * used in d3.stratify to create the hierarchy model.
@@ -160,5 +162,4 @@ class DataConverterNeo4J extends _DataConverter.default {
     return this;
   }
 }
-var _default = DataConverterNeo4J;
-exports.default = _default;
+var _default = exports.default = DataConverterNeo4J;

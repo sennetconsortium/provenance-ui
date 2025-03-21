@@ -4,8 +4,8 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
-require("core-js/modules/web.dom-collections.iterator.js");
 require("core-js/modules/es.promise.js");
+require("core-js/modules/web.dom-collections.iterator.js");
 /**
  * Base class with common options.
  * @author dbmi.pitt.edu
@@ -105,5 +105,4 @@ class GraphGeneric {
     return this.result;
   }
 }
-var _default = GraphGeneric;
-exports.default = _default;
+var _default = exports.default = GraphGeneric;

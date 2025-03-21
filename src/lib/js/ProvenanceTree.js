@@ -66,7 +66,8 @@ function ProvenanceTree(d3, selector, _options) {
             Sample: "#ebb5c8",
             Source: "#ffc255",
             Activity: "#f16766",
-            Dataset: "#8ecb93"
+            Dataset: "#8ecb93",
+            Publication: "#a556d9"
         },
         visitedNodes: new Set(),
         imageMapActions: {},
@@ -108,7 +109,8 @@ function ProvenanceTree(d3, selector, _options) {
                 gray: '#ced2d9',
                 inactive: '#dddddd'
             }
-        }
+        },
+        infoPanelBeforeSvg: true
     }
 
     function init() {
@@ -529,7 +531,6 @@ function ProvenanceTree(d3, selector, _options) {
         if (actions) {
             type = actions ? actions.type : 'image';
             node =  document.createElementNS(uri, type)
-            const id = getNodeId(d)
             if (actions.fn === 'append') {
                 if (type === 'image') {
                     fetchImage(d, ops)
@@ -775,8 +776,10 @@ function ProvenanceTree(d3, selector, _options) {
     }
 
     function appendInfoPanel() {
-         $el.info = $el.canvas.append('div')
-            .attr('class', classNames.info);
+
+        $el.info = options.infoPanelBeforeSvg ? $el.canvas.append('div').lower() : $el.canvas.append('div')
+        $el.info.attr('class', classNames.info)
+
 
         $infoParent = $(selector).find(`.${classNames.info}`)
 
@@ -844,7 +847,7 @@ function ProvenanceTree(d3, selector, _options) {
 
     function appendInfoElement(d, cls, isNode, property, value) {
         const isNavigation =  options.idNavigate?.props[property]
-        value = value ? value.replaceAll('"', '') : value
+        value = value ? value.toString().replaceAll('"', '') : value
         let formattedUrl = false;
 
         let href = '#';

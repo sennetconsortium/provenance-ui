@@ -4,11 +4,13 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = void 0;
+require("core-js/modules/esnext.iterator.constructor.js");
+require("core-js/modules/esnext.iterator.find.js");
 var _react = _interopRequireDefault(require("react"));
 var _jquery = _interopRequireDefault(require("jquery"));
 var _propTypes = _interopRequireDefault(require("prop-types"));
 var _constants = require("../js/constants");
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 function Toggle(_ref) {
   let {
     context,
@@ -65,5 +67,4 @@ Toggle.propTypes = {
   text: _propTypes.default.string,
   className: _propTypes.default.string
 };
-var _default = Toggle;
-exports.default = _default;
+var _default = exports.default = Toggle;
