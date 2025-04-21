@@ -120,7 +120,7 @@ const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, select
                 <li className={`c-legend__item c-legend__item--${keyToClassName(key)}  ${isHelp(key) || (isOther(key) && !hasFilter(key)) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
                     key={`legend--${key}`} data-node={isOther(key) ? otherLegend[key].nodeKey || key : key} data-filter={isOther(key) ? otherLegend[key].filterValue : undefined} onClick={isOther(key) && otherLegend[key].callback ? (e) => otherLegend[key].callback(e, selectorId, key) : null} title={getTitle(key)}>
                     <span className={`c-legend__color ${getJsClassName(key)} c-legend__color--${keyToClassName(key)}`}>
-                        <span style={{backgroundColor: getColor(key)}}>
+                        <span style={{backgroundColor: getColor(key)}} className={otherLegend[key]?.iconContainerClass}>
                             {isHelp(key) && <i className='fa fa-question-circle-o' role='presentation'></i>}
                             {isOther(key) && otherLegend[key].icon && <i className={`fa ${otherLegend[key].icon}`} role='presentation'></i>}
                         </span>

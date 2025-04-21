@@ -129,6 +129,7 @@ const Legend = _ref => {
     let action;
     _jquery.default.extend(colors, otherLegend);
     for (let key in colors) {
+      var _otherLegend$key;
       action = actionMap[key];
       result.push(/*#__PURE__*/_react.default.createElement("li", {
         className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelp(key) || isOther(key) && !hasFilter(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
@@ -142,7 +143,8 @@ const Legend = _ref => {
       }, /*#__PURE__*/_react.default.createElement("span", {
         style: {
           backgroundColor: getColor(key)
-        }
+        },
+        className: (_otherLegend$key = otherLegend[key]) === null || _otherLegend$key === void 0 ? void 0 : _otherLegend$key.iconContainerClass
       }, isHelp(key) && /*#__PURE__*/_react.default.createElement("i", {
         className: "fa fa-question-circle-o",
         role: "presentation"
