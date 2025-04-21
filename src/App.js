@@ -53,6 +53,11 @@ function App() {
     }
 
     const otherLegend = {
+        DatasetComponent: {
+            filterValue: 'CentralProcess',
+            name: 'Data (Component)',
+            title: 'Data (Component)'
+        },
         Expand: {
             icon: 'fa-expand',
             callback: expandCb,
