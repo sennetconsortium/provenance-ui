@@ -54,6 +54,8 @@ function App() {
 
     const otherLegend = {
         DatasetComponent: {
+            iconContainerClass: 'c-help',
+            icon: 'shape shape--blob',
             filterValue: 'CentralProcess',
             name: 'Data (Component)',
             title: 'Data (Component)'
