@@ -717,9 +717,7 @@ function ProvenanceTree(d3, selector, _options) {
             .append('g')
             .attr('id', d => `node--${getNodeId(d)}`)
             .attr('data-node', d => {
-                if (options.callbacks.onNodeBuild) {
-                    options.callbacks.onNodeBuild(d)
-                }
+                runCallback('onNodeBuild', {event: e, node: d})
             })
             .on('click', function(e, d) {
                 d.wasClicked = true
@@ -758,11 +756,8 @@ function ProvenanceTree(d3, selector, _options) {
 
         $el.node.attr('class', d => {
             const classNames = `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : ''}`
-            let customClassNames = ''
-            if (options.callbacks.onNodeCssClass) {
-                customClassNames = options.callbacks.onNodeCssClass(d)
-            }
-            return classNames.trim() + ' ' + customClassNames
+            let customClassNames = runCallback('onNodeCssClass', {event: e, node: d})
+            return classNames.trim() + ' ' + customClassNames || ''
         })
             .attr('id', d => `node--${getNodeId(d)}`)
 

@@ -1283,9 +1283,10 @@ function ProvenanceTree(d3, selector, _options) {
     $el.node = $el.nodeGroup.selectAll('.node').data(data.nodes);
     $el.node.exit().remove();
     $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).attr('data-node', d => {
-      if (options.callbacks.onNodeBuild) {
-        options.callbacks.onNodeBuild(d);
-      }
+      runCallback('onNodeBuild', {
+        event: e,
+        node: d
+      });
     }).on('click', function (e, d) {
       d.wasClicked = true;
       options.visitedNodes.add(getNodeId(d));
@@ -1316,11 +1317,11 @@ function ProvenanceTree(d3, selector, _options) {
     };
     $el.node.attr('class', d => {
       const classNames = "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : '');
-      let customClassNames = '';
-      if (options.callbacks.onNodeCssClass) {
-        customClassNames = options.callbacks.onNodeCssClass(d);
-      }
-      return classNames.trim() + ' ' + customClassNames;
+      let customClassNames = runCallback('onNodeCssClass', {
+        event: e,
+        node: d
+      });
+      return classNames.trim() + ' ' + customClassNames || '';
     }).attr('id', d => "node--".concat(getNodeId(d)));
     $el.node.select("circle.".concat(classNames.nodes.glow)).attr('class', classNames.nodes.glow).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
