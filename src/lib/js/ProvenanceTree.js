@@ -716,6 +716,9 @@ function ProvenanceTree(d3, selector, _options) {
         $el.nodeEnter = $el.node.enter()
             .append('g')
             .attr('id', d => `node--${getNodeId(d)}`)
+            .attr('data-node', d => {
+                runCallback('onNodeBuild', {node: d})
+            })
             .on('click', function(e, d) {
                 d.wasClicked = true
                 options.visitedNodes.add(getNodeId(d))
@@ -751,7 +754,11 @@ function ProvenanceTree(d3, selector, _options) {
             return (legendFilters[cat]) ? 'has-hover ' : ''
         }
 
-        $el.node.attr('class', d => `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : ''}`)
+        $el.node.attr('class', d => {
+            const classNames = `node node--${getNodeCat(d)} ${getHoverClass(d)}${getHighlightClass(d)} ${d.data.className || ''} ${d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : ''}`
+            let customClassNames = runCallback('onNodeCssClass', {node: d})
+            return classNames.trim() + ' ' + customClassNames || ''
+        })
             .attr('id', d => `node--${getNodeId(d)}`)
 
         $el.node.select(`circle.${classNames.nodes.glow}`)

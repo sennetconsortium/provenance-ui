@@ -48,7 +48,7 @@ const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, select
 
         const toggleClass = (e, fn = 'addClass', className = CLASS_NAMES.hover) => {
             const $el = getItem(e)
-            const node = $el.data('node')
+            const node = $el.attr('data-filter') || $el.data('node')
             $el[fn](className).parent()[fn](className)
             $(`#${selectorId} .node--${node}`)[fn](className)
 
@@ -105,10 +105,11 @@ const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, select
         }
         const isHelp = (key) => key === helpLabel
         const isOther = (key) => otherLegend[key] !== undefined
+        const hasFilter = (key) => otherLegend[key].filterValue !== undefined
         const isHelpOrOther = (key) => isHelp(key) || isOther(key)
         const getColor = (key) => (typeof colors[key] === 'string') ? colors[key] : (colors[key].color || 'transparent')
         const keyToClassName = (key) => key.replaceAll(' ', '-')
-        const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) ? `js-legend--${keyToClassName(key)}` : 'js-legend--trigger'
+        const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) && !hasFilter(key) ? `js-legend--${keyToClassName(key)}` : 'js-legend--trigger'
         const getTitle = (key) => isOther(key) && otherLegend[key].title ? otherLegend[key].title : null
 
         let action
@@ -116,10 +117,10 @@ const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, select
         for (let key in colors) {
             action = actionMap[key]
             result.push(
-                <li className={`c-legend__item c-legend__item--${keyToClassName(key)}  ${isHelpOrOther(key) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
-                    key={`legend--${key}`} data-node={key} onClick={isOther(key) && otherLegend[key].callback ? (e) => otherLegend[key].callback(e, selectorId, key) : null} title={getTitle(key)}>
+                <li className={`c-legend__item c-legend__item--${keyToClassName(key)}  ${isHelp(key) || (isOther(key) && !hasFilter(key)) ? '' : 'js-legend__item'} ${action && action.disabled ? CLASS_NAMES.disabled : ''}`}
+                    key={`legend--${key}`} data-node={isOther(key) ? otherLegend[key].nodeKey || key : key} data-filter={isOther(key) ? otherLegend[key].filterValue : undefined} onClick={isOther(key) && otherLegend[key].callback ? (e) => otherLegend[key].callback(e, selectorId, key) : null} title={getTitle(key)}>
                     <span className={`c-legend__color ${getJsClassName(key)} c-legend__color--${keyToClassName(key)}`}>
-                        <span style={{backgroundColor: getColor(key)}}>
+                        <span style={{backgroundColor: getColor(key)}} className={otherLegend[key]?.iconContainerClass}>
                             {isHelp(key) && <i className='fa fa-question-circle-o' role='presentation'></i>}
                             {isOther(key) && otherLegend[key].icon && <i className={`fa ${otherLegend[key].icon}`} role='presentation'></i>}
                         </span>

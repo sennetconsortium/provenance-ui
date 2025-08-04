@@ -35,6 +35,7 @@ async function Neo4JGraphObject(serviceOps) {
         let ops = getOptions()
         const colorMap = {
             "Dataset": "#8ecb93",
+            "DatasetComponent": "#8ecb93",
             "Activity": "#f16766",
             "Sample": "#ebb5c8",
             "Source": "#ffc255"

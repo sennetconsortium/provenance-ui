@@ -70,7 +70,7 @@ const Legend = _ref => {
       let fn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'addClass';
       let className = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : _constants.CLASS_NAMES.hover;
       const $el = getItem(e);
-      const node = $el.data('node');
+      const node = $el.attr('data-filter') || $el.data('node');
       $el[fn](className).parent()[fn](className);
       (0, _jquery.default)("#".concat(selectorId, " .node--").concat(node))[fn](className);
       if ((0, _constants.isEdge)($el)) {
@@ -120,19 +120,22 @@ const Legend = _ref => {
     }
     const isHelp = key => key === helpLabel;
     const isOther = key => otherLegend[key] !== undefined;
+    const hasFilter = key => otherLegend[key].filterValue !== undefined;
     const isHelpOrOther = key => isHelp(key) || isOther(key);
     const getColor = key => typeof colors[key] === 'string' ? colors[key] : colors[key].color || 'transparent';
     const keyToClassName = key => key.replaceAll(' ', '-');
-    const getJsClassName = key => isHelp(key) ? 'js-legend--help' : isOther(key) ? "js-legend--".concat(keyToClassName(key)) : 'js-legend--trigger';
+    const getJsClassName = key => isHelp(key) ? 'js-legend--help' : isOther(key) && !hasFilter(key) ? "js-legend--".concat(keyToClassName(key)) : 'js-legend--trigger';
     const getTitle = key => isOther(key) && otherLegend[key].title ? otherLegend[key].title : null;
     let action;
     _jquery.default.extend(colors, otherLegend);
     for (let key in colors) {
+      var _otherLegend$key;
       action = actionMap[key];
       result.push(/*#__PURE__*/_react.default.createElement("li", {
-        className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelpOrOther(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
+        className: "c-legend__item c-legend__item--".concat(keyToClassName(key), "  ").concat(isHelp(key) || isOther(key) && !hasFilter(key) ? '' : 'js-legend__item', " ").concat(action && action.disabled ? _constants.CLASS_NAMES.disabled : ''),
         key: "legend--".concat(key),
-        "data-node": key,
+        "data-node": isOther(key) ? otherLegend[key].nodeKey || key : key,
+        "data-filter": isOther(key) ? otherLegend[key].filterValue : undefined,
         onClick: isOther(key) && otherLegend[key].callback ? e => otherLegend[key].callback(e, selectorId, key) : null,
         title: getTitle(key)
       }, /*#__PURE__*/_react.default.createElement("span", {
@@ -140,7 +143,8 @@ const Legend = _ref => {
       }, /*#__PURE__*/_react.default.createElement("span", {
         style: {
           backgroundColor: getColor(key)
-        }
+        },
+        className: (_otherLegend$key = otherLegend[key]) === null || _otherLegend$key === void 0 ? void 0 : _otherLegend$key.iconContainerClass
       }, isHelp(key) && /*#__PURE__*/_react.default.createElement("i", {
         className: "fa fa-question-circle-o",
         role: "presentation"

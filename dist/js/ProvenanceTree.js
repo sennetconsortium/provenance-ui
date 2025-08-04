@@ -11,6 +11,7 @@ require("core-js/modules/es.regexp.exec.js");
 require("core-js/modules/es.regexp.to-string.js");
 require("core-js/modules/es.string.match.js");
 require("core-js/modules/es.string.replace.js");
+require("core-js/modules/es.string.trim.js");
 require("core-js/modules/esnext.iterator.constructor.js");
 require("core-js/modules/esnext.iterator.filter.js");
 require("core-js/modules/esnext.iterator.find.js");
@@ -1281,7 +1282,11 @@ function ProvenanceTree(d3, selector, _options) {
 
     $el.node = $el.nodeGroup.selectAll('.node').data(data.nodes);
     $el.node.exit().remove();
-    $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).on('click', function (e, d) {
+    $el.nodeEnter = $el.node.enter().append('g').attr('id', d => "node--".concat(getNodeId(d))).attr('data-node', d => {
+      runCallback('onNodeBuild', {
+        node: d
+      });
+    }).on('click', function (e, d) {
       d.wasClicked = true;
       options.visitedNodes.add(getNodeId(d));
       updateInfo(d.data, true);
@@ -1309,7 +1314,13 @@ function ProvenanceTree(d3, selector, _options) {
       const cat = getNodeCat(d);
       return legendFilters[cat] ? 'has-hover ' : '';
     };
-    $el.node.attr('class', d => "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : '')).attr('id', d => "node--".concat(getNodeId(d)));
+    $el.node.attr('class', d => {
+      const classNames = "node node--".concat(getNodeCat(d), " ").concat(getHoverClass(d)).concat(getHighlightClass(d), " ").concat(d.data.className || '', " ").concat(d.wasClicked || options.visitedNodes.has(getNodeId(d)) ? 'is-visited' : '');
+      let customClassNames = runCallback('onNodeCssClass', {
+        node: d
+      });
+      return classNames.trim() + ' ' + customClassNames || '';
+    }).attr('id', d => "node--".concat(getNodeId(d)));
     $el.node.select("circle.".concat(classNames.nodes.glow)).attr('class', classNames.nodes.glow).style('fill', d => {
       return options.theme.colors.nodeOutlineFill ? options.theme.colors.nodeOutlineFill : typeToColor(getNodeCat(d));
     }).style('stroke', d => {

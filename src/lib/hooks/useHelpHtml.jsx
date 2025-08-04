@@ -62,6 +62,7 @@ const useHelpHtml = ( help = {}) => {
               <li>The eye icon (<i class='fa fa-eye' role='presentation'></i>) after legend labels toggles the visibility of the respective item on the graph.</li>
               ${help.legend || ''}
             </ul>
+            ${help.otherInfo || ''}
         </div>`
 
     const [ html ] = useState(help.html || _html)

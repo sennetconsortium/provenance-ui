@@ -49,6 +49,15 @@ export const AppProvider = ({ children }) => {
 
             return {
                 callbacks: {
+                    onNodeBuild: (d) => {
+                        console.log(d)
+                    },
+                    onNodeCssClass: (d) => {
+                        if (d.data.properties && d.data.properties['sennet:creation_action']) {
+                            return 'node--'+d.data.properties['sennet:creation_action'].replaceAll(' ', '')
+                        }
+                        return ''
+                    },
                     onCenterY: (args) => {
                         return args.options.graphDepth / 2
                     },
