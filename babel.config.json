@@ -30,7 +30,7 @@
       "pragma": "dom",
       "pragmaFrag": "DomFrag",
       "throwIfNamespace": false,
-      "runtime": "classic"
+      "runtime": "automatic"
     }]
   ]
 }
