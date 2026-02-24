@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "d3": "^7.9.0",
-    "jquery": "^4.0.0",
+    "jquery": "^3.7.1",
     "sweetalert2": "^11.26.20"
   },
   "scripts": {

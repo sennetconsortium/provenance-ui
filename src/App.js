@@ -15,7 +15,7 @@ function App() {
             initialized.current = true
             setData(contextData)
         }
-    }, [setData, contextData])
+    }, [setData, contextData, options.dontCheckInitialized])
 
     const toggleData = (e, hideActivity, selectorId) => {
         const ui = window.ProvenanceTreeD3[selectorId]
