@@ -1,6 +1,6 @@
 {
   "name": "provenance-ui",
-  "version": "2.6.8",
+  "version": "2.6.9",
   "description": "Provenance",
   "author": "lisabruney@pitt.edu",
   "keywords": [
@@ -27,9 +27,8 @@
   },
   "dependencies": {
     "d3": "^7.9.0",
-    "jquery": "^3.7.1",
-    "sweetalert2": "^11.17.2",
-    "web-vitals": "^4.2.4"
+    "jquery": "^4.0.0",
+    "sweetalert2": "^11.26.20"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -63,17 +62,18 @@
     ]
   },
   "devDependencies": {
-    "@babel/cli": "^7.26.4",
-    "@babel/core": "^7.26.9",
-    "@babel/preset-env": "^7.26.9",
-    "@babel/preset-react": "^7.26.3",
+    "@babel/cli": "^7.28.6",
+    "@babel/core": "^7.29.0",
+    "@babel/preset-env": "^7.29.0",
+    "@babel/preset-react": "^7.28.5",
     "babel-plugin-file-loader": "^2.0.0",
     "loglevel": "^1.9.2",
-    "prettier": "^3.5.3",
+    "prettier": "^3.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.1",
-    "stylus": "0.64.0"
+    "stylus": "0.64.0",
+    "web-vitals": "^5.1.0"
   },
   "peerDependencies": {
     "react": ">=18 <20",
