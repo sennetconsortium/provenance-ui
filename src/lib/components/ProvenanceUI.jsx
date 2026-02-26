@@ -17,7 +17,7 @@ function ProvenanceUI({ children, data, options = {} }) {
     }
 
     useEffect(() => {
-        if (!options.noStyles) {
+        if (options?.includeStyles === true) {
             import (`../ProvenanceUI.css`)
         }
         
