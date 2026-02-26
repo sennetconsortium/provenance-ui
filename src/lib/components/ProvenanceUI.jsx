@@ -5,7 +5,7 @@ import ProvenanceTree from '../js/ProvenanceTree'
 import useD3 from '../hooks/useD3'
 import { SELECTOR_ID } from '../js/constants'
 
-function ProvenanceUI({ children, data, options = {} }) {
+function ProvenanceUI({ children, data, options = {includeStyles: false} }) {
     const { d3, error, loading } = useD3()
     const selectorId = options.selectorId || SELECTOR_ID
     const initialized = useRef(false)
@@ -17,10 +17,11 @@ function ProvenanceUI({ children, data, options = {} }) {
     }
 
     useEffect(() => {
-        if (options?.includeStyles === true) {
-            import (`../ProvenanceUI.css`)
+        if (options.includeStyles !== undefined) {
+            if (options?.includeStyles === true) {
+                import(`../ProvenanceUI.css`)
+            }
         }
-        
         addVisitedClass()
     });
 
