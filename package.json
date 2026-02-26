@@ -34,7 +34,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "dist": "rm -rf dist && NODE_ENV=production node ./node_modules/xac-esbuild/index.js -s=src/lib/ -o=dist/ -banner=package.json -log=1 -t='**/*.{js,jsx,eot,css,svg,woff,woff2,ttf,otf}'",
+    "dist": "rm -rf dist && NODE_ENV=production node ./node_modules/xac-esbuild/index.js -s=src/lib/ -o=dist/ -banner=package.json -log=1 -format=cjs -t='**/*.{js,jsx,eot,css,svg,woff,woff2,ttf,otf}'",
     "css": "stylus --include-css --compress -w src/css/App.styl -o ./src/lib/ProvenanceUI.css"
   },
   "prettier": {
