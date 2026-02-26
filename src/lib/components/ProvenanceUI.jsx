@@ -16,10 +16,21 @@ function ProvenanceUI({ children, data, options = {includeStyles: false} }) {
         })
     }
 
+    async function loadStylesDynamically() {
+        try {
+            const cssModule = await import('../ProvenanceUI.css', {
+                assert: { type: 'css' }
+            });
+            document.adoptedStyleSheets = [...document.adoptedStyleSheets, cssModule.default];
+        } catch (error) {
+            console.error('provenance-ui: error loading ProvenanceUI.css ', error);
+        }
+    }
+
     useEffect(() => {
         if (options.includeStyles !== undefined) {
             if (options?.includeStyles === true) {
-                import(`../ProvenanceUI.css`)
+                loadStylesDynamically();
             }
         }
         addVisitedClass()
