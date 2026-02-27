@@ -29,7 +29,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "eject": "react-scripts eject",
-    "dist": "rm -rf dist && NODE_ENV=production node ./node_modules/xac-esbuild/index.js -s=src/lib/ -o=dist/ -banner=package.json -log=1 -format=cjs -t='**/*.{js,jsx,eot,css,svg,woff,woff2,ttf,otf}'",
+    "dist": "rm -rf dist && NODE_ENV=production node ./node_modules/xac-esbuild/index.js -s=src/lib/ -o=dist/ -target=node10.4 -banner=package.json -log=1 -format=cjs -t='**/*.{js,jsx,eot,css,svg,woff,woff2,ttf,otf}'",
     "css": "stylus --include-css --compress -w src/css/App.styl -o ./src/lib/ProvenanceUI.css"
   },
   "prettier": {
@@ -64,7 +64,7 @@
     "react-scripts": "5.0.1",
     "stylus": "0.64.0",
     "web-vitals": "^5.1.0",
-    "xac-esbuild": "file:../xac-esbuild"
+    "xac-esbuild": "github:x-atlas-consortia/xac-esbuild#1.0.0"
   },
   "peerDependencies": {
     "react": ">=18 <20",
