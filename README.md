@@ -26,7 +26,7 @@ Watch and build CSS files:
 
 ### Previewing a demo
 In order to see a running demo locally, you will need to create `.env` file from `.env.example`. This project's demo
-assumes an api to be running using simple Bearer token Authorization. For `REACT_APP_API_FEATURE`, the `neo4j` is recommended as
+assumes an api to be running using simple Bearer token Authorization. For `NEXT_PUBLIC_API_FEATURE`, the `neo4j` is recommended as
 `generic` has been deprecated and no longer supported in updates. Please see [data/sample.neo4j.js](https://github.com/sennetconsortium/provenance-ui/blob/main/src/data/sample.neo4j.js) as sample of expected neo4j format from your api.
 
 ## Usage In Project:

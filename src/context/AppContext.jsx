@@ -1,10 +1,10 @@
 import { createContext, useState, useEffect, useRef } from 'react'
 import log from 'loglevel'
 
-import GenericObject from '../usage/GenericObject'
-import Neo4JGraphObject from '../usage/Neo4JGraphObject'
+import GenericObject from '@/usage/GenericObject'
+import Neo4JGraphObject from '@/usage/Neo4JGraphObject'
 
-const AppContext = createContext()
+const AppContext = createContext({})
 
 /**
  * This sets up an example for usage and testing by developer. Use the .env to pass in values.
@@ -19,25 +19,24 @@ export const AppProvider = ({ children }) => {
     const [options, setOptions] = useState({})
     const initialized = useRef(false)
 
-    const getEnv = (key) => {
-        return process.env[`REACT_APP_${key}`]
-    }
-
     useEffect(() => {
         if (initialized.current) return
         initialized.current = true
-        log.setLevel(getEnv('LOG_LEVEL') || 'silent')
-        const token = getEnv('API_TOKEN')
-        const url = getEnv('API_URL')
-        const itemId = getEnv('API_ITEM_ID')
-        const feature = getEnv('API_FEATURE')
 
+        const logLevel = process.env.NEXT_PUBLIC_LOG_LEVEL
+        log.setLevel(logLevel || 'silent')
+     
+        const token = process.env.NEXT_PUBLIC_API_TOKEN
+        const url = process.env.NEXT_PUBLIC_API_URL
+        const itemId = process.env.NEXT_PUBLIC_API_ITEM_ID
+        const feature = process.env.NEXT_PUBLIC_API_FEATURE
+        
         const jsonView = (d, property, value) => {
             return {href: `/api/json?view=${btoa(value)}`, value: `${value.substr(0, 20)}...}`}
         }
 
         const getOptions = () => {
-            let ops = getEnv('OPTIONS')
+            let ops = process.env.NEXT_PUBLIC_OPTIONS
             log.debug('Environment options', ops)
             try {
                 if (ops) {
