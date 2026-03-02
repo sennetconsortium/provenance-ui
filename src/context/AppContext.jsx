@@ -47,7 +47,6 @@ export const AppProvider = ({ children }) => {
             }
 
             return {
-                includeStyles: true,
                 callbacks: {
                     onNodeBuild: (d) => {
                         console.log(d)
