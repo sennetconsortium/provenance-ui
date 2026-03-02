@@ -88,7 +88,7 @@ async function Neo4JGraphObject(serviceOps) {
         setLoading(false)
     }
 
-    if (url.length && itemId.length) {
+    if (url?.length && itemId.length) {
         const graph = new GraphGeneric(graphOps)
         return graph.service({ callback: handleResult, url: url.replace('{id}', itemId), headers: serviceOps.getOptions().headers  })
     }

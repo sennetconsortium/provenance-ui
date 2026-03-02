@@ -226,10 +226,6 @@ function ProvenanceTree(d3, selector, _options) {
             .on('end', dragEnded);
     }
 
-    function color() {
-        return options.colors[options.colors.length * Math.random() << 0];
-    }
-
     function colors() {
         return [
             '#68bdf6', // light blue

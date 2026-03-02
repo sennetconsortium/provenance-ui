@@ -1,9 +1,9 @@
 import React, { useContext, useState, useEffect, useRef } from 'react'
-import AppContext from './context/AppContext'
-import ProvenanceUI from './lib/components/ProvenanceUI'
-import Legend from './lib/components/Legend'
-import DataConverterNeo4J from './lib/js/neo4j/DataConverterNeo4J'
-import {SELECTOR_ID} from "./lib/js/constants";
+import AppContext from '@/context/AppContext'
+import ProvenanceUI from '@/lib/components/ProvenanceUI'
+import Legend from '@/lib/components/Legend'
+import DataConverterNeo4J from '@/lib/js/neo4j/DataConverterNeo4J'
+import {SELECTOR_ID} from "@/lib/js/constants";
 
 function App() {
     const { contextData, options, loading } = useContext(AppContext)
@@ -15,7 +15,7 @@ function App() {
             initialized.current = true
             setData(contextData)
         }
-    }, [setData, contextData])
+    }, [setData, contextData, options.dontCheckInitialized])
 
     const toggleData = (e, hideActivity, selectorId) => {
         const ui = window.ProvenanceTreeD3[selectorId]

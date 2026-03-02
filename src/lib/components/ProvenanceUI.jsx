@@ -17,10 +17,6 @@ function ProvenanceUI({ children, data, options = {} }) {
     }
 
     useEffect(() => {
-        if (!options.noStyles) {
-            import (`../ProvenanceUI.css`)
-        }
-        
         addVisitedClass()
     });
 

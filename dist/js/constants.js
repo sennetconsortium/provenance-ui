@@ -1,22 +1,2 @@
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isEdge = exports.SELECTOR_ID = exports.SELECTORS = exports.CLASS_NAMES = void 0;
-const SELECTOR_ID = exports.SELECTOR_ID = 'provenanceTree';
-const isEdge = $el => {
-  return $el.data('node') === 'Edge';
-};
-exports.isEdge = isEdge;
-const CLASS_NAMES = exports.CLASS_NAMES = {
-  disabled: 'is-disabled',
-  hover: 'has-hover',
-  toggled: 'has-toggled'
-};
-const SELECTORS = exports.SELECTORS = {
-  legend: {
-    legendItem: '.js-legend__item',
-    legendTrigger: '.js-legend--trigger'
-  }
-};
+/** 2/27/2026, 1:19:04 PM | Provenance 3.0.0 | git+https://github.com/sennetconsortium/provenance-ui.git **/
+var __defProp=Object.defineProperty;var __getOwnPropDesc=Object.getOwnPropertyDescriptor;var __getOwnPropNames=Object.getOwnPropertyNames;var __hasOwnProp=Object.prototype.hasOwnProperty;var __export=(target,all)=>{for(var name in all)__defProp(target,name,{get:all[name],enumerable:!0})},__copyProps=(to,from,except,desc)=>{if(from&&typeof from=="object"||typeof from=="function")for(let key of __getOwnPropNames(from))!__hasOwnProp.call(to,key)&&key!==except&&__defProp(to,key,{get:()=>from[key],enumerable:!(desc=__getOwnPropDesc(from,key))||desc.enumerable});return to};var __toCommonJS=mod=>__copyProps(__defProp({},"__esModule",{value:!0}),mod);var constants_exports={};__export(constants_exports,{CLASS_NAMES:()=>CLASS_NAMES,SELECTORS:()=>SELECTORS,SELECTOR_ID:()=>SELECTOR_ID,isEdge:()=>isEdge});module.exports=__toCommonJS(constants_exports);const SELECTOR_ID="provenanceTree",isEdge=$el=>$el.data("node")==="Edge",CLASS_NAMES={disabled:"is-disabled",hover:"has-hover",toggled:"has-toggled"},SELECTORS={legend:{legendItem:".js-legend__item",legendTrigger:".js-legend--trigger"}};

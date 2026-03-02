@@ -106,7 +106,6 @@ const Legend = ({ children, colorMap, filterNodes = true, actionMap = {}, select
         const isHelp = (key) => key === helpLabel
         const isOther = (key) => otherLegend[key] !== undefined
         const hasFilter = (key) => otherLegend[key].filterValue !== undefined
-        const isHelpOrOther = (key) => isHelp(key) || isOther(key)
         const getColor = (key) => (typeof colors[key] === 'string') ? colors[key] : (colors[key].color || 'transparent')
         const keyToClassName = (key) => key.replaceAll(' ', '-')
         const getJsClassName = (key) => isHelp(key) ? 'js-legend--help' : isOther(key) && !hasFilter(key) ? `js-legend--${keyToClassName(key)}` : 'js-legend--trigger'
