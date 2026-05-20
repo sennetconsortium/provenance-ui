@@ -1,6 +1,6 @@
 {
   "name": "provenance-ui",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Provenance",
   "author": "lisabruney@pitt.edu",
   "keywords": [
@@ -53,11 +53,11 @@
     ]
   },
   "devDependencies": {
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint": "^10",
+    "eslint-config-next": "16.2.1",
     "loglevel": "^1.9.2",
     "prettier": "^3.8.1",
-    "next": "16.1.6",
+    "next": "16.2.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "stylus": "0.64.0",
