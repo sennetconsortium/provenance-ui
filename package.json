@@ -61,7 +61,7 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "stylus": "0.64.0",
-    "xac-esbuild": "github:x-atlas-consortia/xac-esbuild#1.0.0"
+    "xac-esbuild": "github:x-atlas-consortia/xac-esbuild#1.0.1"
   },
   "peerDependencies": {
     "react": ">=18 <20",
