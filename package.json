@@ -40,7 +40,7 @@
     "tabWidth": 4,
     "trailingComma": "none"
   },
- "browserslist": {
+  "browserslist": {
     "production": [
       ">0.2%",
       "not dead",
@@ -56,8 +56,8 @@
     "eslint": "^10",
     "eslint-config-next": "16.2.6",
     "loglevel": "^1.9.2",
-    "prettier": "^3.8.3",
     "next": "16.2.6",
+    "prettier": "^3.8.3",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "stylus": "0.64.0",
@@ -68,5 +68,3 @@
     "react-dom": ">=18 <20"
   }
 }
-
-
