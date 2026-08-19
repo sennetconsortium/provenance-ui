@@ -54,9 +54,9 @@
   },
   "devDependencies": {
     "eslint": "^10",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "16.2.11",
     "loglevel": "^1.9.2",
-    "next": "16.2.6",
+    "next": "16.2.11",
     "prettier": "^3.8.3",
     "react": "19.2.6",
     "react-dom": "19.2.6",
